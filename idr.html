@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pranto's Workspace v4.0</title>
+    <title>Pranto's Workspace v4.1</title>
     <link rel="icon" type="image/png" href="note.png"> 
     
     <!-- Fonts -->
@@ -42,6 +42,7 @@
 
             --accent: #06b6d4;
             --accent-grad: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            --danger-grad: linear-gradient(135deg, #ef4444, #b91c1c); /* New Red Gradient */
         }
 
         [data-bs-theme="light"] { 
@@ -91,7 +92,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
-        /* Navigation Menu (Original Style) */
+        /* Navigation Menu */
         .nav-center {
             position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
             display: flex; gap: 1rem;
@@ -145,15 +146,19 @@
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         /* Inputs */
-        .form-control {
+        .form-control, .form-select {
             background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); 
             color: var(--text-body); border-radius: 8px; font-family: monospace; font-size: 0.85rem;
             transition: 0.2s;
         }
-        .form-control:focus { 
+        .form-control:focus, .form-select:focus { 
             background: rgba(255,255,255,0.08); border-color: var(--accent); 
             box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2); color: var(--text-body); 
         }
+        /* Style for Select Option items (Dark mode fix) */
+        .form-select option { background-color: var(--bg-dark); color: var(--text-dark); }
+        [data-bs-theme="light"] .form-select option { background-color: var(--bg-light); color: var(--text-light); }
+
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; overflow-y: auto; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
@@ -167,6 +172,14 @@
             transition: 0.3s;
         }
         .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6); color: white; }
+
+        /* New Clear Button Style (Red Vibes) */
+        .btn-glow-danger {
+            background: var(--danger-grad); border: none; color: white; border-radius: 50px;
+            padding: 8px 24px; font-weight: 600; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            transition: 0.3s;
+        }
+        .btn-glow-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6); color: white; }
         
         .btn-icon { background: var(--glass-bg); border: 1px solid var(--border-color); color: var(--text-body); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-icon:hover { background: var(--accent); color: white; border-color: var(--accent); }
@@ -241,12 +254,13 @@
                 </div>
             </div>
             
-            <a href="index.html" class="btn-nav">Contact Us</a>
+            <a href="index.html" class="btn-nav">Contact</a>
         </div>
 
         <div class="d-flex align-items-center gap-2">
+            <!-- Clear button made larger and red -->
             <button id="processBtn" class="btn-glow"><i class="bi bi-lightning-charge-fill"></i> Extract</button>
-            <button id="clearBtn" class="btn-icon text-danger"><i class="bi bi-trash3"></i></button>
+             <button id="clearBtn" class="btn-glow-danger"><i class="bi bi-trash3"></i> Clear</button>
             <button id="themeToggle" class="btn-icon"><i class="bi bi-palette"></i></button>
         </div>
     </header>
@@ -272,10 +286,10 @@
                 <div id="eob-content" class="d-flex gap-4 align-items-center w-100 text-nowrap" style="font-family: var(--font-tech); font-weight: 600; font-size: 1.1rem;"></div>
             </div>
 
-            <!-- Input Grid (Updated Layout) -->
+            <!-- Input Grid -->
             <div class="row g-3 mb-4">
                 
-                <!-- 1. IDR Inputs (Center - Largest) -->
+                <!-- 1. IDR Inputs -->
                 <div class="col-lg-7 order-lg-2">
                     <div class="glass-card p-3 h-100">
                         <div class="row g-2">
@@ -303,7 +317,7 @@
                     </div>
                 </div>
 
-                <!-- 2. Updated EOB (Left) -->
+                <!-- 2. Updated EOB -->
                 <div class="col-lg-2 order-lg-1">
                     <div class="glass-card p-2 h-100 d-flex flex-column">
                         <span class="section-label text-primary ps-2">Updated EOB</span>
@@ -311,7 +325,7 @@
                     </div>
                 </div>
 
-                <!-- 3. EOB Breakdown (Right - Last) -->
+                <!-- 3. EOB Breakdown -->
                 <div class="col-lg-3 order-lg-3">
                     <div class="glass-card p-3 h-100 d-flex flex-column">
                         <span class="section-label text-info">EOB Breakdown</span>
@@ -337,14 +351,22 @@
                     <div class="tab-pane fade show active" id="tab-corr">
                         <div class="row g-4">
                             <div class="col-md-9">
-                                <textarea id="note_Text" class="form-control copyable no-scrollbar" rows="8" readonly onclick="copyToClipboard(this)" placeholder="Generated note will appear here..."></textarea>
+                                <textarea id="note_Text" class="form-control copyable no-scrollbar" rows="10" readonly onclick="copyToClipboard(this)" placeholder="Generated note will appear here..."></textarea>
                                 <div class="d-flex justify-content-end mt-1"><small class="text-muted fst-italic">*Click to copy</small></div>
                             </div>
+                            <!-- Updated User Info Panel -->
                             <div class="col-md-3">
+                                <!-- Generate Button on TOP -->
+                                <button id="genNoteBtn" class="btn-glow w-100 mb-3"><i class="bi bi-stars"></i> Generate</button>
+                                
                                 <span class="section-label">User Info</span>
+                                <!-- Shift Selection -->
+                                <select id="note_Shift" class="form-select mb-2">
+                                    <option value="Day">Day Shift (BDT)</option>
+                                    <option value="Night">Night Shift (US)</option>
+                                </select>
                                 <input type="text" id="note_Name" class="form-control mb-2" placeholder="Your Name (Required)">
                                 <input type="text" id="note_Initial" class="form-control mb-3" placeholder="Initial (Auto)">
-                                <button id="genNoteBtn" class="btn-glow w-100 mb-3"><i class="bi bi-stars"></i> Generate</button>
                                 
                                 <div id="adjustments" class="glass-card p-3 border-0 bg-primary bg-opacity-10 d-none">
                                     <div class="d-flex justify-content-between mb-1 text-info small"><span>Adj w/ PT:</span> <span id="adj-pt" class="fw-bold">--</span></div>
@@ -423,7 +445,24 @@
         // --- Formatters ---
         const fmtMoney = (n) => isNaN(n) ? '$0.00' : '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         const parseMoney = (s) => parseFloat((s||'').replace(/[$,\s]/g, '')) || 0;
-        const getDate = () => { const d = new Date(); return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${String(d.getFullYear()).slice(-2)}`; };
+        
+        // --- Updated Date Function (Shift Aware) ---
+        const getDate = () => {
+            const shift = document.getElementById('note_Shift').value;
+            // Day Shift = Asia/Dhaka, Night Shift = America/New_York
+            const timeZone = shift === 'Night' ? 'America/New_York' : 'Asia/Dhaka';
+            
+            try {
+                return new Date().toLocaleDateString('en-US', {
+                    timeZone: timeZone,
+                    year: '2-digit', month: '2-digit', day: '2-digit'
+                });
+            } catch (e) {
+                // Fallback to local if error
+                const d = new Date(); 
+                return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${String(d.getFullYear()).slice(-2)}`;
+            }
+        };
 
         // --- Parsing: EOB ---
         function parseEOB(txt) {
@@ -452,7 +491,7 @@
             return { tkt, clm, prov, billed, paid, ptResp, addl, coins, copay, deduc };
         }
 
-        // --- Parsing: IDR (Updated Logic for Addl Date) ---
+        // --- Parsing: IDR ---
         function parseIDR() {
             const allInputs = [
                 ...els.idr24.map(e => ({ v: e.value, m: '24' })),
@@ -475,15 +514,16 @@
                 const g = (i) => cols[i]?.trim() || '--';
 
                 const pmtDateVal = g(map.pd);
-                // LOGIC: If Date exists (not empty, not --) -> Received, else Waiting
                 const status = (pmtDateVal !== '--' && pmtDateVal !== '') ? 'Received' : 'Waiting';
 
                 rows.push({
                     idx: idx,
                     type: o.m === '26' ? '2026' : (o.m==='24'?'2024':'2022'),
                     ticket: g(map.t), idr: g(map.i), claim: g(map.c), cpt: g(map.cpt),
-                    wl: g(map.wl), addl: g(map.add), 
-                    addlStatus: status, // Logic Based on Date Column
+                    // WL initialized as empty as per request
+                    wl: '', 
+                    addl: g(map.add), 
+                    addlStatus: status, 
                     mediator: g(map.m)
                 });
             });
@@ -549,9 +589,9 @@
                 
                 const card = document.createElement('div');
                 card.className = 'idr-card glass-card shadow-sm p-2 mb-2';
-                // Additional Status based on Logic
                 const addlColor = r.addlStatus === 'Received' ? 'text-success' : 'text-warning';
 
+                // WL input is empty by default (r.wl was set to empty in parseIDR)
                 card.innerHTML = `
                     <div class="d-flex justify-content-between mb-2">
                         <span class="fw-bold text-primary small">#${r.idr}</span>
@@ -564,12 +604,12 @@
                     
                     <div class="mt-2 pt-2 border-top border-secondary border-opacity-10">
                         <div class="d-flex align-items-center justify-content-between mb-1">
-                            <span class="small opacity-75">Status</span>
-                            <input class="form-control form-control-sm py-0 w-50 text-end wl-in" value="${r.wl}" data-i="${i}" oninput="handleWL(this)">
+                            <span class="small opacity-75">Status (W/L/C)</span>
+                            <input class="form-control form-control-sm py-0 w-50 text-end wl-in" value="${r.wl}" placeholder="Empty" data-i="${i}" oninput="handleWL(this)">
                         </div>
                         <div class="d-flex align-items-center justify-content-between">
                             <span class="small opacity-75">Refund</span>
-                            <input class="form-control form-control-sm py-0 w-50 text-end ref-in" placeholder="Rec/Wait" data-i="${i}" onfocus="this.select()" oninput="handleRefund(this)">
+                            <input class="form-control form-control-sm py-0 w-50 text-end ref-in" placeholder="Disabled" disabled data-i="${i}" onfocus="this.select()" oninput="handleRefund(this)">
                         </div>
                     </div>
                 `;
@@ -588,114 +628,150 @@
                     document.querySelectorAll('[data-addl]').forEach(e=>e.classList.add('bg-mismatch'));
                 }
             }
-            // Trigger WL check
-            document.querySelectorAll('.wl-in').forEach(e=>handleWL(e));
         }
 
-        // --- Logic: Handling Inputs ---
-        window.handleWL = (el) => {
-            const v = el.value.toLowerCase();
-            const grp = el.closest('.idr-card');
-            const ref = grp.querySelector('.ref-in');
-            
-            if(v.includes('win') || v.includes('close')) {
-                ref.disabled = false;
-                if(v.includes('win')) ref.placeholder = "Required";
-            } else if(v.includes('lose')) {
-                ref.disabled = true; ref.value = ''; ref.placeholder = "Disabled";
-                ref.classList.remove('is-invalid');
-            }
-        };
+        // --- 1. Updated handleWL (Shortcuts & Input Handling) ---
+window.handleWL = (el) => {
+    let v = el.value.toLowerCase();
+    
+    // Shortcuts Logic: Automatically replace single letters with full words
+    if (v === 'w') el.value = 'WIN';
+    else if (v === 'l') el.value = 'LOSE';
+    else if (v === 'c') el.value = 'CLOSED';
+    
+    const newVal = el.value.toLowerCase();
+    const grp = el.closest('.idr-card');
+    const ref = grp.querySelector('.ref-in');
+    
+    // Logic:
+    // W = Win -> Refund Required
+    // L = Lose -> Refund Disabled
+    // C = Closed -> Refund Optional (Enabled but not strict)
+    
+    if (newVal.includes('win')) {
+        ref.disabled = false;
+        ref.placeholder = "Required";
+        ref.classList.remove('is-invalid');
+    } else if (newVal.includes('close')) {
+        ref.disabled = false;
+        ref.placeholder = "Optional";
+        ref.classList.remove('is-invalid');
+    } else if (newVal.includes('lose')) {
+        ref.disabled = true; 
+        ref.value = ''; 
+        ref.placeholder = "Disabled";
+        ref.classList.remove('is-invalid');
+    } else {
+        // If empty or other, disable by default
+        ref.disabled = true;
+        ref.value = '';
+        ref.placeholder = "Disabled";
+    }
+};
 
-        window.handleRefund = (el) => {
-            const v = el.value.toLowerCase();
-            if(v === 'r') el.value = 'Received';
-            if(v === 'w') el.value = 'Waiting';
-            if(el.value) el.classList.remove('is-invalid');
-        };
+window.handleRefund = (el) => {
+    const v = el.value.toLowerCase();
+    if (v === 'r') el.value = 'Received';
+    if (v === 'w') el.value = 'Waiting';
+    if (el.value) el.classList.remove('is-invalid');
+};
 
-        // --- Note Generation ---
-        document.getElementById('genNoteBtn').addEventListener('click', () => {
-            const nameEl = document.getElementById('note_Name');
-            if(!nameEl.value.trim()) { nameEl.classList.add('is-invalid'); setError("Name is required!"); return; }
-            nameEl.classList.remove('is-invalid');
-            setError(null);
+// --- Typewriter Effect Function ---
+function typeWriter(element, text, i = 0) {
+    if (i === 0) element.value = '';
+    if (i < text.length) {
+        element.value += text.charAt(i);
+        setTimeout(() => typeWriter(element, text, i + 1), 5); // Speed adjustment (5ms)
+    }
+}
 
-            const rows = [];
-            let error = false;
+// --- 2. Note Generation (Updated Logic with Smooth Text) ---
+document.getElementById('genNoteBtn').addEventListener('click', () => {
+    const nameEl = document.getElementById('note_Name');
+    if(!nameEl.value.trim()) { nameEl.classList.add('is-invalid'); return; }
+    nameEl.classList.remove('is-invalid');
 
-            document.querySelectorAll('.idr-card').forEach((card, i) => {
-                const wl = card.querySelector('.wl-in').value.toLowerCase();
-                const ref = card.querySelector('.ref-in').value.toLowerCase();
-                const org = globalData.idrRows[i];
+    const rows = [];
+    let error = false;
 
-                if(wl.includes('win') && !ref) {
-                    card.querySelector('.ref-in').classList.add('is-invalid');
-                    error = true;
-                }
+    document.querySelectorAll('.idr-card').forEach((card, i) => {
+        const wl = card.querySelector('.wl-in').value.toLowerCase();
+        const ref = card.querySelector('.ref-in').value.toLowerCase();
+        const org = globalData.idrRows[i];
 
-                rows.push({
-                    wl: wl, ref: ref,
-                    addl: org.addl,
-                    addlRec: org.addlStatus === 'Received',
-                    idr: org.idr, cpt: org.cpt, med: org.mediator
-                });
-            });
+        // Error Check: WIN must have refund status
+        if(wl.includes('win') && !ref) {
+            card.querySelector('.ref-in').classList.add('is-invalid');
+            error = true;
+        }
 
-            if(error) { setError("Refund status missing for WIN cases!"); return; }
-
-            // Init Logic
-            let init = document.getElementById('note_Initial').value.trim();
-            let allDone = true;
-            
-            rows.forEach(r => {
-                if(r.wl.includes('win')) {
-                    if(!r.ref.startsWith('r')) allDone = false;
-                    if(!r.addlRec) allDone = false;
-                } else if(r.wl.includes('close')) {
-                    if(!r.ref.startsWith('r')) allDone = false;
-                } else if(r.wl.includes('lose')) {
-                    if(!r.addlRec) allDone = false;
-                }
-            });
-
-            if(!init) init = allDone ? "FINAL REVIEW" : "IDR FOLLOW UP";
-
-            // Note Text
-            const e = globalData.eob || { clm:rows[0]?.claim||'N/A', billed:0, paid:0, ptResp:0 };
-            
-            let txt = `${getDate()}>${init}>${nameEl.value}>WORKING ON TRACKING SHEET. `;
-            txt += `CLAIM: ${e.clm}; TOTAL BILL ${fmtMoney(e.billed)}, INS PAID ${fmtMoney(e.paid)}, PT RESPONSIBLITY ${fmtMoney(e.ptResp)}. NEGOTIATION AND IDR DONE. `;
-            
-            rows.forEach(r => {
-                const wlUp = r.wl.toUpperCase();
-                if(wlUp.includes('CLOSE')) {
-                    txt += `${r.idr}: STATUS IS ${wlUp}. `;
-                    if(r.ref.startsWith('r')) txt += "WE RECEIVED FEE REFUND. ";
-                    else if(r.ref.startsWith('w')) txt += "WE ARE WAITING FOR FEE REFUND. ";
-                } else {
-                    txt += `${r.idr}: IDR SUBMITTED ON CPT ${r.cpt} TO MEDIATOR ${r.med}. STATUS IS ${wlUp} WITH ADDITIONAL ${r.addl}. `;
-                    txt += r.addlRec ? "WE RECEIVED ADDITIONAL PAYMENT. " : "WE ARE WAITING FOR ADDITIONAL PAYMENT. ";
-                    
-                    if(r.wl.includes('win')) {
-                        if(r.ref.startsWith('r')) txt += "WE RECEIVED FEE REFUND. ";
-                        else txt += "WE ARE WAITING FOR FEE REFUND. ";
-                    }
-                }
-            });
-
-            if(init === "FINAL REVIEW") {
-                txt += "NO FURTHER ACTION NEEDED. BALANCE TO BE ADJUSTED.";
-                document.getElementById('adjustments').classList.remove('d-none');
-                document.getElementById('adj-pt').innerText = fmtMoney(e.billed - (e.paid + e.ptResp));
-                document.getElementById('adj-nopt').innerText = fmtMoney(e.billed - e.paid);
-            } else {
-                txt += "WAITING TO COMPLETE THE IDR PROCESS BEFORE ADJUSTMENT.";
-                document.getElementById('adjustments').classList.add('d-none');
-            }
-
-            typeWriter(document.getElementById('note_Text'), txt.toUpperCase());
+        rows.push({
+            wl: wl, ref: ref,
+            addl: org.addl,
+            addlRec: org.addlStatus === 'Received',
+            idr: org.idr, cpt: org.cpt, med: org.mediator
         });
+    });
+
+    if(error) return;
+
+    // --- Updated Logic for Initial (Final Review vs Follow Up) ---
+    let init = document.getElementById('note_Initial').value.trim();
+    let allDone = true;
+    
+    rows.forEach(r => {
+        const isWin = r.wl.includes('win');
+        const isClose = r.wl.includes('close');
+        const isLose = r.wl.includes('lose');
+        
+        // Addl Logic: Win/Lose active hole Addl must be Received
+        if((isWin || isLose) && !r.addlRec) allDone = false;
+
+        // Refund Logic
+        if(isWin) {
+            if(!r.ref.startsWith('r')) allDone = false;
+        } else if(isClose) {
+            if(r.ref.startsWith('w')) allDone = false;
+        }
+    });
+
+    if(!init) init = allDone ? "FINAL REVIEW" : "IDR FOLLOW UP";
+
+    // Note Text Construction
+    const e = globalData.eob || { clm:rows[0]?.idr||'N/A', billed:0, paid:0, ptResp:0 };
+    let txt = `${getDate()}>${init}>${nameEl.value}>WORKING ON TRACKING SHEET. `;
+    txt += `CLAIM: ${e.clm}; TOTAL BILL ${fmtMoney(e.billed)}, INS PAID ${fmtMoney(e.paid)}, PT RESPONSIBLITY ${fmtMoney(e.ptResp)}. NEGOTIATION AND IDR DONE. `;
+    
+    rows.forEach(r => {
+        const wlUp = r.wl.toUpperCase();
+        
+        if(r.wl.includes('close')) {
+            txt += `${r.idr}: STATUS IS CLOSED. `;
+            if(r.ref.startsWith('r')) txt += "WE RECEIVED FEE REFUND. ";
+            else if(r.ref.startsWith('w')) txt += "WE ARE WAITING FOR FEE REFUND. ";
+        } 
+        else {
+            let statusTxt = r.wl.includes('win') ? "WIN" : (r.wl.includes('lose') ? "LOSE" : wlUp);
+            txt += `${r.idr}: IDR SUBMITTED ON CPT ${r.cpt} TO MEDIATOR ${r.med}. STATUS IS ${statusTxt} WITH ADDITIONAL ${r.addl}. `;
+            txt += r.addlRec ? "WE RECEIVED ADDITIONAL PAYMENT. " : "WE ARE WAITING FOR ADDITIONAL PAYMENT. ";
+            
+            if(r.wl.includes('win')) {
+                if(r.ref.startsWith('r')) txt += "WE RECEIVED FEE REFUND. ";
+                else txt += "WE ARE WAITING FOR FEE REFUND. ";
+            }
+        }
+    });
+
+    if(init === "FINAL REVIEW") {
+        txt += "NO FURTHER ACTION NEEDED. BALANCE TO BE ADJUSTED.";
+    } else {
+        txt += "WAITING TO COMPLETE THE IDR PROCESS BEFORE ADJUSTMENT.";
+    }
+
+    const noteBox = document.getElementById('note_Text');
+    // Calling Typewriter function for smooth text arrival
+    typeWriter(noteBox, txt.toUpperCase());
+});
 
         // --- Core Helpers ---
         function setError(msg) {
@@ -732,14 +808,23 @@
         }
 
         function initPersistent() {
-            ['note_Name','note_Initial'].forEach(id => {
+            // Added note_Shift to persistence
+            ['note_Name','note_Initial', 'note_Shift'].forEach(id => {
                 const e=document.getElementById(id);
-                e.value=localStorage.getItem(id)||'';
-                e.oninput=()=>localStorage.setItem(id,e.value);
+                if(e) {
+                    e.value = localStorage.getItem(id) || (id === 'note_Shift' ? 'Day' : '');
+                    // For select and inputs
+                    const evt = e.tagName === 'SELECT' ? 'change' : 'input';
+                    e.addEventListener(evt, () => localStorage.setItem(id, e.value));
+                }
             });
+            
+            // Clear functionality - skips Name, Initial AND Shift
             els.clear.addEventListener('click', () => {
                 document.querySelectorAll('textarea').forEach(t=>t.value='');
-                document.querySelectorAll('input:not([id*="note_Name"])').forEach(i=>i.value='');
+                document.querySelectorAll('input:not([id*="note_Name"]):not([id*="note_Initial"])').forEach(i=>i.value='');
+                // Shift select is also skipped here automatically as it's a select, not input/textarea
+                
                 els.eobBar.classList.remove('visible');
                 els.results.innerHTML='';
                 els.eobGrid.innerHTML = `<div class="text-center text-muted small opacity-50">Waiting for extraction...</div>`;
