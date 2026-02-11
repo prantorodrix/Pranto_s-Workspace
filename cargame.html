@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra-Realistic Highway Racer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505; 
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            perspective: 1000px;
+        }
+
+        /* Back Button Style */
+        #back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            transition: all 0.3s ease;
+            color: white;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+        }
+        #back-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        #dashboard {
+            width: 130px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, #111, #000);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        #game-container {
+            position: relative;
+            width: 260px; /* Rasta aro cikon kora hoyeche */
+            height: 98vh; 
+            background: #111;
+            border: 3px solid #222;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 1);
+        }
+
+        #road-area {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #181818;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 15px 15px;
+        }
+
+        .lane-marker {
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .lane-marker-1 { left: 25%; }
+        .lane-marker-2 { left: 50%; }
+        .lane-marker-3 { left: 75%; }
+
+        .road-dash {
+            position: absolute;
+            left: 50%;
+            width: 3px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-50%);
+        }
+
+        .guardrail {
+            position: absolute;
+            width: 5px;
+            height: 100%;
+            background: repeating-linear-gradient(#333, #333 15px, #111 15px, #111 30px);
+        }
+        .rail-left { left: 0; }
+        .rail-right { right: 0; }
+
+        .car {
+            position: absolute;
+            width: 42px; /* Gari choto kora hoyeche */
+            height: 80px; 
+            z-index: 50;
+            transition: left 0.18s ease-out, bottom 0.18s ease-out, transform 0.2s ease;
+        }
+
+        .tilt-left { transform: rotate(-10deg); }
+        .tilt-right { transform: rotate(10deg); }
+        .jump { transform: scale(1.3) translateY(-35px); filter: drop-shadow(0 30px 15px rgba(0,0,0,0.6)); }
+
+        .enemy {
+            position: absolute;
+            z-index: 10;
+        }
+
+        .car-shadow {
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 12px;
+            background: rgba(0,0,0,0.5);
+            filter: blur(6px);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.98);
+            padding: 30px 15px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 1000;
+            width: 80%;
+            border: 1px solid #444;
+            backdrop-filter: blur(15px);
+        }
+    </style>
+</head>
+<body>
+
+    <a href="idr.html" id="back-link" title="Back">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+
+    <div id="dashboard">
+        <div class="stat-card">
+            <p class="text-[8px] uppercase tracking-widest opacity-40 mb-1">Top Score</p>
+            <p id="high-score-val" class="text-lg font-bold text-sky-400">0</p>
+        </div>
+        <div class="stat-card">
+            <p class="text-[8px] uppercase tracking-widest opacity-40 mb-1">Current</p>
+            <p id="score-val" class="text-2xl font-black">0</p>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div id="road-area">
+            <div class="guardrail rail-left"></div>
+            <div class="guardrail rail-right"></div>
+            
+            <div class="lane-marker lane-marker-1"></div>
+            <div class="lane-marker lane-marker-2"></div>
+            <div class="lane-marker lane-marker-3"></div>
+
+            <!-- Player Car (Refined Size) -->
+            <div id="player" class="car">
+                <div class="car-shadow"></div>
+                <svg viewBox="0 0 80 140">
+                    <defs>
+                        <linearGradient id="bodyBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#0ea5e9" />
+                            <stop offset="50%" style="stop-color:#38bdf8" />
+                            <stop offset="100%" style="stop-color:#0284c7" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M15,25 Q15,5 40,5 Q65,5 65,25 L68,105 Q68,135 40,135 Q12,135 12,105 Z" fill="url(#bodyBlue)" />
+                    <path d="M22,45 Q40,35 58,45 L54,82 Q40,90 26,82 Z" fill="#020617" />
+                    <rect x="18" y="10" width="8" height="15" rx="3" fill="#fff" opacity="0.8" />
+                    <rect x="54" y="10" width="8" height="15" rx="3" fill="#fff" opacity="0.8" />
+                    <rect x="16" y="122" width="12" height="5" rx="2" fill="#ef4444" />
+                    <rect x="52" y="122" width="12" height="5" rx="2" fill="#ef4444" />
+                </svg>
+            </div>
+
+            <div id="game-over">
+                <p class="text-sky-500 font-bold tracking-widest text-[9px] mb-1 uppercase">Crashed</p>
+                <h1 id="final-score" class="text-5xl font-black mb-6">0</h1>
+                <button onclick="resetGame()" class="w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-sky-400 hover:text-white transition-all uppercase tracking-widest text-[9px]">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const roadArea = document.getElementById('road-area');
+        const player = document.getElementById('player');
+        const scoreVal = document.getElementById('score-val');
+        const highScoreVal = document.getElementById('high-score-val');
+        const gameOverScreen = document.getElementById('game-over');
+
+        const roadWidth = 260; 
+        const numLanes = 4;
+        const laneWidth = roadWidth / numLanes;
+        const pWidth = 42;
+        
+        const lanePositions = [
+            (laneWidth * 0.5) - (pWidth/2),
+            (laneWidth * 1.5) - (pWidth/2),
+            (laneWidth * 2.5) - (pWidth/2),
+            (laneWidth * 3.5) - (pWidth/2)
+        ];
+
+        let currentLane = 1;
+        let gameActive = true;
+        let isFlying = false;
+        let score = 0;
+        let highScore = localStorage.getItem('ultraRacerHighScore') || 0;
+        let enemies = [];
+        let roadDashes = [];
+        let speed = 11; 
+        let roadSpeed = 28;
+        let playerX = lanePositions[currentLane];
+        let playerY = 80;
+
+        highScoreVal.innerText = highScore;
+
+        function updatePlayer() {
+            player.style.left = playerX + 'px';
+            player.style.bottom = playerY + 'px';
+        }
+
+        for(let i=0; i<15; i++) {
+            let dash = document.createElement('div');
+            dash.classList.add('road-dash');
+            let y = i * 90;
+            dash.style.top = y + 'px';
+            roadArea.appendChild(dash);
+            roadDashes.push({ element: dash, y: y });
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if(!gameActive) return;
+
+            if (e.key === 'ArrowLeft' && currentLane > 0) {
+                currentLane--;
+                playerX = lanePositions[currentLane];
+                player.classList.add('tilt-left');
+                setTimeout(() => player.classList.remove('tilt-left'), 150);
+            }
+            if (e.key === 'ArrowRight' && currentLane < 3) {
+                currentLane++;
+                playerX = lanePositions[currentLane];
+                player.classList.add('tilt-right');
+                setTimeout(() => player.classList.remove('tilt-right'), 150);
+            }
+            if (e.key === 'ArrowUp' && playerY < 550) playerY += 35;
+            if (e.key === 'ArrowDown' && playerY > 40) playerY -= 35;
+
+            if (e.code === 'Space' && !isFlying) {
+                isFlying = true;
+                player.classList.add('jump');
+                setTimeout(() => { 
+                    isFlying = false; 
+                    player.classList.remove('jump'); 
+                }, 750);
+            }
+            updatePlayer();
+        });
+
+        function createEnemy() {
+            if (!gameActive) return;
+            const enemy = document.createElement('div');
+            enemy.classList.add('enemy');
+            const laneIdx = Math.floor(Math.random() * 4);
+            
+            const themes = [{b: '#ef4444'}, {b: '#ffffff'}, {b: '#475569'}, {b: '#eab308'}];
+            const t = themes[Math.floor(Math.random() * themes.length)];
+            
+            enemy.style.width = '40px';
+            enemy.style.height = '75px';
+            enemy.style.left = lanePositions[laneIdx] + 'px';
+            enemy.style.top = '-120px';
+            
+            enemy.innerHTML = `
+                <div class="car-shadow"></div>
+                <svg viewBox="0 0 80 140">
+                    <path d="M15,25 Q15,5 40,5 Q65,5 65,25 L68,105 Q68,135 40,135 Q12,135 12,105 Z" fill="${t.b}" />
+                    <path d="M22,45 Q40,35 58,45 L54,82 Q40,90 26,82 Z" fill="#111" />
+                </svg>`;
+            
+            roadArea.appendChild(enemy);
+            enemies.push({ element: enemy, y: -120 });
+        }
+
+        function gameLoop() {
+            if (!gameActive) return;
+
+            roadDashes.forEach(dash => {
+                dash.y += roadSpeed;
+                if (dash.y > window.innerHeight) dash.y = -90;
+                dash.element.style.top = dash.y + 'px';
+            });
+
+            const pRect = player.getBoundingClientRect();
+
+            enemies.forEach((enemy, index) => {
+                enemy.y += speed;
+                enemy.element.style.top = enemy.y + 'px';
+
+                const eRect = enemy.element.getBoundingClientRect();
+
+                if (!isFlying &&
+                    pRect.left < eRect.right - 10 &&
+                    pRect.right > eRect.left + 10 &&
+                    pRect.top < eRect.bottom - 10 &&
+                    pRect.bottom > eRect.top + 10
+                ) {
+                    endGame();
+                }
+
+                if (enemy.y > 1000) {
+                    enemy.element.remove();
+                    enemies.splice(index, 1);
+                    score++;
+                    scoreVal.innerText = score;
+                    if(score % 8 === 0) { speed += 0.4; roadSpeed += 0.5; }
+                }
+            });
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame() {
+            gameActive = false;
+            gameOverScreen.style.display = 'block';
+            document.getElementById('final-score').innerText = score;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('ultraRacerHighScore', highScore);
+                highScoreVal.innerText = highScore;
+            }
+            player.style.filter = 'grayscale(1) brightness(0.3)';
+        }
+
+        function resetGame() {
+            enemies.forEach(e => e.element.remove());
+            enemies = [];
+            score = 0; speed = 11; roadSpeed = 28;
+            currentLane = 1; playerY = 80;
+            playerX = lanePositions[currentLane];
+            scoreVal.innerText = '0';
+            gameActive = true;
+            gameOverScreen.style.display = 'none';
+            player.style.filter = 'none';
+            player.classList.remove('jump');
+            updatePlayer();
+            gameLoop();
+        }
+
+        updatePlayer();
+        setInterval(createEnemy, 1300);
+        gameLoop();
+    </script>
+</body>
+</html>
