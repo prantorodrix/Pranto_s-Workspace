@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultra Realistic Flappy Car</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{margin:0;overflow:hidden;background:#0ea5e9;font-family:'Inter',sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;color:white;}
+#back-link{position:absolute;top:20px;left:20px;width:45px;height:45px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:50%;display:flex;justify-content:center;align-items:center;z-index:200;transition:0.3s;color:white;text-decoration:none;backdrop-filter:blur(8px);}
+#back-link:hover{background:rgba(255,255,255,0.4);transform:scale(1.1);}
+#dashboard{position:absolute;top:20px;right:20px;width:120px;display:flex;flex-direction:column;gap:10px;z-index:100;}
+.stat-card{background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);padding:8px;border-radius:12px;text-align:center;backdrop-filter:blur(10px);}
+#game-container{position:relative;width:350px;height:90vh;background:linear-gradient(to bottom, #0284c7, #38bdf8, #bae6fd);border:4px solid #fff;border-radius:24px;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,0.4);}
+
+/* Parallax Clouds */
+.cloud-layer{position:absolute;width:200%;height:100%;top:0;left:0;pointer-events:none;}
+.cloud{position:absolute;background:rgba(255,255,255,0.8);border-radius:50px;filter:blur(4px);z-index:1;}
+
+/* Pipe Styling with Gradients */
+.pipe{position:absolute;width:65px;background:linear-gradient(90deg, #15803d, #22c55e, #15803d);border:2px solid #052e16;z-index:5;box-shadow:inset 0 0 15px rgba(0,0,0,0.3);}
+.pipe-cap{position:absolute;width:75px;height:30px;background:linear-gradient(90deg, #15803d, #22c55e, #15803d);border:2px solid #052e16;left:-7px;border-radius:4px;box-shadow:0 4px 10px rgba(0,0,0,0.3);}
+
+/* Exhaust Smoke Effect */
+.smoke{position:absolute;width:8px;height:8px;background:rgba(255,255,255,0.6);border-radius:50%;pointer-events:none;z-index:9;}
+
+/* Player Car Bird */
+#player{position:absolute;width:55px;height:40px;z-index:10;filter:drop-shadow(0 10px 15px rgba(0,0,0,0.3));}
+
+/* Screen Shake Effect */
+.shake{animation:shake 0.4s ease-in-out;}
+@keyframes shake{0%{transform:translate(0,0);}20%{transform:translate(-10px,5px);}40%{transform:translate(10px,-5px);}60%{transform:translate(-10px,5px);}80%{transform:translate(10px,-5px);}100%{transform:translate(0,0);}}
+
+#game-over{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(2, 6, 23, 0.95);padding:35px;border-radius:24px;text-align:center;display:none;z-index:1000;width:85%;border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(15px);}
+</style>
+</head>
+<body>
+<a href="idr.html" id="back-link" title="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></a>
+
+<div id="dashboard">
+<div class="stat-card"><p class="text-[10px] uppercase opacity-60 tracking-widest">High</p><p id="high-score-val" class="text-xl font-bold text-sky-400">0</p></div>
+<div class="stat-card"><p class="text-[10px] uppercase opacity-60 tracking-widest">Score</p><p id="score-val" class="text-4xl font-black">0</p></div>
+</div>
+
+<div id="game-container">
+<div class="cloud-layer" id="clouds"></div>
+<div id="player">
+<svg viewBox="0 0 100 70">
+<defs><linearGradient id="carGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#38bdf8"/><stop offset="100%" style="stop-color:#0284c7"/></linearGradient></defs>
+<path d="M10,35 Q10,10 50,10 Q90,10 90,35 L85,60 Q50,70 15,60 Z" fill="url(#carGrad)" stroke="white" stroke-width="1.5"/>
+<rect x="55" y="15" width="25" height="20" rx="5" fill="#020617"/> <!-- Glass -->
+<rect x="15" y="20" width="10" height="15" rx="2" fill="white" opacity="0.6"/> <!-- Headlight -->
+<rect x="15" y="45" width="12" height="6" rx="2" fill="#ef4444"/> <!-- Exhaust area -->
+</svg>
+</div>
+
+<div id="game-over">
+<p class="text-sky-400 font-bold text-xs tracking-tighter mb-2 uppercase">System Failure</p>
+<h1 id="final-score" class="text-7xl font-black mb-8">0</h1>
+<button onclick="resetGame()" class="w-full bg-white text-black font-bold py-4 rounded-2xl hover:bg-sky-400 hover:text-white transition-all uppercase tracking-widest text-xs">Reboot Engine</button>
+</div>
+</div>
+
+<script>
+const container=document.getElementById('game-container'),player=document.getElementById('player'),scoreVal=document.getElementById('score-val'),highScoreVal=document.getElementById('high-score-val'),gameOverScreen=document.getElementById('game-over'),cloudsLayer=document.getElementById('clouds');
+
+let gravity=0.28,velocity=0,gap=180,pipeSpeed=2.8,score=0,gameActive=true,pipes=[],highScore=localStorage.getItem('flappyCarHigh')||0;
+let playerY=250,playerX=50,smokeParticles=[];
+
+highScoreVal.innerText=highScore;
+
+/* Background Clouds Initialization */
+function initClouds(){
+for(let i=0;i<6;i++){
+let c=document.createElement('div');c.className='cloud';
+let w=80+Math.random()*100;c.style.width=w+'px';c.style.height=(w/2.5)+'px';
+c.style.top=(Math.random()*60)+'%';c.style.left=(Math.random()*100)+'%';
+cloudsLayer.appendChild(c);
+}
+}
+
+/* Smoke Effect Logic */
+function createSmoke(){
+if(!gameActive)return;
+const s=document.createElement('div');s.className='smoke';
+s.style.left=(playerX+5)+'px';s.style.top=(playerY+30)+'px';
+container.appendChild(s);
+smokeParticles.push({el:s,x:playerX+5,y:playerY+30,o:0.6,s:2});
+}
+
+function updateSmoke(){
+smokeParticles.forEach((s,i)=>{
+s.x-=2;s.y+=(Math.random()-0.5)*2;s.o-=0.02;s.s+=0.1;
+s.el.style.left=s.x+'px';s.el.style.top=s.y+'px';s.el.style.opacity=s.o;
+s.el.style.transform=`scale(${s.s})`;
+if(s.o<=0){s.el.remove();smokeParticles.splice(i,1);}
+});
+}
+
+/* Controls */
+function jump(){if(!gameActive)return;velocity=-6.5;player.style.transform="rotate(-25deg)";}
+window.addEventListener('keydown',e=>{if(e.code==='Space'||e.key==='ArrowUp')jump();});
+container.addEventListener('mousedown',jump);
+
+/* Pipe Creation */
+function createPipe(){
+if(!gameActive)return;
+const minH=60,maxH=container.offsetHeight-gap-minH;
+const tH=Math.floor(Math.random()*(maxH-minH+1))+minH;
+const pX=400;
+
+const tP=document.createElement('div');tP.className='pipe';tP.style.height=tH+'px';tP.style.top='0';tP.style.left=pX+'px';
+const tC=document.createElement('div');tC.className='pipe-cap';tC.style.bottom='-5px';tP.appendChild(tC);
+
+const bP=document.createElement('div');bP.className='pipe';bP.style.height=(container.offsetHeight-tH-gap)+'px';bP.style.bottom='0';bP.style.left=pX+'px';
+const bC=document.createElement('div');bC.className='pipe-cap';bC.style.top='-5px';bP.appendChild(bC);
+
+container.appendChild(tP);container.appendChild(bP);
+pipes.push({t:tP,b:bP,x:pX,passed:false});
+}
+
+/* Main Animation Loop */
+function loop(){
+if(!gameActive)return;
+velocity+=gravity;playerY+=velocity;
+if(playerY<0){playerY=0;velocity=0;}
+if(playerY+40>container.offsetHeight)endGame();
+
+player.style.top=playerY+'px';player.style.left=playerX+'px';
+if(velocity>2)player.style.transform=`rotate(${Math.min(velocity*4, 40)}deg)`;
+
+createSmoke();updateSmoke();
+
+pipes.forEach((p,i)=>{
+p.x-=pipeSpeed;p.t.style.left=p.x+'px';p.b.style.left=p.x+'px';
+const pR=player.getBoundingClientRect();const tR=p.t.getBoundingClientRect();const bR=p.b.getBoundingClientRect();
+if(pR.right>tR.left+8&&pR.left<tR.right-8&&(pR.top<tR.bottom-5||pR.bottom>bR.top+5))endGame();
+if(!p.passed&&p.x<playerX){p.passed=true;score++;scoreVal.innerText=score;if(score%5===0)pipeSpeed+=0.15;}
+if(p.x<-80){p.t.remove();p.b.remove();pipes.splice(i,1);}
+});
+
+if(pipes.length===0||pipes[pipes.length-1].x<200)createPipe();
+requestAnimationFrame(loop);
+}
+
+function endGame(){
+if(!gameActive)return;
+gameActive=false;
+container.classList.add('shake');
+setTimeout(()=>container.classList.remove('shake'),400);
+gameOverScreen.style.display='block';
+document.getElementById('final-score').innerText=score;
+if(score>highScore){highScore=score;localStorage.setItem('flappyCarHigh',highScore);highScoreVal.innerText=highScore;}
+player.style.filter='grayscale(1) brightness(0.4)';
+}
+
+function resetGame(){
+pipes.forEach(p=>{p.t.remove();p.b.remove();});
+smokeParticles.forEach(s=>s.el.remove());
+pipes=[];smokeParticles=[];score=0;velocity=0;playerY=250;pipeSpeed=2.8;scoreVal.innerText='0';gameActive=true;
+gameOverScreen.style.display='none';player.style.filter='none';
+loop();
+}
+
+initClouds();
+loop();
+</script>
+</body>
+</html>
