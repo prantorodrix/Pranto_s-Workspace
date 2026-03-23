@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pranto's Workspace - IDR Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; overflow-x: hidden; }
+        .glass-card { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-radius: 8px; }
+        .gradient-btn { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); transition: all 0.2s; }
+        .gradient-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-content { animation: fadeInUp 0.4s ease forwards; }
+        .copy-toast { visibility: hidden; background: #1e293b; color: white; padding: 10px 20px; border-radius: 6px; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; font-size: 13px; }
+        .show-toast { visibility: visible; animation: fadeInOut 2.5s; }
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 20%, 80% { opacity: 1; } }
+        textarea { scrollbar-width: thin; resize: none; }
+        .compact-input { padding: 6px 10px; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 6px; outline: none; width: 100%; }
+        .compact-input:focus { border-color: #6366f1; ring: 1px solid #6366f1; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white px-6 py-2 flex items-center justify-between border-b sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="bg-indigo-600 p-1.5 rounded-lg text-white"><i class="fas fa-file-medical"></i></div>
+            <h1 class="text-md font-bold tracking-tight">PRANTO'S <span class="text-indigo-600">WORKSPACE</span></h1>
+        </div>
+
+        <!-- Home Button -->
+        <div class="absolute left-1/2 -translate-x-1/2">
+            <a href="index.html" class="flex items-center gap-2 px-4 py-1.5 rounded-full hover:bg-slate-100 text-slate-600 font-bold text-sm transition-all border border-slate-200">
+                <i class="fas fa-home"></i> HOME
+            </a>
+        </div>
+
+        <div class="flex gap-2">
+            <button onclick="extractData()" class="px-4 py-1.5 bg-indigo-600 text-white rounded-md font-bold text-xs uppercase hover:bg-indigo-700 transition-colors shadow-sm">
+                Extract
+            </button>
+            <button onclick="clearForm()" class="px-4 py-1.5 bg-slate-100 text-slate-600 rounded-md font-bold text-xs uppercase hover:bg-slate-200 transition-colors">
+                Clear
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 p-3 grid grid-cols-12 gap-3 max-w-[1700px] mx-auto w-full">
+        
+        <!-- Sidebar -->
+        <aside class="col-span-12 lg:col-span-2 space-y-3">
+            <div class="glass-card p-3 sticky top-16">
+                <h3 class="text-[10px] font-bold text-slate-400 uppercase mb-2 border-b pb-1">Extracted</h3>
+                <div class="space-y-2">
+                    <div>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">Facility</p>
+                        <p id="resFacility" class="text-[11px] font-bold text-slate-700 truncate">-</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">EM Code</p>
+                        <p id="resEM" class="text-[11px] font-bold text-indigo-600">-</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">CPT Codes</p>
+                        <div id="resCPTs" class="text-[10px] font-medium text-slate-600 leading-tight mt-0.5">-</div>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-t">
+                    <h3 class="text-[9px] font-bold text-red-400 uppercase mb-1">Medicine</h3>
+                    <div id="medicineCodes" class="flex flex-wrap gap-1"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Body -->
+        <div class="col-span-12 lg:col-span-10 space-y-3">
+            
+            <!-- Horizontal Inputs -->
+            <div class="grid grid-cols-12 gap-3">
+                <div class="col-span-12 lg:col-span-4 glass-card p-2.5">
+                    <label class="text-[9px] font-bold text-indigo-500 uppercase px-1">1. EOB Text</label>
+                    <textarea id="eobInput" class="w-full h-20 mt-1 p-2 text-[11px] border rounded bg-slate-50 focus:bg-white outline-none" placeholder="Paste data..."></textarea>
+                </div>
+
+                <div class="col-span-12 lg:col-span-5 glass-card p-2.5">
+                    <label class="text-[9px] font-bold text-amber-500 uppercase px-1">2. Case Details</label>
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                        <input id="drgCode" type="text" placeholder="DRG Code" class="compact-input">
+                        <input id="disputeId" type="text" placeholder="Dispute ID" class="compact-input">
+                        <div class="col-span-2 flex flex-col">
+                            <label class="text-[8px] text-slate-400 ml-1">Resubmission Reason (For Reference)</label>
+                            <input id="resubReason" type="text" class="compact-input" value="DRG Code review's">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-12 lg:col-span-3 glass-card p-2.5 flex flex-col justify-between">
+                    <div>
+                        <label class="text-[9px] font-bold text-cyan-500 uppercase px-1">3. Signature</label>
+                        <input id="userName" type="text" placeholder="Your Name" class="compact-input mt-1">
+                    </div>
+                    <button onclick="generateEmail()" class="w-full py-2 gradient-btn text-white text-[11px] font-bold rounded-lg uppercase shadow-md">
+                        Generate Email
+                    </button>
+                </div>
+            </div>
+
+            <!-- Email Output -->
+            <div class="glass-card flex flex-col overflow-hidden">
+                <div class="bg-slate-50 border-b p-2 px-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Subject</span>
+                        <div id="subjectText" onclick="copyRichText('subjectText')" class="text-xs font-bold text-slate-700 cursor-pointer hover:text-indigo-600">Waiting for generation...</div>
+                    </div>
+                    <div class="text-[9px] text-slate-400 font-medium italic">Click inside to copy as formatted text</div>
+                </div>
+                
+                <div id="emailContainer" class="p-6 bg-white min-h-[350px] cursor-pointer hover:bg-slate-50 transition-colors overflow-auto" onclick="copyRichText('emailOutput')">
+                    <div id="emailOutput" class="text-[13px] leading-relaxed text-slate-800"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="copy-toast">Formatted text copied!</div>
+
+    <script>
+        let extractedData = { facility: "", emCode: "", cptCodes: [], medicineCodes: [] };
+
+        window.onload = () => {
+            const savedName = localStorage.getItem('userName');
+            if (savedName) document.getElementById('userName').value = savedName;
+        };
+
+        document.getElementById('userName').addEventListener('input', (e) => {
+            localStorage.setItem('userName', e.target.value);
+        });
+
+        function extractData() {
+            const input = document.getElementById('eobInput').value;
+            if (!input) return;
+            const facilityMatch = input.match(/Payee Name\s+([^\n\r]+)/i) || input.match(/Billing Provider Name\s+([^\n\r]+)/i) || input.match(/Patient Name\s+([^\n\r]+)/i);
+            extractedData.facility = facilityMatch ? facilityMatch[1].trim() : "FACILITY NAME";
+            const codes = [...input.matchAll(/HCPCS\s+([A-Z0-9]+)/gi)].map(m => m[1]);
+            extractedData.cptCodes = []; extractedData.medicineCodes = []; extractedData.emCode = "";
+            codes.forEach(code => {
+                if (code.startsWith('J') || code.startsWith('Q')) {
+                    if (!extractedData.medicineCodes.includes(code)) extractedData.medicineCodes.push(code);
+                } else {
+                    if (!extractedData.cptCodes.includes(code)) extractedData.cptCodes.push(code);
+                    if (code.startsWith('9928')) extractedData.emCode = code;
+                }
+            });
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('resFacility').innerText = extractedData.facility || '-';
+            document.getElementById('resEM').innerText = extractedData.emCode || '-';
+            document.getElementById('resCPTs').innerText = extractedData.cptCodes.join(', ') || '-';
+            const medDiv = document.getElementById('medicineCodes');
+            medDiv.innerHTML = extractedData.medicineCodes.map(c => `<span class="bg-red-50 text-red-500 border border-red-100 px-1.5 py-0.5 rounded text-[9px] font-bold">${c}</span>`).join('');
+        }
+
+        function generateEmail() {
+            const drg = document.getElementById('drgCode').value || "153";
+            const disp = document.getElementById('disputeId').value || "DISP-5451135";
+            const name = document.getElementById('userName').value || "Shorna";
+            const facility = extractedData.facility || "FACILITY NAME";
+            const emCode = extractedData.emCode || "99284";
+            const allCpts = extractedData.cptCodes.length > 0 ? extractedData.cptCodes.join(', ') : "99284, 0563U, 71046, 87880, 94640, 96372";
+
+            document.getElementById('subjectText').innerHTML = `<b>Sub: Request to Review ${disp}</b>`;
+
+            const body = `
+<div class="space-y-4">
+    <p><b>Sub: Request to Review ${disp}</b></p>
+    <p><b>Dear IDR Reviewer,</b></p>
+    <p>We are in receipt of your notice regarding the above-referenced dispute (<b>${disp}</b>), which indicated that the claim should be resubmitted under <b>DRG code ${drg}</b>. We respectfully object and submit this formal clarification that <b>DRG methodology is not applicable</b> to this claim.</p>
+    
+    <p><b>1. Facility Status and Billing Basis</b><br>
+    <b>${facility}</b> is a licensed <b>freestanding emergency department (FSED)</b>, operating solely on an <b>outpatient basis</b>. Our claims are appropriately billed under <b>CPT/HCPCS codes</b> (e.g., ${allCpts}), not under DRG methodology.</p>
+    
+    <p><b>2. Inapplicability of DRG Coding</b><br>
+    <b>DRG (Diagnosis Related Group)</b> codes are strictly intended for <b>inpatient hospital billing</b>. Federal regulations and the <b>No Surprises Act (NSA)</b> require that <b>outpatient emergency services—including those rendered by FSEDs—be billed and adjudicated using the appropriate CPT or HCPCS codes</b>, not DRGs.</p>
+    
+    <p>This policy is clearly outlined by the <b>Centers for Medicare & Medicaid Services (CMS)</b>:<br>
+    The claim in question was billed using <b>procedure code ${emCode}</b>, consistent with outpatient emergency facility billing, as documented on the attached <b>BCBS EOB</b>. The assignment or requirement of a DRG code for an outpatient FSED claim directly contradicts both <b>CMS technical guidance and the NSA statutory framework</b>.</p>
+    
+    <p><b>3. NSA Compliance Requirements</b><br>
+    • <b>45 C.F.R. §149.140(a)(12):</b> Requires payers to disclose the QPA for each CPT/HCPCS code billed. Substituting a lump-sum DRG payment fails to satisfy this requirement.<br>
+    • <b>45 C.F.R. §149.510(c)(4)(iii):</b> Arbitrators must consider patient acuity, provider training, and the specific services rendered—factors that cannot be evaluated if the dispute is forced into a DRG structure.<br>
+    • <b>45 C.F.R. §149.510(a)(2)(i):</b> Explicitly includes services provided in independent freestanding emergency departments within the NSA’s scope of protection.</p>
+    
+    <p>The claim in question was billed using <b>procedure code ${emCode}</b>, consistent with outpatient emergency facility billing, as shown on the <b>EOB from Blue Cross Blue Shield</b>. The assignment or requirement of a DRG code for an outpatient FSED claim contradicts both CMS guidance and the <b>NSA statutory framework</b>.</p>
+    
+    <p>We respectfully request the dispute be reviewed under the applicable outpatient billing framework, based on the original submitted CPT/HCPCS codes. Further, we request BCBS and the certified IDR entity align all actions with established CMS technical guidance and NSA statutory language regarding facility type and coding requirements.</p>
+    
+    <p><b>Thank You</b><br>
+    <b>${name}</b></p>
+</div>`;
+
+            const output = document.getElementById('emailOutput');
+            output.innerHTML = body;
+            output.parentElement.classList.remove('animate-content');
+            void output.offsetWidth; // Trigger reflow
+            output.parentElement.classList.add('animate-content');
+        }
+
+        async function copyRichText(id) {
+            const el = document.getElementById(id);
+            if (!el.innerHTML || el.innerText.includes("Waiting")) return;
+            
+            try {
+                const type = "text/html";
+                const blob = new Blob([el.innerHTML], { type });
+                const data = [new ClipboardItem({ [type]: blob, "text/plain": new Blob([el.innerText], {type: "text/plain"}) })];
+                await navigator.clipboard.write(data);
+                showToast();
+            } catch (err) {
+                // Fallback for simple copy
+                const range = document.createRange();
+                range.selectNode(el);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                showToast();
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "copy-toast show-toast";
+            setTimeout(() => { toast.className = "copy-toast"; }, 2500);
+        }
+
+        function clearForm() {
+            document.getElementById('eobInput').value = "";
+            document.getElementById('drgCode').value = "";
+            document.getElementById('disputeId').value = "";
+            document.getElementById('emailOutput').innerHTML = "";
+            document.getElementById('subjectText').innerHTML = "Waiting for generation...";
+            extractedData = { facility: "", emCode: "", cptCodes: [], medicineCodes: [] };
+            updateUI();
+        }
+    </script>
+</body>
+</html>
