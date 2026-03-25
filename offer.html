@@ -63,7 +63,7 @@
             <input type="text" id="userName" class="input-field" placeholder="Name..." oninput="filterData()">
         </div>
 
-        <div class="flex-grow min-w-[150px]"><span class="label-title">Input Data</span><input type="text" id="mainInput" class="input-field" placeholder="Paste Data..." oninput="filterData()"></div>
+        <div class="flex-grow min-w-[150px]"><span class="label-title">Input Data</span><input type="text" id="mainInput" class="input-field" placeholder="Paste Data (e.g. DISP-5540137 C215874)..." oninput="filterData()"></div>
         
         <div class="flex flex-wrap gap-1.5 flex-grow">
             <div class="w-[80px]"><span class="label-title">Dispute</span><div id="outDisp" class="output-box" onclick="copyText(this)">---</div></div>
@@ -145,7 +145,8 @@
             let raw = document.getElementById('mainInput').value.trim();
             let name = document.getElementById('userName').value.trim();
             
-            let tickets = [...new Set((raw.match(/MID[0-9A-Z]+/gi) || raw.match(/ODE[0-9A-Z]+/gi) || raw.match(/[0-9]{8,}/g) || []).map(t => t.toUpperCase()))];
+            // Fixed Ticket Extraction: Matches MID, ODE, C followed by numbers, or pure 8+ digits
+            let tickets = [...new Set((raw.match(/MID[0-9A-Z]+/gi) || raw.match(/ODE[0-9A-Z]+/gi) || raw.match(/C[0-9]{5,}/gi) || raw.match(/[0-9]{8,}/g) || []).map(t => t.toUpperCase()))];
             let disp = (raw.match(/DISP-[0-9A-Z]+/i) || ['---'])[0].toUpperCase();
             let date = getFormattedDate();
             
@@ -172,7 +173,8 @@
                 });
                 
                 if(isValid) {
-                    document.getElementById('outNote').innerText = `${date}>IDR FOLLOW UP>${name.toUpperCase()}>RECEIVED NOTIFICATION THAT OFFER LETTER NEEDED. SUBMITTED OFFER LETTER THROUGH LINK PROVIDED IN FEDERAL IDR EMAIL. PDF COPY OF NOTICE OF OFFER PRINTED AND TO BE UPLOADED INTO CENTRICITY. DISPUTE ID# ${disp}.`;
+                    const ticketList = tickets.join(', ');
+                    document.getElementById('outNote').innerText = `${date}>IDR FOLLOW UP>${name.toUpperCase()}>RECEIVED NOTIFICATION THAT OFFER LETTER NEEDED. SUBMITTED OFFER LETTER THROUGH LINK PROVIDED IN FEDERAL IDR EMAIL. PDF COPY OF NOTICE OF OFFER PRINTED AND TO BE UPLOADED INTO CENTRICITY. DISPUTE ID# ${disp}. TICKETS: ${ticketList}.`;
                 } else {
                     document.getElementById('outNote').innerText = '--- (NAME REQUIRED)';
                 }
@@ -192,7 +194,7 @@
         function saveToTable() {
             if (!validateInput()) return;
             let raw = document.getElementById('mainInput').value.trim();
-            let tickets = [...new Set((raw.match(/MID[0-9A-Z]+/gi) || raw.match(/ODE[0-9A-Z]+/gi) || raw.match(/[0-9]{8,}/g) || []).map(t => t.toUpperCase()))];
+            let tickets = [...new Set((raw.match(/MID[0-9A-Z]+/gi) || raw.match(/ODE[0-9A-Z]+/gi) || raw.match(/C[0-9]{5,}/gi) || raw.match(/[0-9]{8,}/g) || []).map(t => t.toUpperCase()))];
             let disp = (raw.match(/DISP-[0-9A-Z]+/i) || ['---'])[0].toUpperCase();
             let date = document.getElementById('outDate').innerText;
             let note = document.getElementById('outNote').innerText;
