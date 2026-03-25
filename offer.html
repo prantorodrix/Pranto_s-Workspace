@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pranto's Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background:#f0f4f8; font-family:'Segoe UI',sans-serif; overflow-x:hidden; padding:10px; }
+        .card { background:#fff; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,0.05); padding:10px; }
+        .input-field { border:1px solid #e2e8f0; border-radius:5px; width:100%; padding:5px 8px; font-size:11px; outline:none; transition: all 0.3s; }
+        .input-error { border: 2px solid #ef4444 !important; background: #fef2f2; }
+        .label-title { color:#5c67f2; font-weight:700; font-size:8px; text-transform:uppercase; margin-bottom:2px; display:block; }
+        
+        .output-box { background:#f8fafc; border:1px dashed #cbd5e1; border-radius:5px; padding:5px 8px; font-size:10px; color:#475569; cursor:pointer; min-height:30px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition: 0.2s; }
+        .output-box:hover { background: #f1f5f9; border-color: #94a3b8; }
+        .output-box.copied { background:#dcfce7!important; border: 1px solid #22c55e!important; color:#166534!important; font-weight: bold; }
+        
+        .save-btn { background:linear-gradient(135deg,#4facfe,#00f2fe); color:#fff; border-radius:5px; font-weight:700; height:32px; padding:0 15px; font-size:10px; text-transform:uppercase; transition: 0.2s; }
+        .save-btn:disabled { background: #cbd5e1; cursor: not-allowed; opacity: 0.6; }
+        
+        .excel-btn { background:#166534; color:#fff; border-radius:5px; font-weight:700; padding:8px 15px; font-size:10px; text-transform:uppercase; display: flex; align-items: center; gap: 6px; }
+        .clear-btn { background:#be185d; color:#fff; border-radius:5px; font-weight:700; padding:8px 15px; font-size:10px; text-transform:uppercase; }
+        .restore-btn { background:#6366f1; color:#fff; border-radius:5px; font-weight:700; padding:8px 15px; font-size:10px; text-transform:uppercase; }
+
+        .table-container { max-height:calc(100vh - 280px); overflow-y:auto; margin-top:10px; }
+        th { position:sticky; top:0; background:#f8fafc; font-size:9px; color:#94a3b8; padding:6px; border-bottom:1px solid #e2e8f0; text-transform:uppercase; z-index: 10; }
+        td { padding:5px 8px; font-size:10px; border-bottom:1px solid #f1f5f9; }
+        
+        .id-box { background:#eef2ff; color:#4338ca; font-weight:800; text-align:center; width:32px; height:32px; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:11px; border: 1px solid #e0e7ff; }
+        .dynamic-container { display: flex; flex-direction: column; gap: 4px; }
+
+        @keyframes fadeInRow {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-row { animation: fadeInRow 0.4s ease-out forwards; }
+        
+        .nav-link { font-size: 10px; font-weight: 700; color: #64748b; transition: 0.2s; text-transform: uppercase; }
+        .nav-link:hover { color: #5c67f2; }
+    </style>
+</head>
+<body>
+    <header class="flex justify-between items-center mb-2 px-2 bg-white p-2 rounded-lg shadow-sm">
+        <div class="font-black text-indigo-600 text-sm tracking-tight">PRANTO'S WORKSPACE</div>
+        
+        <!-- Navigation Menu -->
+        <nav class="flex gap-6">
+            <a href="Index.html" class="nav-link flex items-center gap-1"><i class="fa-solid fa-house-chimney"></i> Home</a>
+            <span class="nav-link text-indigo-500 border-b-2 border-indigo-500">Offer System</span>
+        </nav>
+
+        <div id="errorMsg" class="text-red-500 font-bold text-[10px] hidden animate-pulse underline">NAME REQUIRED FOR NOTE!</div>
+    </header>
+
+    <div class="card flex flex-wrap items-start gap-2">
+        <div class="w-[32px]"><span class="label-title">SL</span><div id="slDisplay" class="id-box">1</div></div>
+        
+        <!-- Name Input -->
+        <div class="w-[120px]">
+            <span class="label-title">Analyst Name</span>
+            <input type="text" id="userName" class="input-field" placeholder="Enter Name..." oninput="filterData()">
+        </div>
+
+        <div class="flex-grow min-w-[200px]"><span class="label-title">Input Data</span><input type="text" id="mainInput" class="input-field" placeholder="Paste Ticket/Batch..." oninput="filterData()"></div>
+        
+        <div class="flex flex-wrap gap-2 flex-grow">
+            <div class="w-[90px]"><span class="label-title">Dispute</span><div id="outDisp" class="output-box" onclick="copyText(this)">---</div></div>
+            <div class="w-[110px]">
+                <span class="label-title">Ticket(s)</span>
+                <div id="ticketContainer" class="dynamic-container"><div class="output-box">---</div></div>
+            </div>
+            <div class="w-[200px]"><span class="label-title">Full Note</span><div id="outNote" class="output-box" onclick="copyText(this)">---</div></div>
+            <div class="w-[130px]"><span class="label-title">Letter</span><div id="outOfferLetter" class="output-box" onclick="copyText(this)">---</div></div>
+            <div class="w-[110px]">
+                <span class="label-title">Mail(s)</span>
+                <div id="mailContainer" class="dynamic-container"><div class="output-box">---</div></div>
+            </div>
+            <div class="w-[75px]"><span class="label-title">Date</span><div id="outDate" class="output-box" onclick="copyText(this)">---</div></div>
+        </div>
+        <button onclick="saveToTable()" id="saveBtn" class="save-btn self-end mb-1">Save Entry</button>
+    </div>
+
+    <div class="card table-container">
+        <table class="w-full text-left" id="mainTable">
+            <thead>
+                <tr>
+                    <th>SL</th>
+                    <th>Dispute</th>
+                    <th>Ticket</th>
+                    <th>Full Note</th>
+                    <th>Letter</th>
+                    <th>Mail Ref</th>
+                    <th>Date</th>
+                    <th width="30"></th>
+                </tr>
+            </thead>
+            <tbody id="dataTable" class="text-gray-600"></tbody>
+        </table>
+    </div>
+
+    <div class="mt-3 flex justify-between items-center px-1">
+        <div class="text-[10px] text-gray-400 font-medium">* System enforces Analyst Name for Note generation.</div>
+        <div class="flex gap-2">
+            <button onclick="restoreLastClear()" id="restoreBtn" class="restore-btn hidden"><i class="fa-solid fa-rotate-left"></i> Restore</button>
+            <button onclick="clearDatabase()" class="clear-btn"><i class="fa-solid fa-trash-can"></i> Clear All</button>
+            <button onclick="copyForExcel()" class="excel-btn"><i class="fa-solid fa-file-excel"></i> Copy for Excel</button>
+        </div>
+    </div>
+
+    <script>
+        let db = JSON.parse(localStorage.getItem('pranto_v6')) || [];
+        let backupDb = JSON.parse(localStorage.getItem('pranto_v6_backup')) || [];
+
+        function getFormattedDate() {
+            const d = new Date();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const yy = String(d.getFullYear()).slice(-2);
+            return `${mm}/${dd}/${yy}`;
+        }
+
+        function validateInput() {
+            const name = document.getElementById('userName').value.trim();
+            const nameField = document.getElementById('userName');
+            const saveBtn = document.getElementById('saveBtn');
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!name) {
+                nameField.classList.add('input-error');
+                saveBtn.disabled = true;
+                errorMsg.classList.remove('hidden');
+                return false;
+            } else {
+                nameField.classList.remove('input-error');
+                saveBtn.disabled = false;
+                errorMsg.classList.add('hidden');
+                localStorage.setItem('pranto_analyst_name', name);
+                return true;
+            }
+        }
+
+        function filterData() {
+            const isValid = validateInput();
+            let raw = document.getElementById('mainInput').value.trim();
+            let name = document.getElementById('userName').value.trim();
+            let tickets = [...new Set((raw.match(/MID[0-9A-Z]+/gi) || raw.match(/[0-9]{10,}/g) || []).map(t => t.toUpperCase()))];
+            let disp = (raw.match(/DISP-[0-9A-Z]+/i) || ['---'])[0].toUpperCase();
+            let date = getFormattedDate();
+            
+            document.getElementById('outDisp').innerText = disp;
+            const tContainer = document.getElementById('ticketContainer');
+            const mContainer = document.getElementById('mailContainer');
+            tContainer.innerHTML = '';
+            mContainer.innerHTML = '';
+            
+            if (tickets.length === 0) {
+                tContainer.innerHTML = '<div class="output-box">---</div>';
+                mContainer.innerHTML = '<div class="output-box">---</div>';
+                document.getElementById('outNote').innerText = '---';
+            } else {
+                tickets.forEach(t => {
+                    const tBox = document.createElement('div');
+                    tBox.className = 'output-box'; tBox.innerText = t;
+                    tBox.onclick = function() { copyText(this); };
+                    tContainer.appendChild(tBox);
+
+                    const mBox = document.createElement('div');
+                    mBox.className = 'output-box'; mBox.innerText = t + ' MAIL';
+                    mBox.onclick = function() { copyText(this); };
+                    mContainer.appendChild(mBox);
+                });
+                
+                // Note only generates if name is present
+                if(isValid) {
+                    document.getElementById('outNote').innerText = `${date}>IDR FOLLOW UP>${name.toUpperCase()}>RECEIVED NOTIFICATION THAT OFFER LETTER NEEDED. SUBMITTED OFFER LETTER THROUGH LINK PROVIDED IN FEDERAL IDR EMAIL. PDF COPY OF NOTICE OF OFFER PRINTED AND TO BE UPLOADED INTO CENTRICITY. DISPUTE ID# ${disp}.`;
+                } else {
+                    document.getElementById('outNote').innerText = '--- (NAME REQUIRED)';
+                }
+            }
+
+            document.getElementById('outOfferLetter').innerText = disp !== '---' ? disp + ' Offer Letter' : '---';
+            document.getElementById('outDate').innerText = date;
+            document.querySelectorAll('.output-box').forEach(b => b.classList.remove('copied'));
+        }
+
+        function copyText(e) {
+            let t = e.innerText; if(t === '---' || t.includes('REQUIRED')) return;
+            let el = document.createElement("textarea"); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            e.classList.add('copied'); 
+        }
+
+        function saveToTable() {
+            if (!validateInput()) return;
+            let raw = document.getElementById('mainInput').value.trim();
+            let tickets = [...new Set((raw.match(/MID[0-9A-Z]+/gi) || raw.match(/[0-9]{10,}/g) || []).map(t => t.toUpperCase()))];
+            let disp = (raw.match(/DISP-[0-9A-Z]+/i) || ['---'])[0].toUpperCase();
+            let date = document.getElementById('outDate').innerText;
+            let note = document.getElementById('outNote').innerText;
+            
+            if(!tickets.length || note.includes('REQUIRED')) return;
+            
+            db.unshift({tickets, disp, date, note});
+            localStorage.setItem('pranto_v6', JSON.stringify(db));
+            document.getElementById('mainInput').value = ''; 
+            filterData(); 
+            render(true);
+        }
+
+        function render(shouldAnimate = false) {
+            let body = document.getElementById('dataTable'); body.innerHTML = '';
+            let sl = db.length;
+            db.forEach((b, i) => {
+                b.tickets.forEach((t, ti) => {
+                    let isF = ti === 0;
+                    const row = document.createElement('tr');
+                    if (shouldAnimate && i === 0) row.className = 'animate-row';
+                    if (!isF) row.style.background = '#fcfcfc';
+                    row.innerHTML = `
+                        <td class="font-bold text-gray-300">${isF ? sl : ''}</td>
+                        <td class="font-bold text-indigo-600">${isF ? b.disp : ''}</td>
+                        <td class="font-medium text-gray-700">${t}</td>
+                        <td class="text-[9px] text-gray-500 italic max-w-[250px] truncate" title="${b.note}">${isF ? b.note : ''}</td>
+                        <td class="text-blue-500 font-medium">${isF ? b.disp + ' Offer Letter' : ''}</td>
+                        <td class="text-orange-500 font-bold">${t} MAIL</td>
+                        <td class="text-gray-400 font-mono">${isF ? b.date : ''}</td>
+                        <td>${isF ? `<button onclick="del(${i})" class="text-pink-300 hover:text-pink-600">×</button>` : ''}</td>
+                    `;
+                    body.appendChild(row);
+                });
+                sl--;
+            });
+            document.getElementById('slDisplay').innerText = db.length + 1;
+            document.getElementById('restoreBtn').classList.toggle('hidden', backupDb.length === 0);
+        }
+
+        function copyForExcel() {
+            let csv = "SL\tDispute\tTicket\tFull Note\tOffer Letter\tMail Ref\tDate\n";
+            let sl = db.length;
+            db.forEach(b => {
+                b.tickets.forEach((t, ti) => {
+                    let isF = ti === 0;
+                    csv += `${isF?sl:""}\t${isF?b.disp:""}\t${t}\t${isF?b.note:""}\t${isF?b.disp+" Offer Letter":""}\t${t} MAIL\t${b.date}\n`;
+                });
+                sl--;
+            });
+            let el = document.createElement("textarea"); el.value = csv; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            alert("Copied for Excel! Paste directly into your sheet.");
+        }
+
+        function del(i) { 
+            db.splice(i, 1); 
+            localStorage.setItem('pranto_v6', JSON.stringify(db)); 
+            render(); 
+        }
+
+        function clearDatabase() { 
+            if(confirm("Are you sure you want to clear the database?")) { 
+                backupDb = [...db];
+                localStorage.setItem('pranto_v6_backup', JSON.stringify(backupDb));
+                db = []; 
+                localStorage.removeItem('pranto_v6'); 
+                render(); 
+            } 
+        }
+
+        function restoreLastClear() {
+            if (backupDb.length > 0) {
+                db = [...backupDb];
+                backupDb = [];
+                localStorage.setItem('pranto_v6', JSON.stringify(db));
+                localStorage.removeItem('pranto_v6_backup');
+                render();
+            }
+        }
+        
+        window.onload = () => {
+            const savedName = localStorage.getItem('pranto_analyst_name');
+            if(savedName) document.getElementById('userName').value = savedName;
+            filterData(); // This will trigger validation and initial state
+            render();
+        };
+    </script>
+</body>
+</html>
