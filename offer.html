@@ -3,157 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pranto's Workspace</title>
+    <title>Pranto's Workspace - IDR Offer Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background:#f0f4f8; font-family:'Segoe UI',sans-serif; overflow-x:hidden; padding:5px; }
-        .card { background:#fff; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.05); padding:8px; }
-        .input-field { border:1px solid #e2e8f0; border-radius:4px; width:100%; padding:4px 6px; font-size:11px; outline:none; transition: all 0.2s; }
-        .input-error { border: 1.5px solid #ef4444 !important; background: #fef2f2; }
-        .label-title { color:#5c67f2; font-weight:700; font-size:8px; text-transform:uppercase; margin-bottom:1px; display:block; }
+        body { background:#f4f7fa; font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding: 10px; }
         
-        .output-box { background:#f8fafc; border:1px dashed #cbd5e1; border-radius:4px; padding:4px 6px; font-size:10px; color:#475569; cursor:pointer; min-height:26px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition: 0.1s; }
-        .output-box:hover { background: #f1f5f9; border-color: #94a3b8; }
-        .output-box.copied { background:#dcfce7!important; border: 1px solid #22c55e!important; color:#166534!important; font-weight: bold; }
-        
-        .save-btn { background:linear-gradient(135deg,#4facfe,#00f2fe); color:#fff; border-radius:4px; font-weight:700; height:28px; padding:0 12px; font-size:9px; text-transform:uppercase; transition: 0.2s; }
-        .save-btn:disabled { background: #cbd5e1; cursor: not-allowed; opacity: 0.6; }
-        
-        .excel-btn { background:#166534; color:#fff; border-radius:4px; font-weight:700; padding:6px 12px; font-size:9px; text-transform:uppercase; display: flex; align-items: center; gap: 4px; }
-        .day-copy-btn { background:#0ea5e9; color:#fff; border-radius:3px; font-weight:700; padding:1px 6px; font-size:8px; text-transform:uppercase; }
-        .restore-btn { background:#6366f1; color:#fff; border-radius:4px; font-weight:700; padding:6px 12px; font-size:9px; text-transform:uppercase; }
-
-        .table-container { max-height:calc(100vh - 240px); overflow-y:auto; margin-top:6px; }
-        th { position:sticky; top:0; background:#f8fafc; font-size:8px; color:#94a3b8; padding:4px; border-bottom:1px solid #e2e8f0; text-transform:uppercase; z-index: 10; }
-        td { padding:3px 6px; font-size:10px; border-bottom:1px solid #f8fafc; line-height: 1.2; }
-        
-        .id-box { background:#eef2ff; color:#4338ca; font-weight:800; text-align:center; width:28px; height:28px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; border: 1px solid #e0e7ff; }
-        .dynamic-container { display: flex; flex-direction: column; gap: 2px; }
-
-        .date-header { background: #f1f5f9; color: #475569; font-weight: 800; font-size: 10px; padding: 4px 8px; border-left: 3px solid #6366f1; display: flex; justify-content: space-between; align-items: center; }
-
-        @keyframes fadeInRow {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
+        .header-section { flex-shrink: 0; }
+        .input-section { flex-shrink: 0; margin-bottom: 8px; }
+        .table-container { 
+            flex-grow: 1; 
+            background: #fff; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            overflow-y: auto; 
+            position: relative;
         }
-        .animate-row { animation: fadeInRow 0.3s ease-out forwards; }
+
+        .card { background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.03); padding:10px; }
+        .input-field { border:1.5px solid #e2e8f0; border-radius:6px; width:100%; padding:6px 10px; font-size:12px; outline:none; transition: all 0.2s; color: #1e293b; background: #f8fafc; }
+        .input-field:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        .label-title { color:#6366f1; font-weight:800; font-size:9px; text-transform:uppercase; margin-bottom:2px; display:block; letter-spacing: 0.8px; }
         
-        .nav-link { font-size: 9px; font-weight: 700; color: #64748b; transition: 0.2s; text-transform: uppercase; }
-        .nav-link:hover { color: #5c67f2; }
+        /* Premium Gradient Style for Output Boxes */
+        .output-box { 
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 11px;
+            color: #334155;
+            cursor: pointer;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .output-box:hover { border-color: #6366f1; background: #f5f7ff; transform: translateY(-1px); }
+        
+        /* Persistent Active State with Gradient */
+        .output-box.active-copy { 
+            background: linear-gradient(135deg, #6366f1, #a855f7) !important; 
+            border-color: transparent !important;
+            color: white !important; 
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            transform: scale(0.98);
+        }
+        
+        .save-btn { background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border-radius:6px; font-weight:700; height:34px; padding:0 18px; font-size:12px; text-transform:uppercase; transition: 0.3s; cursor: pointer; border: none; box-shadow: 0 3px 6px rgba(79, 70, 229, 0.2); }
+        .save-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        /* Ultra Compact Table Styling */
+        table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
+        th { 
+            position: sticky; top: 0; background: #f8fafc; z-index: 40; 
+            font-size: 9px; color: #64748b; padding: 6px 8px; border-bottom: 2px solid #e2e8f0; 
+            text-transform: uppercase; text-align: left;
+        }
+        td { padding: 3px 8px; font-size: 11px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .date-header { 
+            position: sticky; top: 25px; z-index: 30; background: #eff6ff; 
+            color: #1e40af; font-weight: 800; font-size: 11.5px; padding: 4px 10px; 
+            border-left: 4px solid #3b82f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .time-badge { background: #dbeafe; color: #1e40af; font-size: 9px; padding: 1px 6px; border-radius: 4px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; border: 1px solid #bfdbfe; }
+        .id-box { background:#eef2ff; color:#4338ca; font-weight:800; text-align:center; width:30px; height:30px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; border: 1.5px solid #e0e7ff; }
+
+        /* Custom Scrollbar */
+        .table-container::-webkit-scrollbar { width: 6px; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        #manualModal { background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
     </style>
 </head>
 <body>
-    <header class="flex justify-between items-center mb-1.5 px-2 bg-white p-1.5 rounded-lg shadow-sm">
-        <div class="font-black text-indigo-600 text-xs tracking-tight">PRANTO'S WORKSPACE</div>
-        
+    <header class="header-section flex justify-between items-center mb-1 px-4 bg-white p-2 rounded-xl shadow-sm border-b border-indigo-50">
+        <div class="flex items-center gap-2">
+            <div class="bg-indigo-600 p-1.5 rounded-lg text-white shadow-md"><i class="fa-solid fa-bolt text-xs"></i></div>
+            <div class="font-black text-slate-800 text-lg tracking-tight">PRANTO'S <span class="text-indigo-600">WORKSPACE</span></div>
+        </div>
         <nav class="flex gap-4">
-            <a href="index.html" class="nav-link flex items-center gap-1"><i class="fa-solid fa-house-chimney"></i> Home</a>
-            <span class="nav-link text-indigo-500 border-b-2 border-indigo-500">Offer System</span>
+            <a href="Index.html" class="text-[10px] font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-widest">Home</a>
+            <span class="text-[10px] font-bold text-indigo-600 border-b-2 border-indigo-600 uppercase tracking-widest">Offer System</span>
         </nav>
-
-        <div id="errorMsg" class="text-red-500 font-bold text-[9px] hidden animate-pulse underline">NAME REQUIRED!</div>
+        <div id="errorMsg" class="text-red-500 font-bold text-[9px] hidden animate-pulse uppercase">Enter Name</div>
     </header>
 
-    <div class="card flex flex-wrap items-start gap-1.5">
-        <div class="w-[28px]"><span class="label-title">SL</span><div id="slDisplay" class="id-box">1</div></div>
-        
-        <div class="w-[100px]">
-            <span class="label-title">Analyst Name</span>
-            <input type="text" id="userName" class="input-field" placeholder="Name..." oninput="filterData()">
-        </div>
+    <div class="input-section">
+        <div class="card grid grid-cols-12 gap-3 items-end">
+            <div class="col-span-1"><span class="label-title">SL</span><div id="slDisplay" class="id-box">1</div></div>
+            <div class="col-span-2"><span class="label-title">Analyst</span><input type="text" id="userName" class="input-field" placeholder="Name..." oninput="filterData()"></div>
+            <div class="col-span-8"><span class="label-title">Data String</span><input type="text" id="mainInput" class="input-field" placeholder="Paste IDR Data..." oninput="filterData()"></div>
+            <div class="col-span-1"><button onclick="saveToTable()" id="saveBtn" class="save-btn w-full">Save</button></div>
 
-        <div class="flex-grow min-w-[150px]"><span class="label-title">Input Data</span><input type="text" id="mainInput" class="input-field" placeholder="Paste Data (e.g. DISP-5540541 ABC12345)..." oninput="filterData()"></div>
-        
-        <div class="flex flex-wrap gap-1.5 flex-grow">
-            <div class="w-[80px]"><span class="label-title">Dispute</span><div id="outDisp" class="output-box" onclick="copyText(this)">---</div></div>
-            <div class="w-[100px]">
-                <span class="label-title">Ticket(s)</span>
-                <div id="ticketContainer" class="dynamic-container"><div class="output-box">---</div></div>
+            <div class="col-span-12 grid grid-cols-5 gap-2 mt-1">
+                <div><span class="label-title">Dispute ID</span><div id="outDisp" class="output-box" onclick="copyAndKeepColor(this)">---</div></div>
+                <div><span class="label-title">Ticket List</span><div id="ticketContainer" class="flex flex-col gap-1"><div class="output-box">---</div></div></div>
+                <div><span class="label-title">Auto Note</span><div id="outNote" class="output-box" onclick="copyAndKeepColor(this)">---</div></div>
+                <div><span class="label-title">Offer Letter</span><div id="outOfferLetter" class="output-box" onclick="copyAndKeepColor(this)">---</div></div>
+                <div><span class="label-title">Mail Ref</span><div id="mailContainer" class="flex flex-col gap-1"><div class="output-box">---</div></div></div>
             </div>
-            <div class="w-[180px]"><span class="label-title">Full Note</span><div id="outNote" class="output-box" onclick="copyText(this)">---</div></div>
-            <div class="w-[110px]"><span class="label-title">Letter</span><div id="outOfferLetter" class="output-box" onclick="copyText(this)">---</div></div>
-            <div class="w-[100px]">
-                <span class="label-title">Mail(s)</span>
-                <div id="mailContainer" class="dynamic-container"><div class="output-box">---</div></div>
-            </div>
-            <div class="w-[65px]"><span class="label-title">Date</span><div id="outDate" class="output-box" onclick="copyText(this)">---</div></div>
         </div>
-        <button onclick="saveToTable()" id="saveBtn" class="save-btn self-end mb-0.5">Save</button>
     </div>
 
-    <div class="card table-container">
-        <table class="w-full text-left" id="mainTable">
+    <div class="table-container">
+        <div class="sticky top-0 z-50 bg-white/95 px-4 py-1 border-b flex justify-between items-center">
+            <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i> Log History
+            </h2>
+            <button onclick="copyForExcel()" class="bg-emerald-600 text-white px-3 py-1 rounded-md text-[9px] font-bold uppercase hover:bg-emerald-700 transition">Export All</button>
+        </div>
+        <table id="mainTable">
             <thead>
                 <tr>
-                    <th>SL</th>
-                    <th>Dispute</th>
-                    <th>Ticket</th>
-                    <th>Full Note</th>
-                    <th>Letter</th>
-                    <th>Mail Ref</th>
-                    <th>Date</th>
-                    <th width="20"></th>
+                    <th style="width: 35px;" class="text-center">SL</th>
+                    <th style="width: 85px;">Dispute</th>
+                    <th style="width: 85px;">Ticket</th>
+                    <th>Note</th>
+                    <th style="width: 120px;">File Name</th>
+                    <th style="width: 100px;">Mail Ref</th>
+                    <th style="width: 155px;">BDT Time</th>
+                    <th style="width: 40px;" class="text-center">Del</th>
                 </tr>
             </thead>
-            <tbody id="dataTable" class="text-gray-600"></tbody>
+            <tbody id="dataTable"></tbody>
         </table>
     </div>
 
-    <div class="mt-2 flex justify-between items-center px-1">
-        <div class="text-[9px] text-gray-400 font-medium">* Purono data auto save hoye thake.</div>
-        <div class="flex gap-1.5">
-            <button onclick="restoreLastClear()" id="restoreBtn" class="restore-btn hidden"><i class="fa-solid fa-rotate-left"></i> Restore</button>
-            <button onclick="copyForExcel()" class="excel-btn"><i class="fa-solid fa-file-excel"></i> Copy All</button>
+    <!-- Manual Modal -->
+    <div id="manualModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl w-full max-w-sm shadow-2xl p-5 border border-indigo-100">
+            <h3 class="text-lg font-black text-slate-800 mb-3 border-b pb-1 uppercase tracking-tight">Manual Entry</h3>
+            <div class="space-y-3">
+                <div><span class="label-title">Date</span><input type="text" id="mDate" class="input-field" placeholder="MM/DD/YY"></div>
+                <div><span class="label-title">Dispute</span><input type="text" id="mDisp" class="input-field" placeholder="DISP-XXXX"></div>
+                <div><span class="label-title">Tickets</span><input type="text" id="mTickets" class="input-field" placeholder="TKT1, TKT2"></div>
+                <div><span class="label-title">Note Content</span><textarea id="mNote" class="input-field h-20" placeholder="Content..."></textarea></div>
+            </div>
+            <div class="flex gap-2 mt-5">
+                <button onclick="closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2 rounded-lg text-[10px] uppercase">Cancel</button>
+                <button onclick="saveManual()" class="flex-1 bg-indigo-600 text-white font-bold py-2 rounded-lg text-[10px] uppercase">Save Data</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('pranto_v6')) || [];
-        let backupDb = JSON.parse(localStorage.getItem('pranto_v6_backup')) || [];
+        let db = JSON.parse(localStorage.getItem('pranto_v6_pro')) || [];
 
-        function getFormattedDate() {
-            const d = new Date();
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            const yy = String(d.getFullYear()).slice(-2);
-            return `${mm}/${dd}/${yy}`;
+        function getBDTTime() {
+            const date = new Date();
+            const options = { timeZone: 'Asia/Dhaka', year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const parts = new Intl.DateTimeFormat('en-US', options).formatToParts(date);
+            const d = `${parts.find(p => p.type === 'month').value}/${parts.find(p => p.type === 'day').value}/${parts.find(p => p.type === 'year').value}`;
+            const t = `${parts.find(p => p.type === 'hour').value}:${parts.find(p => p.type === 'minute').value}:${parts.find(p => p.type === 'second').value} ${parts.find(p => p.type === 'dayPeriod').value}`;
+            return { date: d, time: t };
         }
 
         function validateInput() {
             const name = document.getElementById('userName').value.trim();
-            const nameField = document.getElementById('userName');
-            const saveBtn = document.getElementById('saveBtn');
-            const errorMsg = document.getElementById('errorMsg');
-
-            if (!name) {
-                nameField.classList.add('input-error');
-                saveBtn.disabled = true;
-                errorMsg.classList.remove('hidden');
-                return false;
-            } else {
-                nameField.classList.remove('input-error');
-                saveBtn.disabled = false;
-                errorMsg.classList.add('hidden');
-                localStorage.setItem('pranto_analyst_name', name);
-                return true;
-            }
+            document.getElementById('saveBtn').disabled = !name;
+            document.getElementById('errorMsg').classList.toggle('hidden', !!name);
+            if(name) localStorage.setItem('pranto_analyst_name', name);
+            return !!name;
         }
 
         function extractData(raw) {
-            // Find Dispute ID
-            let dispMatches = raw.match(/DISP-[0-9A-Z]+/gi);
-            let disp = dispMatches ? dispMatches[0].toUpperCase() : '---';
-
-            // Find Tickets: Matches 1 to 3 letters followed by numbers (e.g., A123, TEX123, T123)
-            // Or matches 8+ pure digits.
-            // Excludes anything starting with DISP to avoid duplication.
-            let ticketRegex = /[A-Z]{1,3}[0-9]+|[0-9]{8,}/gi;
-            let potentialTickets = raw.match(ticketRegex) || [];
-            
-            let tickets = [...new Set(potentialTickets.map(t => t.toUpperCase()))]
-                            .filter(t => !t.startsWith('DISP'));
-
+            let disp = (raw.match(/DISP-[0-9A-Z]+/gi) || ["---"])[0].toUpperCase();
+            let tickets = [...new Set((raw.match(/[A-Z]{1,3}[0-9]+|[0-9]{8,}/gi) || []).map(t => t.toUpperCase()))].filter(t => !t.startsWith('DISP'));
             return { disp, tickets };
         }
 
@@ -161,162 +184,131 @@
             const isValid = validateInput();
             let raw = document.getElementById('mainInput').value.trim();
             let name = document.getElementById('userName').value.trim();
-            
             let { disp, tickets } = extractData(raw);
-            let date = getFormattedDate();
+            let bdt = getBDTTime();
             
             document.getElementById('outDisp').innerText = disp;
-            const tContainer = document.getElementById('ticketContainer');
-            const mContainer = document.getElementById('mailContainer');
-            tContainer.innerHTML = ''; mContainer.innerHTML = '';
+            const tc = document.getElementById('ticketContainer');
+            const mc = document.getElementById('mailContainer');
+            tc.innerHTML = ''; mc.innerHTML = '';
             
-            if (tickets.length === 0) {
-                tContainer.innerHTML = '<div class="output-box">---</div>';
-                mContainer.innerHTML = '<div class="output-box">---</div>';
+            // Reset active colors when input changes
+            document.querySelectorAll('.output-box').forEach(el => el.classList.remove('active-copy'));
+            
+            if (!tickets.length) {
+                tc.innerHTML = '<div class="output-box">---</div>';
+                mc.innerHTML = '<div class="output-box">---</div>';
                 document.getElementById('outNote').innerText = '---';
                 document.getElementById('outOfferLetter').innerText = '---';
-                document.getElementById('outDate').innerText = '---';
             } else {
                 tickets.forEach(t => {
-                    const tBox = document.createElement('div');
-                    tBox.className = 'output-box'; tBox.innerText = t;
-                    tBox.onclick = function() { copyText(this); };
-                    tContainer.appendChild(tBox);
-
-                    const mBox = document.createElement('div');
-                    mBox.className = 'output-box'; mBox.innerText = t + ' MAIL';
-                    mBox.onclick = function() { copyText(this); };
-                    mContainer.appendChild(mBox);
+                    tc.innerHTML += `<div class="output-box" onclick="copyAndKeepColor(this)">${t}</div>`;
+                    mc.innerHTML += `<div class="output-box" onclick="copyAndKeepColor(this)">${t} MAIL</div>`;
                 });
-                
-                if(isValid) {
-                    const ticketList = tickets.join(', ');
-                    document.getElementById('outNote').innerText = `${date}>IDR FOLLOW UP>${name.toUpperCase()}>RECEIVED NOTIFICATION THAT OFFER LETTER NEEDED. SUBMITTED OFFER LETTER THROUGH LINK PROVIDED IN FEDERAL IDR EMAIL. PDF COPY OF NOTICE OF OFFER PRINTED AND TO BE UPLOADED INTO CENTRICITY. DISPUTE ID# ${disp}.`;
-                } else {
-                    document.getElementById('outNote').innerText = '--- (NAME REQUIRED)';
-                }
+                if(isValid) document.getElementById('outNote').innerText = `${bdt.date}>IDR FOLLOW UP>${name.toUpperCase()}>RECEIVED NOTIFICATION THAT OFFER LETTER NEEDED. SUBMITTED OFFER LETTER THROUGH LINK PROVIDED IN FEDERAL IDR EMAIL. PDF COPY OF NOTICE OF OFFER PRINTED AND TO BE UPLOADED INTO CENTRICITY. DISPUTE ID# ${disp}.`;
                 document.getElementById('outOfferLetter').innerText = disp !== '---' ? disp + ' Offer Letter' : '---';
-                document.getElementById('outDate').innerText = date;
             }
-
-            document.querySelectorAll('.output-box').forEach(b => b.classList.remove('copied'));
         }
 
-        function copyText(e) {
-            let t = e.innerText; if(t === '---' || t.includes('REQUIRED')) return;
+        function copyAndKeepColor(e) {
+            let t = e.innerText; if(t === '---') return;
             let el = document.createElement("textarea"); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            e.classList.add('copied'); 
+            e.classList.add('active-copy'); 
         }
 
         function saveToTable() {
             if (!validateInput()) return;
-            let raw = document.getElementById('mainInput').value.trim();
-            let { disp, tickets } = extractData(raw);
-            
-            let date = document.getElementById('outDate').innerText;
-            let note = document.getElementById('outNote').innerText;
-            
-            if(!tickets.length || note.includes('---')) return;
-            
-            db.unshift({tickets, disp, date, note, timestamp: new Date().getTime()});
-            localStorage.setItem('pranto_v6', JSON.stringify(db));
-            
-            document.getElementById('mainInput').value = ''; 
-            filterData(); 
-            render(true);
+            let { disp, tickets } = extractData(document.getElementById('mainInput').value);
+            if(!tickets.length) return;
+            let bdt = getBDTTime();
+            db.unshift({ tickets, disp, date: bdt.date, time: bdt.time, note: document.getElementById('outNote').innerText, timestamp: Date.now() });
+            localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
+            document.getElementById('mainInput').value = ''; filterData(); render();
         }
 
-        function render(shouldAnimate = false) {
-            let body = document.getElementById('dataTable'); body.innerHTML = '';
-            
-            const grouped = db.reduce((acc, obj) => {
-                const key = obj.date;
-                if (!acc[key]) acc[key] = [];
-                acc[key].push(obj);
-                return acc;
-            }, {});
+        function openModal(d) { document.getElementById('mDate').value = d || getBDTTime().date; document.getElementById('manualModal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('manualModal').classList.add('hidden'); }
 
+        function saveManual() {
+            let tickets = document.getElementById('mTickets').value.split(',').map(t => t.trim()).filter(t => t);
+            if(!tickets.length) return alert("Add at least one ticket!");
+            db.unshift({ tickets, disp: document.getElementById('mDisp').value.toUpperCase(), date: document.getElementById('mDate').value, time: "Manual", note: document.getElementById('mNote').value, timestamp: Date.now() });
+            localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
+            closeModal(); render();
+        }
+
+        function render() {
+            let body = document.getElementById('dataTable'); body.innerHTML = '';
+            const grouped = db.reduce((acc, obj) => { (acc[obj.date] = acc[obj.date] || []).push(obj); return acc; }, {});
             const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
             let globalSl = db.length;
             
             sortedDates.forEach(date => {
-                const dateRow = document.createElement('tr');
-                dateRow.innerHTML = `
-                    <td colspan="8" class="date-header">
-                        <span><i class="fa-solid fa-calendar-day mr-1"></i> ${date}</span>
-                        <button onclick="copyForExcelByDate('${date}')" class="day-copy-btn">Copy Day</button>
-                    </td>
-                `;
-                body.appendChild(dateRow);
+                const headerRow = document.createElement('tr');
+                headerRow.className = 'date-header';
+                headerRow.innerHTML = `
+                    <td colspan="8">
+                        <div class="flex justify-between items-center w-full">
+                            <span><i class="fa-solid fa-calendar-check mr-1 text-blue-500"></i> ${date}</span>
+                            <div class="flex gap-2">
+                                <button onclick="openModal('${date}')" class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase hover:bg-indigo-700 transition">Add New</button>
+                                <button onclick="copyForExcelByDate('${date}')" class="bg-sky-600 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase hover:bg-sky-700 transition">Copy Day</button>
+                            </div>
+                        </div>
+                    </td>`;
+                body.appendChild(headerRow);
 
-                grouped[date].forEach((b, i) => {
+                grouped[date].forEach(b => {
                     const originalIdx = db.findIndex(item => item.timestamp === b.timestamp);
                     b.tickets.forEach((t, ti) => {
                         let isF = ti === 0;
                         const row = document.createElement('tr');
-                        if (shouldAnimate && originalIdx === 0) row.className = 'animate-row';
-                        if (!isF) row.style.background = '#fafafa';
-                        
+                        if(!isF) row.style.background = '#fafafa';
                         row.innerHTML = `
-                            <td class="font-bold text-gray-300">${isF ? globalSl : ''}</td>
+                            <td class="font-bold text-slate-300 text-center">${isF ? globalSl : ''}</td>
                             <td class="font-bold text-indigo-600">${isF ? b.disp : ''}</td>
-                            <td class="font-medium text-gray-700">${t}</td>
-                            <td class="text-[8px] text-gray-400 italic max-w-[150px] truncate" title="${b.note}">${isF ? b.note : ''}</td>
-                            <td class="text-blue-500 font-medium">${isF ? b.disp + ' Offer Letter' : ''}</td>
-                            <td class="text-orange-400 font-bold">${t} MAIL</td>
-                            <td class="text-gray-400 font-mono text-[9px]">${isF ? b.date : ''}</td>
-                            <td>${isF ? `<button onclick="del(${originalIdx})" class="text-pink-200 hover:text-pink-600">×</button>` : ''}</td>
+                            <td class="font-semibold text-slate-700">${t}</td>
+                            <td class="text-[9px] text-slate-400 italic" title="${b.note}">${isF ? b.note : ''}</td>
+                            <td class="text-blue-600 font-semibold">${isF ? b.disp + ' Offer Letter' : ''}</td>
+                            <td class="text-orange-600 font-black">${t} MAIL</td>
+                            <td>${isF ? `<span class="flex items-center gap-1"><span class="text-slate-500 font-bold">${b.date}</span><span class="time-badge">${b.time}</span></span>` : ''}</td>
+                            <td class="text-center">
+                                ${isF ? `<button onclick="del(${originalIdx})" class="w-6 h-6 rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can text-[9px]"></i></button>` : ''}
+                            </td>
                         `;
                         body.appendChild(row);
                     });
                     globalSl--;
                 });
             });
-
             document.getElementById('slDisplay').innerText = db.length + 1;
-            document.getElementById('restoreBtn').classList.toggle('hidden', backupDb.length === 0);
-        }
-
-        function copyForExcel() { generateExcelData(db); }
-        function copyForExcelByDate(targetDate) {
-            const filtered = db.filter(item => item.date === targetDate);
-            generateExcelData(filtered);
         }
 
         function generateExcelData(dataList) {
-            let csv = "SL\tDispute\tTicket\tFull Note\tOffer Letter\tMail Ref\tDate\n";
+            let csv = "SL\tDispute\tTicket\tFull Note\tOffer Letter\tMail Ref\tDate\tTime\n";
             let sl = dataList.length;
             dataList.forEach(b => {
-                b.tickets.forEach((t, ti) => {
-                    let isF = ti === 0;
-                    csv += `${isF?sl:""}\t${isF?b.disp:""}\t${t}\t${isF?b.note:""}\t${isF?b.disp+" Offer Letter":""}\t${t} MAIL\t${b.date}\n`;
-                });
+                b.tickets.forEach((t, ti) => { csv += `${ti===0?sl:""}\t${ti===0?b.disp:""}\t${t}\t${ti===0?b.note:""}\t${ti===0?b.disp+" Offer Letter":""}\t${t} MAIL\t${b.date}\t${ti===0?b.time:""}\n`; });
                 sl--;
             });
             let el = document.createElement("textarea"); el.value = csv; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            alert("Copied!");
+            alert("Data copied for Excel!");
         }
 
-        function del(i) { 
-            if(confirm("Delete this entry?")) {
-                db.splice(i, 1); 
-                localStorage.setItem('pranto_v6', JSON.stringify(db)); 
-                render(); 
-            }
-        }
-
-        function restoreLastClear() {
-            if (backupDb.length > 0) {
-                db = [...backupDb]; backupDb = [];
-                localStorage.setItem('pranto_v6', JSON.stringify(db));
-                localStorage.removeItem('pranto_v6_backup');
+        function copyForExcel() { generateExcelData(db); }
+        function copyForExcelByDate(d) { generateExcelData(db.filter(item => item.date === d)); }
+        
+        function del(idx) {
+            if(confirm("Permanently delete this record?")) {
+                db.splice(idx, 1);
+                localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
                 render();
             }
         }
-        
+
         window.onload = () => {
-            const savedName = localStorage.getItem('pranto_analyst_name');
-            if(savedName) document.getElementById('userName').value = savedName;
+            const n = localStorage.getItem('pranto_analyst_name');
+            if(n) document.getElementById('userName').value = n;
             filterData(); render();
         };
     </script>
