@@ -10,7 +10,7 @@
         body { background:#f4f7fa; font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding: 10px; }
         
         .header-section { flex-shrink: 0; }
-        .input-section { flex-shrink: 0; margin-bottom: 8px; }
+        .input-section { flex-shrink: 0; margin-bottom: 6px; }
         .table-container { 
             flex-grow: 1; 
             background: #fff; 
@@ -20,21 +20,20 @@
             position: relative;
         }
 
-        .card { background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.03); padding:10px; }
-        .input-field { border:1.5px solid #e2e8f0; border-radius:6px; width:100%; padding:6px 10px; font-size:12px; outline:none; transition: all 0.2s; color: #1e293b; background: #f8fafc; }
+        .card { background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.03); padding: 6px 10px; }
+        .input-field { border:1.5px solid #e2e8f0; border-radius:6px; width:100%; padding:5px 10px; font-size:12px; outline:none; transition: all 0.2s; color: #1e293b; background: #f8fafc; }
         .input-field:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-        .label-title { color:#6366f1; font-weight:800; font-size:9px; text-transform:uppercase; margin-bottom:2px; display:block; letter-spacing: 0.8px; }
+        .label-title { color:#6366f1; font-weight:800; font-size:9px; text-transform:uppercase; margin-bottom:1px; display:block; letter-spacing: 0.8px; }
         
-        /* Premium Gradient Style for Output Boxes */
         .output-box { 
             background: linear-gradient(145deg, #ffffff, #f1f5f9);
             border: 1px solid #e2e8f0;
             border-radius: 6px;
-            padding: 6px 10px;
+            padding: 4px 10px;
             font-size: 11px;
             color: #334155;
             cursor: pointer;
-            min-height: 32px;
+            min-height: 26px;
             display: flex;
             align-items: center;
             white-space: nowrap;
@@ -42,45 +41,50 @@
             text-overflow: ellipsis;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 600;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .output-box:hover { border-color: #6366f1; background: #f5f7ff; transform: translateY(-1px); }
         
-        /* Persistent Active State with Gradient */
         .output-box.active-copy { 
             background: linear-gradient(135deg, #6366f1, #a855f7) !important; 
             border-color: transparent !important;
             color: white !important; 
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-            transform: scale(0.98);
         }
         
-        .save-btn { background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border-radius:6px; font-weight:700; height:34px; padding:0 18px; font-size:12px; text-transform:uppercase; transition: 0.3s; cursor: pointer; border: none; box-shadow: 0 3px 6px rgba(79, 70, 229, 0.2); }
-        .save-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .save-btn { background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border-radius:6px; font-weight:700; height:28px; padding:0 18px; font-size:10px; text-transform:uppercase; transition: 0.3s; cursor: pointer; border: none; }
         
-        /* Ultra Compact Table Styling */
+        /* Table Styles */
         table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
-        th { 
-            position: sticky; top: 0; background: #f8fafc; z-index: 40; 
-            font-size: 9px; color: #64748b; padding: 6px 8px; border-bottom: 2px solid #e2e8f0; 
-            text-transform: uppercase; text-align: left;
-        }
-        td { padding: 3px 8px; font-size: 11px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        th { position: sticky; top: 0; background: #f8fafc; z-index: 40; font-size: 9px; color: #64748b; padding: 4px 8px; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; text-align: left; }
+        td { padding: 2px 8px; font-size: 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 0.2s; }
+
+        /* Row Click Highlighting */
+        .clickable-cell { cursor: pointer; }
+        .row-done { background: #ecfdf5 !important; }
+        .row-done td { color: #065f46 !important; border-bottom-color: #d1fae5; }
+        
+        .cell-highlight { background: #e0e7ff !important; color: #4338ca !important; font-weight: 700; }
 
         .date-header { 
-            position: sticky; top: 25px; z-index: 30; background: #eff6ff; 
-            color: #1e40af; font-weight: 800; font-size: 11.5px; padding: 4px 10px; 
-            border-left: 4px solid #3b82f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: sticky; top: 20px; z-index: 30; background: #eff6ff; 
+            color: #1e40af; font-weight: 800; font-size: 10.5px; padding: 2px 10px; 
+            border-left: 4px solid #3b82f6;
         }
 
-        .time-badge { background: #dbeafe; color: #1e40af; font-size: 9px; padding: 1px 6px; border-radius: 4px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; border: 1px solid #bfdbfe; }
-        .id-box { background:#eef2ff; color:#4338ca; font-weight:800; text-align:center; width:30px; height:30px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; border: 1.5px solid #e0e7ff; }
+        .count-badge { background: #fff; color: #6366f1; padding: 1px 6px; border-radius: 99px; font-size: 9px; border: 1px solid #e0e7ff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 
-        /* Custom Scrollbar */
-        .table-container::-webkit-scrollbar { width: 6px; }
+        .time-badge { background: #dbeafe; color: #1e40af; font-size: 8px; padding: 1px 4px; border-radius: 4px; font-weight: 700; border: 1px solid #bfdbfe; }
+        .id-box { background:#eef2ff; color:#4338ca; font-weight:800; text-align:center; width:26px; height:26px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; border: 1.5px solid #e0e7ff; }
+
+        .table-container::-webkit-scrollbar { width: 5px; }
         .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        #manualModal { background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
+        .modal-overlay { background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        
+        .status-check { width: 12px; height: 12px; cursor: pointer; accent-color: #10b981; }
+        .header-check { accent-color: #6366f1; transform: scale(0.9); }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .blink-text { animation: blink 0.8s infinite; }
     </style>
 </head>
 <body>
@@ -89,25 +93,26 @@
             <div class="bg-indigo-600 p-1.5 rounded-lg text-white shadow-md"><i class="fa-solid fa-bolt text-xs"></i></div>
             <div class="font-black text-slate-800 text-lg tracking-tight">PRANTO'S <span class="text-indigo-600">WORKSPACE</span></div>
         </div>
-        <nav class="flex gap-4">
-            <a href="Index.html" class="text-[10px] font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-widest">Home</a>
+        <nav class="flex gap-4 items-center">
+            <div id="duplicateAlert" class="text-red-600 font-black text-[10px] hidden blink-text uppercase mr-4"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Duplicate Dispute Found!</div>
+            <a href="index.html" class="text-[10px] font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-widest">Home</a>
             <span class="text-[10px] font-bold text-indigo-600 border-b-2 border-indigo-600 uppercase tracking-widest">Offer System</span>
         </nav>
         <div id="errorMsg" class="text-red-500 font-bold text-[9px] hidden animate-pulse uppercase">Enter Name</div>
     </header>
 
     <div class="input-section">
-        <div class="card grid grid-cols-12 gap-3 items-end">
+        <div class="card grid grid-cols-12 gap-2 items-end">
             <div class="col-span-1"><span class="label-title">SL</span><div id="slDisplay" class="id-box">1</div></div>
             <div class="col-span-2"><span class="label-title">Analyst</span><input type="text" id="userName" class="input-field" placeholder="Name..." oninput="filterData()"></div>
             <div class="col-span-8"><span class="label-title">Data String</span><input type="text" id="mainInput" class="input-field" placeholder="Paste IDR Data..." oninput="filterData()"></div>
             <div class="col-span-1"><button onclick="saveToTable()" id="saveBtn" class="save-btn w-full">Save</button></div>
 
             <div class="col-span-12 grid grid-cols-5 gap-2 mt-1">
-                <div><span class="label-title">Dispute ID</span><div id="outDisp" class="output-box" onclick="copyAndKeepColor(this)">---</div></div>
+                <div><span class="label-title">Dispute ID</span><div id="outDisp" class="output-box" onclick="copyAndHighlight(this)">---</div></div>
                 <div><span class="label-title">Ticket List</span><div id="ticketContainer" class="flex flex-col gap-1"><div class="output-box">---</div></div></div>
-                <div><span class="label-title">Auto Note</span><div id="outNote" class="output-box" onclick="copyAndKeepColor(this)">---</div></div>
-                <div><span class="label-title">Offer Letter</span><div id="outOfferLetter" class="output-box" onclick="copyAndKeepColor(this)">---</div></div>
+                <div><span class="label-title">Auto Note</span><div id="outNote" class="output-box" onclick="copyAndHighlight(this)">---</div></div>
+                <div><span class="label-title">Offer Letter</span><div id="outOfferLetter" class="output-box" onclick="copyAndHighlight(this)">---</div></div>
                 <div><span class="label-title">Mail Ref</span><div id="mailContainer" class="flex flex-col gap-1"><div class="output-box">---</div></div></div>
             </div>
         </div>
@@ -118,7 +123,9 @@
             <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
                 <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i> Log History
             </h2>
-            <button onclick="copyForExcel()" class="bg-emerald-600 text-white px-3 py-1 rounded-md text-[9px] font-bold uppercase hover:bg-emerald-700 transition">Export All</button>
+            <div class="flex gap-2">
+                <button onclick="copyForExcel()" class="bg-emerald-600 text-white px-3 py-1 rounded-md text-[9px] font-bold uppercase hover:bg-emerald-700 transition">Export All</button>
+            </div>
         </div>
         <table id="mainTable">
             <thead>
@@ -129,7 +136,8 @@
                     <th>Note</th>
                     <th style="width: 120px;">File Name</th>
                     <th style="width: 100px;">Mail Ref</th>
-                    <th style="width: 155px;">BDT Time</th>
+                    <th style="width: 130px;">BDT Time</th>
+                    <th style="width: 45px;" class="text-center">Done</th>
                     <th style="width: 40px;" class="text-center">Del</th>
                 </tr>
             </thead>
@@ -137,8 +145,8 @@
         </table>
     </div>
 
-    <!-- Manual Modal -->
-    <div id="manualModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <!-- Manual Entry Modal -->
+    <div id="manualModal" class="modal-overlay hidden">
         <div class="bg-white rounded-xl w-full max-w-sm shadow-2xl p-5 border border-indigo-100">
             <h3 class="text-lg font-black text-slate-800 mb-3 border-b pb-1 uppercase tracking-tight">Manual Entry</h3>
             <div class="space-y-3">
@@ -148,14 +156,30 @@
                 <div><span class="label-title">Note Content</span><textarea id="mNote" class="input-field h-20" placeholder="Content..."></textarea></div>
             </div>
             <div class="flex gap-2 mt-5">
-                <button onclick="closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2 rounded-lg text-[10px] uppercase">Cancel</button>
+                <button onclick="closeModal('manualModal')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2 rounded-lg text-[10px] uppercase">Cancel</button>
                 <button onclick="saveManual()" class="flex-1 bg-indigo-600 text-white font-bold py-2 rounded-lg text-[10px] uppercase">Save Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Warning Modal -->
+    <div id="deleteModal" class="modal-overlay hidden">
+        <div class="bg-white rounded-xl w-full max-w-xs shadow-2xl p-6 text-center">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-trash-can text-xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-slate-800 mb-1">Delete Record?</h3>
+            <p class="text-slate-500 text-xs mb-6">Ai data-ti permanent vabe delete hoye jabe. Apni ki nishchit?</p>
+            <div class="flex gap-2">
+                <button onclick="closeModal('deleteModal')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2 rounded-lg text-[10px] uppercase">No, Keep</button>
+                <button id="confirmDelBtn" class="flex-1 bg-red-600 text-white font-bold py-2 rounded-lg text-[10px] uppercase shadow-lg shadow-red-200">Yes, Delete</button>
             </div>
         </div>
     </div>
 
     <script>
         let db = JSON.parse(localStorage.getItem('pranto_v6_pro')) || [];
+        let pendingDelIdx = null;
 
         function getBDTTime() {
             const date = new Date();
@@ -187,12 +211,13 @@
             let { disp, tickets } = extractData(raw);
             let bdt = getBDTTime();
             
+            const isDuplicate = disp !== "---" && db.some(item => item.disp === disp);
+            document.getElementById('duplicateAlert').classList.toggle('hidden', !isDuplicate);
+            
             document.getElementById('outDisp').innerText = disp;
             const tc = document.getElementById('ticketContainer');
             const mc = document.getElementById('mailContainer');
             tc.innerHTML = ''; mc.innerHTML = '';
-            
-            // Reset active colors when input changes
             document.querySelectorAll('.output-box').forEach(el => el.classList.remove('active-copy'));
             
             if (!tickets.length) {
@@ -202,18 +227,25 @@
                 document.getElementById('outOfferLetter').innerText = '---';
             } else {
                 tickets.forEach(t => {
-                    tc.innerHTML += `<div class="output-box" onclick="copyAndKeepColor(this)">${t}</div>`;
-                    mc.innerHTML += `<div class="output-box" onclick="copyAndKeepColor(this)">${t} MAIL</div>`;
+                    tc.innerHTML += `<div class="output-box" onclick="copyAndHighlight(this)">${t}</div>`;
+                    mc.innerHTML += `<div class="output-box" onclick="copyAndHighlight(this)">${t} MAIL</div>`;
                 });
                 if(isValid) document.getElementById('outNote').innerText = `${bdt.date}>IDR FOLLOW UP>${name.toUpperCase()}>RECEIVED NOTIFICATION THAT OFFER LETTER NEEDED. SUBMITTED OFFER LETTER THROUGH LINK PROVIDED IN FEDERAL IDR EMAIL. PDF COPY OF NOTICE OF OFFER PRINTED AND TO BE UPLOADED INTO CENTRICITY. DISPUTE ID# ${disp}.`;
                 document.getElementById('outOfferLetter').innerText = disp !== '---' ? disp + ' Offer Letter' : '---';
             }
         }
 
-        function copyAndKeepColor(e) {
+        function copyAndHighlight(e) {
             let t = e.innerText; if(t === '---') return;
-            let el = document.createElement("textarea"); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            const el = document.createElement("textarea"); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
             e.classList.add('active-copy'); 
+        }
+        
+        function copyCell(e) {
+            const text = e.innerText;
+            if(!text || text === "Manual") return;
+            const el = document.createElement("textarea"); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            e.classList.add('cell-highlight');
         }
 
         function saveToTable() {
@@ -221,67 +253,123 @@
             let { disp, tickets } = extractData(document.getElementById('mainInput').value);
             if(!tickets.length) return;
             let bdt = getBDTTime();
-            db.unshift({ tickets, disp, date: bdt.date, time: bdt.time, note: document.getElementById('outNote').innerText, timestamp: Date.now() });
+            db.unshift({ tickets, disp, date: bdt.date, time: bdt.time, note: document.getElementById('outNote').innerText, timestamp: Date.now(), isDone: false });
             localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
-            document.getElementById('mainInput').value = ''; filterData(); render();
+            document.getElementById('mainInput').value = ''; 
+            document.getElementById('duplicateAlert').classList.add('hidden');
+            filterData(); render();
         }
 
-        function openModal(d) { document.getElementById('mDate').value = d || getBDTTime().date; document.getElementById('manualModal').classList.remove('hidden'); }
-        function closeModal() { document.getElementById('manualModal').classList.add('hidden'); }
+        function openModal(id, d) { 
+            if(id === 'manualModal') document.getElementById('mDate').value = d || getBDTTime().date;
+            document.getElementById(id).classList.remove('hidden'); 
+        }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         function saveManual() {
             let tickets = document.getElementById('mTickets').value.split(',').map(t => t.trim()).filter(t => t);
-            if(!tickets.length) return alert("Add at least one ticket!");
-            db.unshift({ tickets, disp: document.getElementById('mDisp').value.toUpperCase(), date: document.getElementById('mDate').value, time: "Manual", note: document.getElementById('mNote').value, timestamp: Date.now() });
+            if(!tickets.length) return;
+            db.unshift({ tickets, disp: document.getElementById('mDisp').value.toUpperCase(), date: document.getElementById('mDate').value, time: "Manual", note: document.getElementById('mNote').value, timestamp: Date.now(), isDone: false });
             localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
-            closeModal(); render();
+            closeModal('manualModal'); render();
+        }
+
+        function toggleDone(timestamp) {
+            const idx = db.findIndex(item => item.timestamp === timestamp);
+            if(idx !== -1) {
+                db[idx].isDone = !db[idx].isDone;
+                localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
+                render();
+            }
+        }
+
+        function toggleAllDoneForDate(date, status) {
+            db.forEach(item => {
+                if(item.date === date) item.isDone = status;
+            });
+            localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
+            render();
         }
 
         function render() {
             let body = document.getElementById('dataTable'); body.innerHTML = '';
             const grouped = db.reduce((acc, obj) => { (acc[obj.date] = acc[obj.date] || []).push(obj); return acc; }, {});
             const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
-            let globalSl = db.length;
             
             sortedDates.forEach(date => {
+                const recordsInDay = grouped[date];
+                const allChecked = recordsInDay.every(r => r.isDone);
+                
+                // Calculate counts for the date
+                const totalDisputes = recordsInDay.length;
+                const totalTickets = recordsInDay.reduce((sum, item) => sum + item.tickets.length, 0);
+
                 const headerRow = document.createElement('tr');
                 headerRow.className = 'date-header';
                 headerRow.innerHTML = `
-                    <td colspan="8">
+                    <td colspan="9">
                         <div class="flex justify-between items-center w-full">
-                            <span><i class="fa-solid fa-calendar-check mr-1 text-blue-500"></i> ${date}</span>
+                            <div class="flex items-center gap-3">
+                                <span><i class="fa-solid fa-calendar-check mr-1 text-blue-500"></i> ${date}</span>
+                                <div class="flex gap-1.5 ml-2">
+                                    <span class="count-badge">Disputes: <b>${totalDisputes}</b></span>
+                                    <span class="count-badge">Tickets: <b>${totalTickets}</b></span>
+                                </div>
+                                <label class="flex items-center gap-1 cursor-pointer bg-white px-2 py-0.5 rounded border border-blue-100 text-[8px] text-blue-600 font-bold uppercase ml-4">
+                                    <input type="checkbox" class="header-check" ${allChecked ? 'checked' : ''} onchange="toggleAllDoneForDate('${date}', this.checked)">
+                                    MARK DAY DONE
+                                </label>
+                            </div>
                             <div class="flex gap-2">
-                                <button onclick="openModal('${date}')" class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase hover:bg-indigo-700 transition">Add New</button>
+                                <button onclick="openModal('manualModal','${date}')" class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase hover:bg-indigo-700 transition">Add New</button>
                                 <button onclick="copyForExcelByDate('${date}')" class="bg-sky-600 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase hover:bg-sky-700 transition">Copy Day</button>
                             </div>
                         </div>
                     </td>`;
                 body.appendChild(headerRow);
 
-                grouped[date].forEach(b => {
+                let dailySl = recordsInDay.length;
+
+                recordsInDay.forEach(b => {
                     const originalIdx = db.findIndex(item => item.timestamp === b.timestamp);
                     b.tickets.forEach((t, ti) => {
                         let isF = ti === 0;
                         const row = document.createElement('tr');
-                        if(!isF) row.style.background = '#fafafa';
+                        if(b.isDone) row.classList.add('row-done');
+                        if(!isF && !b.isDone) row.style.background = '#fafafa';
+                        
                         row.innerHTML = `
-                            <td class="font-bold text-slate-300 text-center">${isF ? globalSl : ''}</td>
+                            <td class="font-bold text-slate-300 text-center">${isF ? dailySl : ''}</td>
                             <td class="font-bold text-indigo-600">${isF ? b.disp : ''}</td>
-                            <td class="font-semibold text-slate-700">${t}</td>
-                            <td class="text-[9px] text-slate-400 italic" title="${b.note}">${isF ? b.note : ''}</td>
+                            <td class="font-semibold text-slate-700 clickable-cell" onclick="copyCell(this)">${t}</td>
+                            <td class="text-[9px] text-slate-400 italic clickable-cell" onclick="copyCell(this)" title="${b.note}">${isF ? b.note : ''}</td>
                             <td class="text-blue-600 font-semibold">${isF ? b.disp + ' Offer Letter' : ''}</td>
                             <td class="text-orange-600 font-black">${t} MAIL</td>
-                            <td>${isF ? `<span class="flex items-center gap-1"><span class="text-slate-500 font-bold">${b.date}</span><span class="time-badge">${b.time}</span></span>` : ''}</td>
+                            <td>${isF ? `<span class="flex items-center gap-1"><span class="text-slate-500 font-bold text-[8px]">${b.date}</span><span class="time-badge">${b.time}</span></span>` : ''}</td>
                             <td class="text-center">
-                                ${isF ? `<button onclick="del(${originalIdx})" class="w-6 h-6 rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can text-[9px]"></i></button>` : ''}
+                                ${isF ? `<input type="checkbox" class="status-check" ${b.isDone ? 'checked' : ''} onchange="toggleDone(${b.timestamp})">` : ''}
+                            </td>
+                            <td class="text-center">
+                                ${isF ? `<button onclick="confirmDelete(${originalIdx})" class="w-6 h-6 rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can text-[9px]"></i></button>` : ''}
                             </td>
                         `;
                         body.appendChild(row);
                     });
-                    globalSl--;
+                    dailySl--;
                 });
             });
             document.getElementById('slDisplay').innerText = db.length + 1;
+        }
+
+        function confirmDelete(idx) {
+            pendingDelIdx = idx;
+            openModal('deleteModal');
+            document.getElementById('confirmDelBtn').onclick = () => {
+                db.splice(pendingDelIdx, 1);
+                localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
+                closeModal('deleteModal');
+                render();
+            };
         }
 
         function generateExcelData(dataList) {
@@ -297,14 +385,6 @@
 
         function copyForExcel() { generateExcelData(db); }
         function copyForExcelByDate(d) { generateExcelData(db.filter(item => item.date === d)); }
-        
-        function del(idx) {
-            if(confirm("Permanently delete this record?")) {
-                db.splice(idx, 1);
-                localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
-                render();
-            }
-        }
 
         window.onload = () => {
             const n = localStorage.getItem('pranto_analyst_name');
