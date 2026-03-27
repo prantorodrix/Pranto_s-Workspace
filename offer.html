@@ -7,10 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background:#f4f7fa; font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding: 10px; }
+        body { background:#f4f7fa; font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding: 12px; }
         
         .header-section { flex-shrink: 0; }
-        .input-section { flex-shrink: 0; margin-bottom: 6px; }
+        .input-section { flex-shrink: 0; margin-bottom: 8px; }
         .table-container { 
             flex-grow: 1; 
             background: #fff; 
@@ -20,20 +20,27 @@
             position: relative;
         }
 
-        .card { background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.03); padding: 6px 10px; }
-        .input-field { border:1.5px solid #e2e8f0; border-radius:6px; width:100%; padding:5px 10px; font-size:12px; outline:none; transition: all 0.2s; color: #1e293b; background: #f8fafc; }
-        .input-field:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-        .label-title { color:#6366f1; font-weight:800; font-size:9px; text-transform:uppercase; margin-bottom:1px; display:block; letter-spacing: 0.8px; }
+        .card { background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.03); padding: 10px 14px; }
+        .input-field { border:1.5px solid #e2e8f0; border-radius:8px; width:100%; padding:7px 12px; font-size:13.5px; outline:none; transition: all 0.3s; color: #1e293b; background: #f8fafc; }
+        
+        /* Updated Input Focus Gradient */
+        .input-field:focus { 
+            border-color: #a5b4fc; 
+            background: linear-gradient(to right, #ffffff, #f5f7ff); 
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08); 
+        }
+
+        .label-title { color:#6366f1; font-weight:800; font-size:10px; text-transform:uppercase; margin-bottom:3px; display:block; letter-spacing: 0.8px; }
         
         .output-box { 
             background: linear-gradient(145deg, #ffffff, #f1f5f9);
             border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 4px 10px;
-            font-size: 11px;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
             color: #334155;
             cursor: pointer;
-            min-height: 26px;
+            min-height: 32px;
             display: flex;
             align-items: center;
             white-space: nowrap;
@@ -43,6 +50,7 @@
             font-weight: 600;
         }
         
+        /* Persistent Highlight Style */
         .output-box.active-copy { 
             background: linear-gradient(135deg, #6366f1, #a855f7) !important; 
             border-color: transparent !important;
@@ -50,14 +58,14 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
         
-        .save-btn { background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border-radius:6px; font-weight:700; height:28px; padding:0 18px; font-size:10px; text-transform:uppercase; transition: 0.3s; cursor: pointer; border: none; }
+        .save-btn { background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border-radius:8px; font-weight:700; height:34px; padding:0 20px; font-size:12px; text-transform:uppercase; transition: 0.3s; cursor: pointer; border: none; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2); }
+        .save-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3); }
         
         /* Table Styles */
         table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
-        th { position: sticky; top: 0; background: #f8fafc; z-index: 40; font-size: 9px; color: #64748b; padding: 4px 8px; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; text-align: left; }
-        td { padding: 2px 8px; font-size: 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 0.2s; }
+        th { position: sticky; top: 0; background: #f8fafc; z-index: 40; font-size: 11px; color: #64748b; padding: 10px 12px; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; text-align: left; }
+        td { padding: 8px 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 0.2s; }
 
-        /* Row Click Highlighting */
         .clickable-cell { cursor: pointer; }
         .row-done { background: #ecfdf5 !important; }
         .row-done td { color: #065f46 !important; border-bottom-color: #d1fae5; }
@@ -65,80 +73,83 @@
         .cell-highlight { background: #e0e7ff !important; color: #4338ca !important; font-weight: 700; }
 
         .date-header { 
-            position: sticky; top: 20px; z-index: 30; background: #eff6ff; 
-            color: #1e40af; font-weight: 800; font-size: 10.5px; padding: 2px 10px; 
-            border-left: 4px solid #3b82f6;
+            position: sticky; top: 38px; z-index: 30; background: #eff6ff; 
+            color: #1e40af; font-weight: 800; font-size: 12px; padding: 6px 14px; 
+            border-left: 5px solid #3b82f6;
         }
 
-        .count-badge { background: #fff; color: #6366f1; padding: 1px 6px; border-radius: 99px; font-size: 9px; border: 1px solid #e0e7ff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .count-badge { background: #fff; color: #6366f1; padding: 2px 10px; border-radius: 99px; font-size: 11px; border: 1px solid #e0e7ff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 
-        .time-badge { background: #dbeafe; color: #1e40af; font-size: 8px; padding: 1px 4px; border-radius: 4px; font-weight: 700; border: 1px solid #bfdbfe; }
-        .id-box { background:#eef2ff; color:#4338ca; font-weight:800; text-align:center; width:26px; height:26px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; border: 1.5px solid #e0e7ff; }
+        .time-badge { background: #dbeafe; color: #1e40af; font-size: 10px; padding: 2px 6px; border-radius: 5px; font-weight: 700; border: 1px solid #bfdbfe; }
+        .id-box { background:#eef2ff; color:#4338ca; font-weight:800; text-align:center; width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; border: 1.5px solid #e0e7ff; }
 
-        .table-container::-webkit-scrollbar { width: 5px; }
+        .table-container::-webkit-scrollbar { width: 6px; }
         .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         .modal-overlay { background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
         
-        .status-check { width: 12px; height: 12px; cursor: pointer; accent-color: #10b981; }
-        .header-check { accent-color: #6366f1; transform: scale(0.9); }
+        .status-check { width: 16px; height: 16px; cursor: pointer; accent-color: #10b981; }
+        .header-check { accent-color: #6366f1; transform: scale(1.1); }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .blink-text { animation: blink 0.8s infinite; }
     </style>
 </head>
 <body>
-    <header class="header-section flex justify-between items-center mb-1 px-4 bg-white p-2 rounded-xl shadow-sm border-b border-indigo-50">
-        <div class="flex items-center gap-2">
-            <div class="bg-indigo-600 p-1.5 rounded-lg text-white shadow-md"><i class="fa-solid fa-bolt text-xs"></i></div>
-            <div class="font-black text-slate-800 text-lg tracking-tight">PRANTO'S <span class="text-indigo-600">WORKSPACE</span></div>
+    <header class="header-section flex justify-between items-center mb-2 px-6 bg-white p-3 rounded-2xl shadow-sm border-b border-indigo-50">
+        <div class="flex items-center gap-3">
+            <div class="bg-indigo-600 p-2 rounded-xl text-white shadow-md"><i class="fa-solid fa-bolt text-sm"></i></div>
+            <div class="font-black text-slate-800 text-xl tracking-tight">PRANTO'S <span class="text-indigo-600">WORKSPACE</span></div>
         </div>
-        <nav class="flex gap-4 items-center">
-            <div id="duplicateAlert" class="text-red-600 font-black text-[10px] hidden blink-text uppercase mr-4"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Duplicate Dispute Found!</div>
-            <a href="index.html" class="text-[10px] font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-widest">Home</a>
-            <span class="text-[10px] font-bold text-indigo-600 border-b-2 border-indigo-600 uppercase tracking-widest">Offer System</span>
+        
+        <!-- Navigation with Home in Center -->
+        <nav class="flex gap-8 items-center">
+            <div id="duplicateAlert" class="text-red-600 font-black text-xs hidden blink-text uppercase"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Duplicate Dispute Found!</div>
+            <a href="index.html" class="text-xs font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors">Home</a>
+            <span class="text-xs font-bold text-indigo-600 border-b-2 border-indigo-600 pb-1 uppercase tracking-widest">Offer System</span>
         </nav>
-        <div id="errorMsg" class="text-red-500 font-bold text-[9px] hidden animate-pulse uppercase">Enter Name</div>
+        
+        <div id="errorMsg" class="text-red-500 font-bold text-xs hidden animate-pulse uppercase">Enter Name</div>
     </header>
 
     <div class="input-section">
-        <div class="card grid grid-cols-12 gap-2 items-end">
+        <div class="card grid grid-cols-12 gap-3 items-end">
             <div class="col-span-1"><span class="label-title">SL</span><div id="slDisplay" class="id-box">1</div></div>
-            <div class="col-span-2"><span class="label-title">Analyst</span><input type="text" id="userName" class="input-field" placeholder="Name..." oninput="filterData()"></div>
-            <div class="col-span-8"><span class="label-title">Data String</span><input type="text" id="mainInput" class="input-field" placeholder="Paste IDR Data..." oninput="filterData()"></div>
+            <div class="col-span-2"><span class="label-title">Analyst Name</span><input type="text" id="userName" class="input-field" placeholder="Full Name..." oninput="filterData()"></div>
+            <div class="col-span-8"><span class="label-title">Data String (IDR Raw)</span><input type="text" id="mainInput" class="input-field" placeholder="Paste IDR Data string here..." oninput="filterData()"></div>
             <div class="col-span-1"><button onclick="saveToTable()" id="saveBtn" class="save-btn w-full">Save</button></div>
 
-            <div class="col-span-12 grid grid-cols-5 gap-2 mt-1">
+            <div class="col-span-12 grid grid-cols-5 gap-3 mt-1">
                 <div><span class="label-title">Dispute ID</span><div id="outDisp" class="output-box" onclick="copyAndHighlight(this)">---</div></div>
-                <div><span class="label-title">Ticket List</span><div id="ticketContainer" class="flex flex-col gap-1"><div class="output-box">---</div></div></div>
+                <div><span class="label-title">Ticket List</span><div id="ticketContainer" class="flex flex-col gap-1.5"><div class="output-box">---</div></div></div>
                 <div><span class="label-title">Auto Note</span><div id="outNote" class="output-box" onclick="copyAndHighlight(this)">---</div></div>
                 <div><span class="label-title">Offer Letter</span><div id="outOfferLetter" class="output-box" onclick="copyAndHighlight(this)">---</div></div>
-                <div><span class="label-title">Mail Ref</span><div id="mailContainer" class="flex flex-col gap-1"><div class="output-box">---</div></div></div>
+                <div><span class="label-title">Mail Ref</span><div id="mailContainer" class="flex flex-col gap-1.5"><div class="output-box">---</div></div></div>
             </div>
         </div>
     </div>
 
     <div class="table-container">
-        <div class="sticky top-0 z-50 bg-white/95 px-4 py-1 border-b flex justify-between items-center">
-            <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i> Log History
+        <div class="sticky top-0 z-50 bg-white px-6 py-2 border-b flex justify-between items-center">
+            <h2 class="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i> Data Management Log
             </h2>
-            <div class="flex gap-2">
-                <button onclick="copyForExcel()" class="bg-emerald-600 text-white px-3 py-1 rounded-md text-[9px] font-bold uppercase hover:bg-emerald-700 transition">Export All</button>
+            <div class="flex gap-3">
+                <button onclick="copyForExcel()" class="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase hover:bg-emerald-700 transition shadow-sm">Export Master List</button>
             </div>
         </div>
         <table id="mainTable">
             <thead>
                 <tr>
-                    <th style="width: 35px;" class="text-center">SL</th>
-                    <th style="width: 85px;">Dispute</th>
-                    <th style="width: 85px;">Ticket</th>
-                    <th>Note</th>
-                    <th style="width: 120px;">File Name</th>
-                    <th style="width: 100px;">Mail Ref</th>
-                    <th style="width: 130px;">BDT Time</th>
-                    <th style="width: 45px;" class="text-center">Done</th>
-                    <th style="width: 40px;" class="text-center">Del</th>
+                    <th style="width: 45px;" class="text-center">SL</th>
+                    <th style="width: 110px;">Dispute ID</th>
+                    <th style="width: 110px;">Ticket No</th>
+                    <th>Auto Note</th>
+                    <th style="width: 140px;">File Attachment</th>
+                    <th style="width: 120px;">Mail Ref</th>
+                    <th style="width: 150px;">Entry Time</th>
+                    <th style="width: 55px;" class="text-center">Status</th>
+                    <th style="width: 50px;" class="text-center">Act</th>
                 </tr>
             </thead>
             <tbody id="dataTable"></tbody>
@@ -147,32 +158,32 @@
 
     <!-- Manual Entry Modal -->
     <div id="manualModal" class="modal-overlay hidden">
-        <div class="bg-white rounded-xl w-full max-w-sm shadow-2xl p-5 border border-indigo-100">
-            <h3 class="text-lg font-black text-slate-800 mb-3 border-b pb-1 uppercase tracking-tight">Manual Entry</h3>
-            <div class="space-y-3">
-                <div><span class="label-title">Date</span><input type="text" id="mDate" class="input-field" placeholder="MM/DD/YY"></div>
-                <div><span class="label-title">Dispute</span><input type="text" id="mDisp" class="input-field" placeholder="DISP-XXXX"></div>
-                <div><span class="label-title">Tickets</span><input type="text" id="mTickets" class="input-field" placeholder="TKT1, TKT2"></div>
-                <div><span class="label-title">Note Content</span><textarea id="mNote" class="input-field h-20" placeholder="Content..."></textarea></div>
+        <div class="bg-white rounded-2xl w-full max-sm shadow-2xl p-6 border border-indigo-100">
+            <h3 class="text-xl font-black text-slate-800 mb-4 border-b pb-2 uppercase tracking-tight">Manual Data Entry</h3>
+            <div class="space-y-4">
+                <div><span class="label-title">Record Date</span><input type="text" id="mDate" class="input-field" placeholder="MM/DD/YY"></div>
+                <div><span class="label-title">Dispute ID</span><input type="text" id="mDisp" class="input-field" placeholder="DISP-XXXX"></div>
+                <div><span class="label-title">Ticket Numbers</span><input type="text" id="mTickets" class="input-field" placeholder="Comma separated: TKT1, TKT2"></div>
+                <div><span class="label-title">Note Content</span><textarea id="mNote" class="input-field h-24" placeholder="Type or paste your note..."></textarea></div>
             </div>
-            <div class="flex gap-2 mt-5">
-                <button onclick="closeModal('manualModal')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2 rounded-lg text-[10px] uppercase">Cancel</button>
-                <button onclick="saveManual()" class="flex-1 bg-indigo-600 text-white font-bold py-2 rounded-lg text-[10px] uppercase">Save Data</button>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeModal('manualModal')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2.5 rounded-xl text-xs uppercase">Cancel</button>
+                <button onclick="saveManual()" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs uppercase shadow-lg shadow-indigo-100">Save Record</button>
             </div>
         </div>
     </div>
 
     <!-- Delete Warning Modal -->
     <div id="deleteModal" class="modal-overlay hidden">
-        <div class="bg-white rounded-xl w-full max-w-xs shadow-2xl p-6 text-center">
-            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-trash-can text-xl"></i>
+        <div class="bg-white rounded-2xl w-full max-w-xs shadow-2xl p-8 text-center border">
+            <div class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-5">
+                <i class="fa-solid fa-trash-can text-2xl"></i>
             </div>
-            <h3 class="text-lg font-black text-slate-800 mb-1">Delete Record?</h3>
-            <p class="text-slate-500 text-xs mb-6">Ai data-ti permanent vabe delete hoye jabe. Apni ki nishchit?</p>
-            <div class="flex gap-2">
-                <button onclick="closeModal('deleteModal')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2 rounded-lg text-[10px] uppercase">No, Keep</button>
-                <button id="confirmDelBtn" class="flex-1 bg-red-600 text-white font-bold py-2 rounded-lg text-[10px] uppercase shadow-lg shadow-red-200">Yes, Delete</button>
+            <h3 class="text-xl font-black text-slate-800 mb-2">Delete Record?</h3>
+            <p class="text-slate-500 text-sm mb-8 leading-relaxed">Ai data-ti permanent vabe database theke muche jabe. Apni ki nishchit?</p>
+            <div class="flex flex-col gap-2">
+                <button id="confirmDelBtn" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase shadow-lg shadow-red-200">Yes, Delete Permanently</button>
+                <button onclick="closeModal('deleteModal')" class="w-full bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-xs uppercase">No, Keep It</button>
             </div>
         </div>
     </div>
@@ -217,8 +228,9 @@
             document.getElementById('outDisp').innerText = disp;
             const tc = document.getElementById('ticketContainer');
             const mc = document.getElementById('mailContainer');
+            
+            // Note: We don't clear classes here if typing continues to keep the flow
             tc.innerHTML = ''; mc.innerHTML = '';
-            document.querySelectorAll('.output-box').forEach(el => el.classList.remove('active-copy'));
             
             if (!tickets.length) {
                 tc.innerHTML = '<div class="output-box">---</div>';
@@ -238,6 +250,7 @@
         function copyAndHighlight(e) {
             let t = e.innerText; if(t === '---') return;
             const el = document.createElement("textarea"); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            // Persistent highlight until reset/save
             e.classList.add('active-copy'); 
         }
         
@@ -246,6 +259,7 @@
             if(!text || text === "Manual") return;
             const el = document.createElement("textarea"); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
             e.classList.add('cell-highlight');
+            setTimeout(() => e.classList.remove('cell-highlight'), 1000);
         }
 
         function saveToTable() {
@@ -255,8 +269,14 @@
             let bdt = getBDTTime();
             db.unshift({ tickets, disp, date: bdt.date, time: bdt.time, note: document.getElementById('outNote').innerText, timestamp: Date.now(), isDone: false });
             localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
+            
+            // Reset UI
             document.getElementById('mainInput').value = ''; 
             document.getElementById('duplicateAlert').classList.add('hidden');
+            
+            // Clear persistent highlights
+            document.querySelectorAll('.output-box').forEach(el => el.classList.remove('active-copy'));
+            
             filterData(); render();
         }
 
@@ -291,6 +311,22 @@
             render();
         }
 
+        function copyDisputesByDate(date) {
+            const records = db.filter(item => item.date === date);
+            if(!records.length) return;
+            const disputes = records.map(r => r.disp).join('\n');
+            const el = document.createElement("textarea"); el.value = disputes; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            
+            const btn = event.currentTarget;
+            const oldText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
+            btn.classList.replace('bg-indigo-600', 'bg-emerald-500');
+            setTimeout(() => {
+                btn.innerHTML = oldText;
+                btn.classList.replace('bg-emerald-500', 'bg-indigo-600');
+            }, 2000);
+        }
+
         function render() {
             let body = document.getElementById('dataTable'); body.innerHTML = '';
             const grouped = db.reduce((acc, obj) => { (acc[obj.date] = acc[obj.date] || []).push(obj); return acc; }, {});
@@ -299,8 +335,6 @@
             sortedDates.forEach(date => {
                 const recordsInDay = grouped[date];
                 const allChecked = recordsInDay.every(r => r.isDone);
-                
-                // Calculate counts for the date
                 const totalDisputes = recordsInDay.length;
                 const totalTickets = recordsInDay.reduce((sum, item) => sum + item.tickets.length, 0);
 
@@ -308,21 +342,24 @@
                 headerRow.className = 'date-header';
                 headerRow.innerHTML = `
                     <td colspan="9">
-                        <div class="flex justify-between items-center w-full">
-                            <div class="flex items-center gap-3">
-                                <span><i class="fa-solid fa-calendar-check mr-1 text-blue-500"></i> ${date}</span>
-                                <div class="flex gap-1.5 ml-2">
-                                    <span class="count-badge">Disputes: <b>${totalDisputes}</b></span>
-                                    <span class="count-badge">Tickets: <b>${totalTickets}</b></span>
+                        <div class="flex justify-between items-center w-full py-1">
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm"><i class="fa-solid fa-calendar-check mr-2 text-blue-500"></i> ${date}</span>
+                                <div class="flex gap-2">
+                                    <span class="count-badge">Batch: <b>${totalDisputes}</b></span>
+                                    <span class="count-badge">Total Tickets: <b>${totalTickets}</b></span>
                                 </div>
-                                <label class="flex items-center gap-1 cursor-pointer bg-white px-2 py-0.5 rounded border border-blue-100 text-[8px] text-blue-600 font-bold uppercase ml-4">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded-lg border border-blue-100 text-[10px] text-blue-600 font-bold uppercase ml-4 shadow-sm">
                                     <input type="checkbox" class="header-check" ${allChecked ? 'checked' : ''} onchange="toggleAllDoneForDate('${date}', this.checked)">
-                                    MARK DAY DONE
+                                    MARK COMPLETED
                                 </label>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="openModal('manualModal','${date}')" class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase hover:bg-indigo-700 transition">Add New</button>
-                                <button onclick="copyForExcelByDate('${date}')" class="bg-sky-600 text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase hover:bg-sky-700 transition">Copy Day</button>
+                                <button onclick="copyDisputesByDate('${date}')" class="bg-indigo-600 text-white px-3 py-1 rounded-md text-[10px] font-bold uppercase hover:bg-indigo-700 transition flex items-center shadow-sm">
+                                    <i class="fa-solid fa-copy mr-1.5"></i> Copy Disputes
+                                </button>
+                                <button onclick="openModal('manualModal','${date}')" class="bg-slate-600 text-white px-3 py-1 rounded-md text-[10px] font-bold uppercase hover:bg-slate-700 transition shadow-sm">Add New</button>
+                                <button onclick="copyForExcelByDate('${date}')" class="bg-sky-600 text-white px-3 py-1 rounded-md text-[10px] font-bold uppercase hover:bg-sky-700 transition shadow-sm">Export Day</button>
                             </div>
                         </div>
                     </td>`;
@@ -340,17 +377,17 @@
                         
                         row.innerHTML = `
                             <td class="font-bold text-slate-300 text-center">${isF ? dailySl : ''}</td>
-                            <td class="font-bold text-indigo-600">${isF ? b.disp : ''}</td>
+                            <td class="font-bold text-indigo-600 clickable-cell" onclick="copyCell(this)">${isF ? b.disp : ''}</td>
                             <td class="font-semibold text-slate-700 clickable-cell" onclick="copyCell(this)">${t}</td>
-                            <td class="text-[9px] text-slate-400 italic clickable-cell" onclick="copyCell(this)" title="${b.note}">${isF ? b.note : ''}</td>
-                            <td class="text-blue-600 font-semibold">${isF ? b.disp + ' Offer Letter' : ''}</td>
-                            <td class="text-orange-600 font-black">${t} MAIL</td>
-                            <td>${isF ? `<span class="flex items-center gap-1"><span class="text-slate-500 font-bold text-[8px]">${b.date}</span><span class="time-badge">${b.time}</span></span>` : ''}</td>
+                            <td class="text-[11px] text-slate-400 italic clickable-cell leading-snug" onclick="copyCell(this)" title="${b.note}">${isF ? (b.note.length > 50 ? b.note.substring(0,50)+'...' : b.note) : ''}</td>
+                            <td class="text-blue-600 font-semibold clickable-cell" onclick="copyCell(this)">${isF ? b.disp + ' Offer Letter' : ''}</td>
+                            <td class="text-orange-600 font-black clickable-cell" onclick="copyCell(this)">${t} MAIL</td>
+                            <td>${isF ? `<span class="flex items-center gap-2"><span class="text-slate-400 font-bold text-[10px]">${b.date}</span><span class="time-badge">${b.time}</span></span>` : ''}</td>
                             <td class="text-center">
                                 ${isF ? `<input type="checkbox" class="status-check" ${b.isDone ? 'checked' : ''} onchange="toggleDone(${b.timestamp})">` : ''}
                             </td>
                             <td class="text-center">
-                                ${isF ? `<button onclick="confirmDelete(${originalIdx})" class="w-6 h-6 rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can text-[9px]"></i></button>` : ''}
+                                ${isF ? `<button onclick="confirmDelete(${originalIdx})" class="w-8 h-8 rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all flex items-center justify-center mx-auto"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}
                             </td>
                         `;
                         body.appendChild(row);
@@ -373,6 +410,7 @@
         }
 
         function generateExcelData(dataList) {
+            if(!dataList.length) return;
             let csv = "SL\tDispute\tTicket\tFull Note\tOffer Letter\tMail Ref\tDate\tTime\n";
             let sl = dataList.length;
             dataList.forEach(b => {
@@ -380,7 +418,7 @@
                 sl--;
             });
             let el = document.createElement("textarea"); el.value = csv; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            alert("Data copied for Excel!");
+            alert("Success: Master list copied to clipboard!");
         }
 
         function copyForExcel() { generateExcelData(db); }
