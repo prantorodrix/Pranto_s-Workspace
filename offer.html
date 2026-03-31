@@ -23,7 +23,6 @@
         .card { background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.03); padding: 10px 14px; }
         .input-field { border:1.5px solid #e2e8f0; border-radius:8px; width:100%; padding:7px 12px; font-size:13.5px; outline:none; transition: all 0.3s; color: #1e293b; background: #f8fafc; }
         
-        /* Updated Input Focus Gradient */
         .input-field:focus { 
             border-color: #a5b4fc; 
             background: linear-gradient(to right, #ffffff, #f5f7ff); 
@@ -50,7 +49,6 @@
             font-weight: 600;
         }
         
-        /* Persistent Highlight Style */
         .output-box.active-copy { 
             background: linear-gradient(135deg, #6366f1, #a855f7) !important; 
             border-color: transparent !important;
@@ -61,7 +59,6 @@
         .save-btn { background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border-radius:8px; font-weight:700; height:34px; padding:0 20px; font-size:12px; text-transform:uppercase; transition: 0.3s; cursor: pointer; border: none; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2); }
         .save-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3); }
         
-        /* Table Styles */
         table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
         th { position: sticky; top: 0; background: #f8fafc; z-index: 40; font-size: 11px; color: #64748b; padding: 10px 12px; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; text-align: left; }
         td { padding: 8px 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 0.2s; }
@@ -70,7 +67,8 @@
         .row-done { background: #ecfdf5 !important; }
         .row-done td { color: #065f46 !important; border-bottom-color: #d1fae5; }
         
-        .cell-highlight { background: #e0e7ff !important; color: #4338ca !important; font-weight: 700; }
+        /* Subtle Persistent Highlight */
+        .cell-highlight { background: #dcfce7 !important; color: #166534 !important; font-weight: 700; border-left: 3px solid #22c55e; }
 
         .date-header { 
             position: sticky; top: 38px; z-index: 30; background: #eff6ff; 
@@ -102,7 +100,6 @@
             <div class="font-black text-slate-800 text-xl tracking-tight">PRANTO'S <span class="text-indigo-600">WORKSPACE</span></div>
         </div>
         
-        <!-- Navigation with Home in Center -->
         <nav class="flex gap-8 items-center">
             <div id="duplicateAlert" class="text-red-600 font-black text-xs hidden blink-text uppercase"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Duplicate Dispute Found!</div>
             <a href="index.html" class="text-xs font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors">Home</a>
@@ -156,7 +153,7 @@
         </table>
     </div>
 
-    <!-- Manual Entry Modal -->
+    <!-- Modals -->
     <div id="manualModal" class="modal-overlay hidden">
         <div class="bg-white rounded-2xl w-full max-sm shadow-2xl p-6 border border-indigo-100">
             <h3 class="text-xl font-black text-slate-800 mb-4 border-b pb-2 uppercase tracking-tight">Manual Data Entry</h3>
@@ -173,14 +170,13 @@
         </div>
     </div>
 
-    <!-- Delete Warning Modal -->
     <div id="deleteModal" class="modal-overlay hidden">
         <div class="bg-white rounded-2xl w-full max-w-xs shadow-2xl p-8 text-center border">
             <div class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-5">
                 <i class="fa-solid fa-trash-can text-2xl"></i>
             </div>
             <h3 class="text-xl font-black text-slate-800 mb-2">Delete Record?</h3>
-            <p class="text-slate-500 text-sm mb-8 leading-relaxed">Ai data-ti permanent vabe database theke muche jabe. Apni ki nishchit?</p>
+            <p class="text-slate-500 text-sm mb-8 leading-relaxed">Ai data-ti permanent vabe database theke muche jabe.</p>
             <div class="flex flex-col gap-2">
                 <button id="confirmDelBtn" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase shadow-lg shadow-red-200">Yes, Delete Permanently</button>
                 <button onclick="closeModal('deleteModal')" class="w-full bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-xs uppercase">No, Keep It</button>
@@ -229,7 +225,6 @@
             const tc = document.getElementById('ticketContainer');
             const mc = document.getElementById('mailContainer');
             
-            // Note: We don't clear classes here if typing continues to keep the flow
             tc.innerHTML = ''; mc.innerHTML = '';
             
             if (!tickets.length) {
@@ -243,23 +238,23 @@
                     mc.innerHTML += `<div class="output-box" onclick="copyAndHighlight(this)">${t} MAIL</div>`;
                 });
                 if(isValid) document.getElementById('outNote').innerText = `${bdt.date}>IDR FOLLOW UP>${name.toUpperCase()}>RECEIVED NOTIFICATION THAT OFFER LETTER NEEDED. SUBMITTED OFFER LETTER THROUGH LINK PROVIDED IN FEDERAL IDR EMAIL. PDF COPY OF NOTICE OF OFFER PRINTED AND TO BE UPLOADED INTO CENTRICITY. DISPUTE ID# ${disp}.`;
-                document.getElementById('outOfferLetter').innerText = disp !== '---' ? disp + ' Offer Letter' : '---';
+                
+                // Set initial uppercase output box
+                document.getElementById('outOfferLetter').innerText = disp !== '---' ? `${disp} OFFER LETTER` : '---';
             }
         }
 
         function copyAndHighlight(e) {
             let t = e.innerText; if(t === '---') return;
             const el = document.createElement("textarea"); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            // Persistent highlight until reset/save
             e.classList.add('active-copy'); 
         }
         
-        function copyCell(e) {
-            const text = e.innerText;
-            if(!text || text === "Manual") return;
-            const el = document.createElement("textarea"); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+        function copyCell(e, fullText = null) {
+            const textToCopy = fullText || e.innerText;
+            if(!textToCopy || textToCopy === "Manual" || textToCopy === "") return;
+            const el = document.createElement("textarea"); el.value = textToCopy; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
             e.classList.add('cell-highlight');
-            setTimeout(() => e.classList.remove('cell-highlight'), 1000);
         }
 
         function saveToTable() {
@@ -269,21 +264,11 @@
             let bdt = getBDTTime();
             db.unshift({ tickets, disp, date: bdt.date, time: bdt.time, note: document.getElementById('outNote').innerText, timestamp: Date.now(), isDone: false });
             localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
-            
-            // Reset UI
             document.getElementById('mainInput').value = ''; 
-            document.getElementById('duplicateAlert').classList.add('hidden');
-            
-            // Clear persistent highlights
-            document.querySelectorAll('.output-box').forEach(el => el.classList.remove('active-copy'));
-            
             filterData(); render();
         }
 
-        function openModal(id, d) { 
-            if(id === 'manualModal') document.getElementById('mDate').value = d || getBDTTime().date;
-            document.getElementById(id).classList.remove('hidden'); 
-        }
+        function openModal(id, d) { if(id === 'manualModal') document.getElementById('mDate').value = d || getBDTTime().date; document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         function saveManual() {
@@ -296,35 +281,18 @@
 
         function toggleDone(timestamp) {
             const idx = db.findIndex(item => item.timestamp === timestamp);
-            if(idx !== -1) {
-                db[idx].isDone = !db[idx].isDone;
-                localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
-                render();
-            }
+            if(idx !== -1) { db[idx].isDone = !db[idx].isDone; localStorage.setItem('pranto_v6_pro', JSON.stringify(db)); render(); }
         }
 
         function toggleAllDoneForDate(date, status) {
-            db.forEach(item => {
-                if(item.date === date) item.isDone = status;
-            });
-            localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
-            render();
+            db.forEach(item => { if(item.date === date) item.isDone = status; });
+            localStorage.setItem('pranto_v6_pro', JSON.stringify(db)); render();
         }
 
         function copyDisputesByDate(date) {
             const records = db.filter(item => item.date === date);
-            if(!records.length) return;
             const disputes = records.map(r => r.disp).join('\n');
             const el = document.createElement("textarea"); el.value = disputes; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            
-            const btn = event.currentTarget;
-            const oldText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
-            btn.classList.replace('bg-indigo-600', 'bg-emerald-500');
-            setTimeout(() => {
-                btn.innerHTML = oldText;
-                btn.classList.replace('bg-emerald-500', 'bg-indigo-600');
-            }, 2000);
         }
 
         function render() {
@@ -366,7 +334,6 @@
                 body.appendChild(headerRow);
 
                 let dailySl = recordsInDay.length;
-
                 recordsInDay.forEach(b => {
                     const originalIdx = db.findIndex(item => item.timestamp === b.timestamp);
                     b.tickets.forEach((t, ti) => {
@@ -375,20 +342,18 @@
                         if(b.isDone) row.classList.add('row-done');
                         if(!isF && !b.isDone) row.style.background = '#fafafa';
                         
+                        const safeNote = b.note.replace(/'/g, "\\'");
+                        
                         row.innerHTML = `
                             <td class="font-bold text-slate-300 text-center">${isF ? dailySl : ''}</td>
                             <td class="font-bold text-indigo-600 clickable-cell" onclick="copyCell(this)">${isF ? b.disp : ''}</td>
                             <td class="font-semibold text-slate-700 clickable-cell" onclick="copyCell(this)">${t}</td>
-                            <td class="text-[11px] text-slate-400 italic clickable-cell leading-snug" onclick="copyCell(this)" title="${b.note}">${isF ? (b.note.length > 50 ? b.note.substring(0,50)+'...' : b.note) : ''}</td>
-                            <td class="text-blue-600 font-semibold clickable-cell" onclick="copyCell(this)">${isF ? b.disp + ' Offer Letter' : ''}</td>
+                            <td class="text-[11px] text-slate-400 italic clickable-cell leading-snug" onclick="copyCell(this, '${isF ? safeNote : ''}')" title="${b.note}">${isF ? (b.note.length > 50 ? b.note.substring(0,50)+'...' : b.note) : ''}</td>
+                            <td class="text-blue-600 font-semibold clickable-cell" onclick="copyCell(this)">${isF ? b.disp.toUpperCase() + ' OFFER LETTER' : ''}</td>
                             <td class="text-orange-600 font-black clickable-cell" onclick="copyCell(this)">${t} MAIL</td>
                             <td>${isF ? `<span class="flex items-center gap-2"><span class="text-slate-400 font-bold text-[10px]">${b.date}</span><span class="time-badge">${b.time}</span></span>` : ''}</td>
-                            <td class="text-center">
-                                ${isF ? `<input type="checkbox" class="status-check" ${b.isDone ? 'checked' : ''} onchange="toggleDone(${b.timestamp})">` : ''}
-                            </td>
-                            <td class="text-center">
-                                ${isF ? `<button onclick="confirmDelete(${originalIdx})" class="w-8 h-8 rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all flex items-center justify-center mx-auto"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}
-                            </td>
+                            <td class="text-center">${isF ? `<input type="checkbox" class="status-check" ${b.isDone ? 'checked' : ''} onchange="toggleDone(${b.timestamp})">` : ''}</td>
+                            <td class="text-center">${isF ? `<button onclick="confirmDelete(${originalIdx})" class="w-8 h-8 rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all flex items-center justify-center mx-auto"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}</td>
                         `;
                         body.appendChild(row);
                     });
@@ -399,13 +364,9 @@
         }
 
         function confirmDelete(idx) {
-            pendingDelIdx = idx;
-            openModal('deleteModal');
+            pendingDelIdx = idx; openModal('deleteModal');
             document.getElementById('confirmDelBtn').onclick = () => {
-                db.splice(pendingDelIdx, 1);
-                localStorage.setItem('pranto_v6_pro', JSON.stringify(db));
-                closeModal('deleteModal');
-                render();
+                db.splice(pendingDelIdx, 1); localStorage.setItem('pranto_v6_pro', JSON.stringify(db)); closeModal('deleteModal'); render();
             };
         }
 
@@ -414,7 +375,7 @@
             let csv = "SL\tDispute\tTicket\tFull Note\tOffer Letter\tMail Ref\tDate\tTime\n";
             let sl = dataList.length;
             dataList.forEach(b => {
-                b.tickets.forEach((t, ti) => { csv += `${ti===0?sl:""}\t${ti===0?b.disp:""}\t${t}\t${ti===0?b.note:""}\t${ti===0?b.disp+" Offer Letter":""}\t${t} MAIL\t${b.date}\t${ti===0?b.time:""}\n`; });
+                b.tickets.forEach((t, ti) => { csv += `${ti===0?sl:""}\t${ti===0?b.disp:""}\t${t}\t${ti===0?b.note:""}\t${ti===0?b.disp.toUpperCase()+" OFFER LETTER":""}\t${t} MAIL\t${b.date}\t${ti===0?b.time:""}\n`; });
                 sl--;
             });
             let el = document.createElement("textarea"); el.value = csv; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
