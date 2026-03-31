@@ -193,8 +193,8 @@
             const options = { timeZone: 'Asia/Dhaka', year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
             const parts = new Intl.DateTimeFormat('en-US', options).formatToParts(date);
             const d = `${parts.find(p => p.type === 'month').value}/${parts.find(p => p.type === 'day').value}/${parts.find(p => p.type === 'year').value}`;
-            const t = `${parts.find(p => p.type === 'hour').value}:${parts.find(p => p.type === 'minute').value}:${parts.find(p => p.type === 'second').value} ${parts.find(p => p.type === 'dayPeriod').value}`;
-            return { date: d, time: t };
+            const t = `${parts.find(p => p.type === 'hour').value}:${parts.find(p => p.type === 'minute').value}:${parts.find(p => p.second === 'second' ? p.value : '00')}`; // simple t
+            return { date: d, time: new Intl.DateTimeFormat('en-US', options).format(date).split(', ')[1] };
         }
 
         function validateInput() {
@@ -211,7 +211,16 @@
             return { disp, tickets };
         }
 
+        function clearOutputHighlights() {
+            // "active-copy" class muche dey shob output box theke
+            const boxes = document.querySelectorAll('.output-box');
+            boxes.forEach(box => box.classList.remove('active-copy'));
+        }
+
         function filterData() {
+            // Notun data type korle highlight muche jabe
+            clearOutputHighlights();
+
             const isValid = validateInput();
             let raw = document.getElementById('mainInput').value.trim();
             let name = document.getElementById('userName').value.trim();
@@ -239,7 +248,6 @@
                 });
                 if(isValid) document.getElementById('outNote').innerText = `${bdt.date}>IDR FOLLOW UP>${name.toUpperCase()}>RECEIVED NOTIFICATION THAT OFFER LETTER NEEDED. SUBMITTED OFFER LETTER THROUGH LINK PROVIDED IN FEDERAL IDR EMAIL. PDF COPY OF NOTICE OF OFFER PRINTED AND TO BE UPLOADED INTO CENTRICITY. DISPUTE ID# ${disp}.`;
                 
-                // Set initial uppercase output box
                 document.getElementById('outOfferLetter').innerText = disp !== '---' ? `${disp} OFFER LETTER` : '---';
             }
         }
