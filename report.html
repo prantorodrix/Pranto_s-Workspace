@@ -21,45 +21,54 @@
             -webkit-backdrop-filter: blur(10px);
         }
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
         .card-hover {
             transition: all 0.2s ease-in-out;
         }
         .card-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        textarea:focus {
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        /* Excel-like Table Styling */
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .excel-table th {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .excel-table td {
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            background: white;
+        }
+        .excel-table tr:hover td {
+            background: #f8fafc;
         }
 
-        /* Logic for Dynamic Tags */
         .tag-disabled {
             background: #f1f5f9 !important;
             color: #94a3b8 !important;
             border-color: #e2e8f0 !important;
             cursor: not-allowed;
             opacity: 0.6;
-            filter: grayscale(1);
         }
 
         .tag-enabled {
             cursor: pointer;
             opacity: 1;
-            filter: grayscale(0);
         }
         
-        /* Smooth transition for tags */
         .entry-tag {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
         }
     </style>
 </head>
@@ -67,91 +76,90 @@
 
     <!-- Navbar -->
     <nav class="glass-nav border border-slate-200 px-6 py-3 flex justify-between items-center rounded-2xl mb-6 shadow-sm sticky top-4 z-50">
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 w-1/3">
             <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-xl flex items-center justify-center text-white shadow-lg">
                 <i class="fas fa-bolt text-lg"></i>
             </div>
-            <div>
-                <h1 class="text-sm font-bold uppercase tracking-wider text-slate-900 leading-tight">
-                    Pranto's Workspace
-                </h1>
+            <div class="hidden sm:block">
+                <h1 class="text-sm font-bold uppercase tracking-wider text-slate-900 leading-tight">Pranto's Workspace</h1>
                 <p class="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Elite Productivity</p>
             </div>
         </div>
 
-        <div class="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-            <button id="dayBtn" onclick="setShift('Day')" class="shift-btn px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all bg-white text-indigo-600 shadow-sm">
-                <i class="fas fa-sun text-sm"></i> DAY
-            </button>
-            <button id="nightBtn" onclick="setShift('Night')" class="shift-btn px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all text-slate-500">
-                <i class="fas fa-moon text-sm"></i> NIGHT
-            </button>
+        <div class="flex justify-center w-1/3">
+            <a href="index.html" class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-indigo-600 transition-all shadow-md active:scale-95">
+                <i class="fas fa-home"></i>
+                <span class="hidden md:inline">HOME</span>
+            </a>
+        </div>
+
+        <div class="flex justify-end w-1/3">
+            <div class="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                <button id="dayBtn" onclick="setShift('Day')" class="shift-btn px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all bg-white text-indigo-600 shadow-sm">
+                    <i class="fas fa-sun text-sm"></i> DAY
+                </button>
+                <button id="nightBtn" onclick="setShift('Night')" class="shift-btn px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all text-slate-500">
+                    <i class="fas fa-moon text-sm"></i> NIGHT
+                </button>
+            </div>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto space-y-6">
+        <!-- Input & Summary Section -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Left: Input Area -->
             <div class="lg:col-span-8">
                 <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
                     <div class="flex items-center gap-2 mb-4">
                         <i class="fas fa-plus-circle text-indigo-500"></i>
                         <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">New Entry</span>
                     </div>
-                    
                     <textarea id="ticketInput" oninput="handleInput()" placeholder="Enter Ticket ID here..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium text-slate-700 outline-none h-20 resize-none transition-all placeholder:text-slate-400"></textarea>
-                    
-                    <div id="tagContainer" class="flex flex-wrap gap-2 mt-4">
-                        <!-- Tags rendered by JS -->
-                    </div>
+                    <div id="tagContainer" class="flex flex-wrap gap-2 mt-4"></div>
                 </div>
             </div>
 
-            <!-- Right: Summary Panel -->
             <div class="lg:col-span-4">
                 <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm h-full">
                     <div class="flex items-center justify-between mb-5">
-                        <select id="dateFilter" onchange="updateSummary()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-indigo-600 outline-none">
-                        </select>
+                        <select id="dateFilter" onchange="updateSummary()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-indigo-600 outline-none uppercase"></select>
                         <div class="flex items-center gap-2 bg-slate-900 rounded-xl px-4 py-1.5 shadow-lg">
                             <i class="fas fa-chart-pie text-indigo-400 text-xs"></i>
                             <span id="totalCount" class="text-sm font-bold text-white">0</span>
                         </div>
                     </div>
-                    
-                    <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        <!-- Stats boxes -->
-                    </div>
+                    <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Timeline Log -->
+        <!-- History Log with View Switcher -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="bg-slate-50 px-6 py-3 border-b border-slate-200 flex items-center justify-between">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest">
                     <i class="fas fa-history"></i> Production Log
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span class="text-[10px] font-bold text-emerald-600 uppercase">Live Update</span>
+                
+                <!-- View Switcher -->
+                <div class="flex bg-slate-200/50 p-1 rounded-xl border border-slate-200 self-start">
+                    <button id="viewGrid" onclick="setView('grid')" class="view-btn px-4 py-1.5 rounded-lg text-[10px] font-black flex items-center gap-2 transition-all bg-white text-indigo-600 shadow-sm">
+                        <i class="fas fa-th-large"></i> GRID VIEW
+                    </button>
+                    <button id="viewTable" onclick="setView('table')" class="view-btn px-4 py-1.5 rounded-lg text-[10px] font-black flex items-center gap-2 transition-all text-slate-500">
+                        <i class="fas fa-table"></i> TABLE VIEW (EXCEL)
+                    </button>
                 </div>
             </div>
 
-            <div id="historyContainer" class="overflow-y-auto max-h-[600px] p-4 space-y-6">
-                <!-- Log content -->
+            <div id="historyContainer" class="p-6 space-y-8 overflow-x-auto min-h-[300px]">
+                <!-- Log content will render here -->
             </div>
         </div>
     </main>
 
     <footer class="mt-8 flex justify-between items-center px-6 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
         <span>&copy; 2024 PRANTO SYSTEMS</span>
-        <div class="flex items-center gap-4">
-            <span class="text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full italic">v5.5 Elite Standard</span>
-        </div>
+        <span class="text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full italic">v6.0 Excel Edition</span>
     </footer>
 
     <script>
@@ -169,6 +177,7 @@
         ];
 
         let shift = 'Day';
+        let currentView = 'grid'; // Default view
         let production = JSON.parse(localStorage.getItem('pranto_production')) || [];
 
         function getShiftDate(s) {
@@ -176,20 +185,6 @@
                 timeZone: s === 'Night' ? 'America/New_York' : 'Asia/Dhaka', 
                 day: '2-digit', month: 'short', year: 'numeric'
             }).format(new Date());
-        }
-
-        function handleInput() {
-            const val = document.getElementById('ticketInput').value.trim();
-            const tagBtns = document.querySelectorAll('.entry-tag');
-            tagBtns.forEach(btn => {
-                if (val.length > 0) {
-                    btn.classList.remove('tag-disabled');
-                    btn.classList.add('tag-enabled');
-                } else {
-                    btn.classList.add('tag-disabled');
-                    btn.classList.remove('tag-enabled');
-                }
-            });
         }
 
         function setShift(s) {
@@ -202,6 +197,26 @@
             activeBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
             activeBtn.classList.remove('text-slate-500');
             renderAll();
+        }
+
+        function setView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                btn.classList.add('text-slate-500');
+            });
+            const activeBtn = view === 'grid' ? document.getElementById('viewGrid') : document.getElementById('viewTable');
+            activeBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-500');
+            renderHistory();
+        }
+
+        function handleInput() {
+            const val = document.getElementById('ticketInput').value.trim();
+            document.querySelectorAll('.entry-tag').forEach(btn => {
+                if (val.length > 0) { btn.classList.remove('tag-disabled'); btn.classList.add('tag-enabled'); }
+                else { btn.classList.add('tag-disabled'); btn.classList.remove('tag-enabled'); }
+            });
         }
 
         function addEntry(tagName) {
@@ -232,24 +247,15 @@
         }
 
         function copyDate(d) {
-            const text = production.filter(p => p.date === d)
-                .map((p, i) => `${i + 1}. ${p.data} - ${p.tag}`).join('\n');
-            
-            const el = document.createElement("textarea");
-            el.value = text;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
+            const text = production.filter(p => p.date === d).map((p, i) => `${i + 1}. ${p.data} - ${p.tag}`).join('\n');
+            const el = document.createElement("textarea"); el.value = text;
+            document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
             
             const btn = document.querySelector(`[data-date="${d}"]`);
             const original = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied';
             btn.classList.replace('bg-slate-900', 'bg-emerald-600');
-            setTimeout(() => {
-                btn.innerHTML = original;
-                btn.classList.replace('bg-emerald-600', 'bg-slate-900');
-            }, 2000);
+            setTimeout(() => { btn.innerHTML = original; btn.classList.replace('bg-emerald-600', 'bg-slate-900'); }, 2000);
         }
 
         function renderAll() {
@@ -263,7 +269,6 @@
             const container = document.getElementById('tagContainer');
             container.innerHTML = '';
             const val = document.getElementById('ticketInput').value.trim();
-            
             tags.forEach(t => {
                 const btn = document.createElement('button');
                 btn.className = `entry-tag px-4 py-2 rounded-xl border text-[11px] font-bold uppercase tracking-wider transition-all active:scale-95 shadow-sm bg-gradient-to-r ${t.color} text-white border-transparent hover:brightness-110 ${val.length === 0 ? 'tag-disabled' : 'tag-enabled'}`;
@@ -281,8 +286,7 @@
             if(!uniqueDates.includes(today)) uniqueDates.push(today);
             uniqueDates.sort((a,b) => new Date(b) - new Date(a));
             filter.innerHTML = uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('');
-            if(currentSelected && uniqueDates.includes(currentSelected)) filter.value = currentSelected;
-            else filter.value = today;
+            filter.value = (currentSelected && uniqueDates.includes(currentSelected)) ? currentSelected : today;
         }
 
         function updateSummary() {
@@ -295,9 +299,8 @@
             
             statsGrid.innerHTML = tags.map(t => {
                 const count = counts[t.name] || 0;
-                const isActive = count > 0;
                 return `
-                    <div class="rounded-xl flex flex-col items-center justify-center border transition-all p-3 ${isActive ? `bg-gradient-to-br ${t.color} border-transparent text-white shadow-md` : 'bg-slate-50 border-slate-100 opacity-40'}">
+                    <div class="rounded-xl flex flex-col items-center justify-center border transition-all p-3 ${count > 0 ? `bg-gradient-to-br ${t.color} border-transparent text-white shadow-md` : 'bg-slate-50 border-slate-100 opacity-40'}">
                         <span class="text-lg font-bold leading-none mb-1">${count}</span>
                         <span class="text-[9px] font-bold uppercase tracking-widest text-center opacity-90 truncate w-full">${t.name}</span>
                     </div>
@@ -309,61 +312,89 @@
             const container = document.getElementById('historyContainer');
             container.innerHTML = '';
             const grouped = {};
-            production.forEach(p => {
-                if(!grouped[p.date]) grouped[p.date] = [];
-                grouped[p.date].push(p);
-            });
-
+            production.forEach(p => { if(!grouped[p.date]) grouped[p.date] = []; grouped[p.date].push(p); });
             const sortedDates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a));
             
             if(sortedDates.length === 0) {
-                container.innerHTML = `<div class="py-20 text-center text-slate-400 font-medium">No production data available yet.</div>`;
+                container.innerHTML = `<div class="py-20 text-center text-slate-400 font-medium italic">No production recorded yet.</div>`;
                 return;
             }
 
             sortedDates.forEach(d => {
-                const dateSection = document.createElement('div');
-                dateSection.className = "space-y-3";
+                const section = document.createElement('div');
+                section.className = "space-y-4";
                 
-                const dateHeader = `
-                    <div class="flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-sm py-2 z-10">
+                const header = `
+                    <div class="flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-md py-3 z-10 border-b border-slate-100">
                         <div class="flex items-center gap-3">
-                            <h3 class="text-sm font-extrabold text-slate-800 uppercase tracking-tighter">${d}</h3>
-                            <span class="h-px w-8 bg-slate-200"></span>
-                            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">${grouped[d].length} Units</span>
+                            <h3 class="text-sm font-black text-slate-800 uppercase tracking-tighter">${d}</h3>
+                            <span class="text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">${grouped[d].length} TOTAL UNITS</span>
                         </div>
-                        <button data-date="${d}" onclick="copyDate('${d}')" class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all shadow-sm bg-slate-900 text-white hover:bg-slate-800 active:scale-95 flex items-center gap-2">
-                            <i class="fas fa-copy"></i> Copy List
+                        <button data-date="${d}" onclick="copyDate('${d}')" class="px-5 py-2 rounded-xl text-[10px] font-black uppercase transition-all shadow-md bg-slate-900 text-white hover:bg-slate-800 active:scale-95 flex items-center gap-2">
+                            <i class="fas fa-copy"></i> Copy Data
                         </button>
                     </div>
                 `;
                 
-                const grid = document.createElement('div');
-                grid.className = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3";
-                grid.innerHTML = grouped[d].map((item, idx) => `
-                    <div class="group flex flex-col border border-slate-100 p-4 rounded-2xl bg-white card-hover relative overflow-hidden border-l-4 ${'border-l-' + tags.find(t=>t.name===item.tag)?.color.split('-')[1] + '-500'}">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-[10px] font-bold text-slate-300">#${grouped[d].length - idx}</span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[9px] font-bold text-slate-400 italic">${item.time || ''}</span>
-                                <button onclick="deleteEntry(${item.id})" class="text-slate-300 hover:text-rose-500 transition-colors">
-                                    <i class="fas fa-trash-alt text-xs"></i>
-                                </button>
+                let content = '';
+                if(currentView === 'grid') {
+                    content = `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                        ${grouped[d].map((item, idx) => `
+                            <div class="group flex flex-col border border-slate-100 p-4 rounded-2xl bg-white card-hover relative overflow-hidden border-l-4 ${'border-l-' + tags.find(t=>t.name===item.tag)?.color.split('-')[1] + '-500'}">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-[10px] font-black text-slate-300">#${grouped[d].length - idx}</span>
+                                    <button onclick="deleteEntry(${item.id})" class="text-slate-300 hover:text-rose-500 transition-colors"><i class="fas fa-trash-alt text-xs"></i></button>
+                                </div>
+                                <h4 class="text-sm font-bold text-slate-800 break-all leading-snug mb-2">${item.data}</h4>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span class="text-[9px] font-black uppercase tracking-widest text-indigo-500">${item.tag}</span>
+                                    <span class="text-[9px] font-bold text-slate-400 italic">${item.time}</span>
+                                </div>
                             </div>
+                        `).join('')}
+                    </div>`;
+                } else {
+                    // Excel Table View
+                    content = `
+                        <div class="overflow-hidden border border-slate-200 rounded-xl shadow-sm">
+                            <table class="excel-table">
+                                <thead>
+                                    <tr>
+                                        <th width="50">#</th>
+                                        <th>Ticket ID / Data</th>
+                                        <th width="150">Category (Tag)</th>
+                                        <th width="100">Time</th>
+                                        <th width="100">Shift</th>
+                                        <th width="80">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${grouped[d].map((item, idx) => `
+                                        <tr>
+                                            <td class="font-bold text-slate-400 text-center">${grouped[d].length - idx}</td>
+                                            <td class="font-bold text-slate-800">${item.data}</td>
+                                            <td>
+                                                <span class="px-2 py-1 rounded-md text-[10px] font-black uppercase bg-gradient-to-r ${tags.find(t=>t.name===item.tag)?.color} text-white">
+                                                    ${item.tag}
+                                                </span>
+                                            </td>
+                                            <td class="text-slate-500 font-medium">${item.time}</td>
+                                            <td class="text-slate-500 font-medium uppercase">${item.shift}</td>
+                                            <td class="text-center">
+                                                <button onclick="deleteEntry(${item.id})" class="text-slate-300 hover:text-rose-500 transition-colors">
+                                                    <i class="fas fa-trash-alt text-xs"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="space-y-1">
-                            <h4 class="text-sm font-bold text-slate-800 break-all leading-snug">${item.data}</h4>
-                            <div class="flex items-center gap-1.5 pt-1">
-                                <div class="w-1.5 h-1.5 rounded-full bg-gradient-to-r ${tags.find(t=>t.name===item.tag)?.color}"></div>
-                                <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">${item.tag}</span>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-                
-                dateSection.innerHTML = dateHeader;
-                dateSection.appendChild(grid);
-                container.appendChild(dateSection);
+                    `;
+                }
+
+                section.innerHTML = header + content;
+                container.appendChild(section);
             });
         }
 
