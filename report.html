@@ -7,17 +7,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f7fa;
+            background-color: #f8fafc;
+            color: #1e293b;
         }
 
         .glass-nav {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .no-scrollbar::-webkit-scrollbar {
@@ -28,121 +29,143 @@
             scrollbar-width: none;
         }
 
+        .card-hover {
+            transition: all 0.2s ease-in-out;
+        }
         .card-hover:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
 
         textarea:focus {
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.05);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
 
         /* Logic for Dynamic Tags */
         .tag-disabled {
             background: #f1f5f9 !important;
-            color: #cbd5e1 !important;
+            color: #94a3b8 !important;
             border-color: #e2e8f0 !important;
-            box-shadow: none !important;
-            pointer-events: none;
+            cursor: not-allowed;
+            opacity: 0.6;
             filter: grayscale(1);
-            opacity: 0.5;
         }
 
         .tag-enabled {
-            pointer-events: auto;
-            filter: grayscale(0);
+            cursor: pointer;
             opacity: 1;
+            filter: grayscale(0);
+        }
+        
+        /* Smooth transition for tags */
+        .entry-tag {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
-<body class="p-2 md:p-4 min-h-screen">
+<body class="p-4 md:p-6 min-h-screen">
 
-    <!-- Compact Navigation -->
-    <nav class="glass-nav border border-white/60 px-4 py-2 flex justify-between items-center rounded-2xl mb-3 shadow-sm sticky top-2 z-50">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-md">
-                <i class="fas fa-bolt text-xs"></i>
+    <!-- Navbar -->
+    <nav class="glass-nav border border-slate-200 px-6 py-3 flex justify-between items-center rounded-2xl mb-6 shadow-sm sticky top-4 z-50">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-xl flex items-center justify-center text-white shadow-lg">
+                <i class="fas fa-bolt text-lg"></i>
             </div>
-            <h1 class="text-[10px] font-black uppercase tracking-widest text-slate-800 leading-none hidden sm:block">
-                Pranto's Workspace <i class="fas fa-sparkles text-amber-400 ml-1"></i>
-            </h1>
+            <div>
+                <h1 class="text-sm font-bold uppercase tracking-wider text-slate-900 leading-tight">
+                    Pranto's Workspace
+                </h1>
+                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Elite Productivity</p>
+            </div>
         </div>
 
-        <div class="flex bg-slate-100/60 p-1 rounded-xl border border-slate-200/40">
-            <button id="dayBtn" onclick="setShift('Day')" class="shift-btn px-3 py-1 rounded-lg text-[9px] font-black flex items-center gap-1.5 transition-all bg-white text-indigo-600 shadow-sm scale-105">
-                <i class="fas fa-sun text-[10px]"></i> DAY
+        <div class="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+            <button id="dayBtn" onclick="setShift('Day')" class="shift-btn px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all bg-white text-indigo-600 shadow-sm">
+                <i class="fas fa-sun text-sm"></i> DAY
             </button>
-            <button id="nightBtn" onclick="setShift('Night')" class="shift-btn px-3 py-1 rounded-lg text-[9px] font-black flex items-center gap-1.5 transition-all text-slate-400">
-                <i class="fas fa-moon text-[10px]"></i> NIGHT
+            <button id="nightBtn" onclick="setShift('Night')" class="shift-btn px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all text-slate-500">
+                <i class="fas fa-moon text-sm"></i> NIGHT
             </button>
         </div>
     </nav>
 
-    <main class="space-y-3">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
+    <main class="max-w-7xl mx-auto space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Left: Input Area -->
-            <div class="lg:col-span-7 xl:col-span-8">
-                <div class="bg-white rounded-2xl p-3 border border-slate-200/50 shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-[9px] font-black text-indigo-500/70 uppercase tracking-widest flex items-center gap-1.5">
-                            <i class="fas fa-plus-circle text-[10px]"></i> Entry
-                        </span>
+            <div class="lg:col-span-8">
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-plus-circle text-indigo-500"></i>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">New Entry</span>
                     </div>
-                    <textarea id="ticketInput" oninput="handleInput()" placeholder="Ticket ID..." class="w-full bg-slate-50/50 border border-slate-100 rounded-xl p-2 text-[11px] font-semibold text-slate-700 outline-none h-[38px] resize-none overflow-hidden transition-all shadow-inner"></textarea>
                     
-                    <div id="tagContainer" class="flex flex-wrap gap-1 mt-2">
+                    <textarea id="ticketInput" oninput="handleInput()" placeholder="Enter Ticket ID here..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium text-slate-700 outline-none h-20 resize-none transition-all placeholder:text-slate-400"></textarea>
+                    
+                    <div id="tagContainer" class="flex flex-wrap gap-2 mt-4">
                         <!-- Tags rendered by JS -->
                     </div>
                 </div>
             </div>
 
             <!-- Right: Summary Panel -->
-            <div class="lg:col-span-5 xl:col-span-4">
-                <div class="bg-white rounded-2xl p-3 border border-slate-200/50 shadow-sm h-full">
-                    <div class="flex items-center justify-between mb-3">
-                        <select id="dateFilter" onchange="updateSummary()" class="bg-slate-50 border border-slate-100 rounded-lg px-2 py-1 text-[9px] font-black text-indigo-600 outline-none uppercase">
+            <div class="lg:col-span-4">
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm h-full">
+                    <div class="flex items-center justify-between mb-5">
+                        <select id="dateFilter" onchange="updateSummary()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-indigo-600 outline-none">
                         </select>
-                        <div class="flex items-center gap-2 bg-slate-900 rounded-xl px-3 py-1 shadow-md">
-                            <i class="fas fa-chart-bar text-indigo-400 text-[10px]"></i>
-                            <span id="totalCount" class="text-[10px] font-black text-white">0</span>
+                        <div class="flex items-center gap-2 bg-slate-900 rounded-xl px-4 py-1.5 shadow-lg">
+                            <i class="fas fa-chart-pie text-indigo-400 text-xs"></i>
+                            <span id="totalCount" class="text-sm font-bold text-white">0</span>
                         </div>
                     </div>
                     
-                    <div id="statsGrid" class="grid grid-cols-5 gap-1">
+                    <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <!-- Stats boxes -->
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Timeline Log -->
-        <div class="bg-white rounded-2xl border border-slate-200/50 shadow-sm overflow-hidden">
-            <div class="bg-slate-50/50 px-4 py-2 border-b border-slate-100 flex items-center justify-between uppercase tracking-widest text-[9px] font-black text-slate-400">
-                <div class="flex items-center gap-2"><i class="fas fa-list"></i> Log</div>
-                <div class="flex items-center gap-1"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div> Live</div>
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-slate-50 px-6 py-3 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                    <i class="fas fa-history"></i> Production Log
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-600 uppercase">Live Update</span>
+                </div>
             </div>
 
-            <div id="historyContainer" class="overflow-y-auto max-h-[calc(100vh-250px)] p-2">
+            <div id="historyContainer" class="overflow-y-auto max-h-[600px] p-4 space-y-6">
+                <!-- Log content -->
             </div>
         </div>
     </main>
 
-    <footer class="mt-3 flex justify-between items-center px-4 py-2 bg-white/40 border border-white/60 rounded-xl opacity-60 text-[7px] font-black uppercase tracking-widest">
-        <span>PRANTO SYSTEMS</span>
-        <span class="text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-lg">v5.4 WEB-ELITE</span>
+    <footer class="mt-8 flex justify-between items-center px-6 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+        <span>&copy; 2024 PRANTO SYSTEMS</span>
+        <div class="flex items-center gap-4">
+            <span class="text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full italic">v5.5 Elite Standard</span>
+        </div>
     </footer>
 
     <script>
         const tags = [
-            { name: 'Appeal', color: 'from-blue-500 to-indigo-500' },
-            { name: 'Claim Review', color: 'from-purple-500 to-fuchsia-500' },
-            { name: 'Negotiation', color: 'from-emerald-500 to-teal-500' },
-            { name: 'IDR', color: 'from-rose-500 to-pink-500' },
-            { name: 'TDI', color: 'from-orange-500 to-amber-500' },
-            { name: 'Offer letter', color: 'from-cyan-500 to-sky-500' },
-            { name: 'Complaint', color: 'from-red-500 to-orange-500' },
-            { name: 'PT Letter', color: 'from-indigo-600 to-purple-500' },
-            { name: 'Follow-up', color: 'from-teal-500 to-green-500' },
-            { name: 'Final Review', color: 'from-amber-500 to-orange-500' }
+            { name: 'Appeal', color: 'from-blue-500 to-indigo-600' },
+            { name: 'Claim Review', color: 'from-purple-500 to-violet-600' },
+            { name: 'Negotiation', color: 'from-emerald-500 to-teal-600' },
+            { name: 'IDR', color: 'from-rose-500 to-pink-600' },
+            { name: 'TDI', color: 'from-orange-500 to-amber-600' },
+            { name: 'Offer letter', color: 'from-cyan-500 to-blue-600' },
+            { name: 'Complaint', color: 'from-red-500 to-orange-600' },
+            { name: 'PT Letter', color: 'from-indigo-600 to-violet-700' },
+            { name: 'Follow-up', color: 'from-teal-500 to-green-600' },
+            { name: 'Final Review', color: 'from-amber-500 to-orange-600' }
         ];
 
         let shift = 'Day';
@@ -172,12 +195,12 @@
         function setShift(s) {
             shift = s;
             document.querySelectorAll('.shift-btn').forEach(btn => {
-                btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm', 'scale-105');
-                btn.classList.add('text-slate-400');
+                btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                btn.classList.add('text-slate-500');
             });
             const activeBtn = s === 'Day' ? document.getElementById('dayBtn') : document.getElementById('nightBtn');
-            activeBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm', 'scale-105');
-            activeBtn.classList.remove('text-slate-400');
+            activeBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-500');
             renderAll();
         }
 
@@ -191,13 +214,14 @@
                 data: val,
                 tag: tagName,
                 shift: shift,
-                date: getShiftDate(shift)
+                date: getShiftDate(shift),
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
             production.unshift(entry);
             localStorage.setItem('pranto_production', JSON.stringify(production));
             ticketInput.value = '';
-            handleInput(); // Reset tag state
+            handleInput(); 
             renderAll();
         }
 
@@ -220,11 +244,11 @@
             
             const btn = document.querySelector(`[data-date="${d}"]`);
             const original = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check text-[10px]"></i>';
-            btn.classList.replace('bg-slate-900', 'bg-emerald-500');
+            btn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied';
+            btn.classList.replace('bg-slate-900', 'bg-emerald-600');
             setTimeout(() => {
                 btn.innerHTML = original;
-                btn.classList.replace('bg-emerald-500', 'bg-slate-900');
+                btn.classList.replace('bg-emerald-600', 'bg-slate-900');
             }, 2000);
         }
 
@@ -242,7 +266,7 @@
             
             tags.forEach(t => {
                 const btn = document.createElement('button');
-                btn.className = `entry-tag px-2.5 py-1.5 rounded-xl border text-[8px] font-black uppercase tracking-tighter transition-all active:scale-90 shadow-sm bg-gradient-to-r ${t.color} text-white border-transparent hover:brightness-110 ${val.length === 0 ? 'tag-disabled' : 'tag-enabled'}`;
+                btn.className = `entry-tag px-4 py-2 rounded-xl border text-[11px] font-bold uppercase tracking-wider transition-all active:scale-95 shadow-sm bg-gradient-to-r ${t.color} text-white border-transparent hover:brightness-110 ${val.length === 0 ? 'tag-disabled' : 'tag-enabled'}`;
                 btn.innerText = t.name;
                 btn.onclick = () => addEntry(t.name);
                 container.appendChild(btn);
@@ -273,9 +297,9 @@
                 const count = counts[t.name] || 0;
                 const isActive = count > 0;
                 return `
-                    <div class="rounded-xl flex flex-col items-center justify-center border transition-all p-1.5 ${isActive ? `bg-gradient-to-br ${t.color} border-transparent text-white shadow-sm` : 'bg-slate-50 border-slate-100 opacity-20'}">
-                        <span class="text-[10px] font-black leading-none mb-0.5">${count}</span>
-                        <span class="text-[5px] font-black uppercase tracking-tighter text-center opacity-80 truncate w-full">${t.name}</span>
+                    <div class="rounded-xl flex flex-col items-center justify-center border transition-all p-3 ${isActive ? `bg-gradient-to-br ${t.color} border-transparent text-white shadow-md` : 'bg-slate-50 border-slate-100 opacity-40'}">
+                        <span class="text-lg font-bold leading-none mb-1">${count}</span>
+                        <span class="text-[9px] font-bold uppercase tracking-widest text-center opacity-90 truncate w-full">${t.name}</span>
                     </div>
                 `;
             }).join('');
@@ -290,41 +314,56 @@
                 grouped[p.date].push(p);
             });
 
-            Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(d => {
+            const sortedDates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a));
+            
+            if(sortedDates.length === 0) {
+                container.innerHTML = `<div class="py-20 text-center text-slate-400 font-medium">No production data available yet.</div>`;
+                return;
+            }
+
+            sortedDates.forEach(d => {
+                const dateSection = document.createElement('div');
+                dateSection.className = "space-y-3";
+                
                 const dateHeader = `
-                    <div class="bg-white/90 backdrop-blur-md px-3 py-1.5 flex items-center justify-between sticky top-0 z-10 border border-slate-100 rounded-xl shadow-xs mb-1.5 mt-2">
-                        <div class="flex items-center gap-2 text-[9px] font-black text-slate-600 uppercase">
-                            <i class="fas fa-calendar-alt text-indigo-400"></i>
-                            ${d} <span class="bg-indigo-600 text-white px-2 py-0.5 rounded-lg ml-1 font-bold">${grouped[d].length}</span>
+                    <div class="flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-sm py-2 z-10">
+                        <div class="flex items-center gap-3">
+                            <h3 class="text-sm font-extrabold text-slate-800 uppercase tracking-tighter">${d}</h3>
+                            <span class="h-px w-8 bg-slate-200"></span>
+                            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">${grouped[d].length} Units</span>
                         </div>
-                        <button data-date="${d}" onclick="copyDate('${d}')" class="px-4 py-1 rounded-xl text-[9px] font-black uppercase transition-all shadow-sm bg-slate-900 text-white active:scale-95">
-                            <i class="fas fa-copy text-[10px]"></i>
+                        <button data-date="${d}" onclick="copyDate('${d}')" class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all shadow-sm bg-slate-900 text-white hover:bg-slate-800 active:scale-95 flex items-center gap-2">
+                            <i class="fas fa-copy"></i> Copy List
                         </button>
                     </div>
                 `;
                 
                 const grid = document.createElement('div');
-                grid.className = "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1.5";
+                grid.className = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3";
                 grid.innerHTML = grouped[d].map((item, idx) => `
-                    <div class="group flex flex-col border border-slate-50 p-2 rounded-xl bg-white hover:border-indigo-200 hover:shadow-lg transition-all relative overflow-hidden card-hover">
-                        <div class="absolute left-0 top-0 w-1 h-full bg-gradient-to-b ${tags.find(t=>t.name===item.tag)?.color}"></div>
-                        <div class="flex justify-between items-start mb-1 pl-1">
-                            <span class="text-[7px] font-black text-slate-200">#${grouped[d].length - idx}</span>
-                            <button onclick="deleteEntry(${item.id})" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all">
-                                <i class="fas fa-trash text-[10px]"></i>
-                            </button>
+                    <div class="group flex flex-col border border-slate-100 p-4 rounded-2xl bg-white card-hover relative overflow-hidden border-l-4 ${'border-l-' + tags.find(t=>t.name===item.tag)?.color.split('-')[1] + '-500'}">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold text-slate-300">#${grouped[d].length - idx}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] font-bold text-slate-400 italic">${item.time || ''}</span>
+                                <button onclick="deleteEntry(${item.id})" class="text-slate-300 hover:text-rose-500 transition-colors">
+                                    <i class="fas fa-trash-alt text-xs"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex flex-col pl-1">
-                            <span class="text-[9px] font-bold text-slate-700 truncate leading-tight mb-0.5">${item.data}</span>
-                            <span class="text-[6px] font-black uppercase text-slate-400 tracking-tighter">${item.tag}</span>
+                        <div class="space-y-1">
+                            <h4 class="text-sm font-bold text-slate-800 break-all leading-snug">${item.data}</h4>
+                            <div class="flex items-center gap-1.5 pt-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-gradient-to-r ${tags.find(t=>t.name===item.tag)?.color}"></div>
+                                <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">${item.tag}</span>
+                            </div>
                         </div>
                     </div>
                 `).join('');
                 
-                const div = document.createElement('div');
-                div.innerHTML = dateHeader;
-                div.appendChild(grid);
-                container.appendChild(div);
+                dateSection.innerHTML = dateHeader;
+                dateSection.appendChild(grid);
+                container.appendChild(dateSection);
             });
         }
 
