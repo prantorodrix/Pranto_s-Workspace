@@ -1,0 +1,201 @@
+import React, { useState, useEffect } from 'react';
+import { Copy, Trash2, Moon, Sun, Calendar as CalendarIcon, Check, BarChart3, List, Filter, Home, Zap, PlusCircle, Sparkles } from 'lucide-react';
+
+const App = () => {
+  const [shift, setShift] = useState('Day'); 
+  const [ticket, setTicket] = useState('');
+  const [production, setProduction] = useState([]);
+  const [copyStatus, setCopyStatus] = useState(null);
+  
+  const tags = [
+    { name: 'Appeal', color: 'from-blue-600 via-blue-500 to-indigo-600' },
+    { name: 'Claim Review', color: 'from-purple-600 via-fuchsia-500 to-pink-600' },
+    { name: 'Negotiation', color: 'from-emerald-600 via-teal-500 to-cyan-600' },
+    { name: 'IDR', color: 'from-rose-600 via-pink-500 to-rose-500' },
+    { name: 'TDI', color: 'from-orange-600 via-amber-500 to-yellow-600' },
+    { name: 'Offer letter', color: 'from-cyan-600 via-sky-500 to-blue-500' },
+    { name: 'Complaint', color: 'from-red-600 via-orange-500 to-red-500' },
+    { name: 'PT Letter', color: 'from-indigo-700 via-indigo-500 to-purple-600' },
+    { name: 'Follow-up', color: 'from-teal-600 via-emerald-500 to-green-500' },
+    { name: 'Final Review', color: 'from-amber-600 via-yellow-500 to-orange-500' }
+  ];
+
+  const getShiftDate = (s) => new Intl.DateTimeFormat('en-GB', {timeZone: s === 'Night' ? 'America/New_York' : 'Asia/Dhaka', day: '2-digit', month: 'short', year: 'numeric'}).format(new Date());
+  
+  const [selectedSummaryDate, setSelectedSummaryDate] = useState(getShiftDate(shift));
+  useEffect(() => setSelectedSummaryDate(getShiftDate(shift)), [shift]);
+
+  const addEntry = (t) => { 
+    if(!ticket.trim()) return; 
+    setProduction([{id: Date.now(), data: ticket.trim(), tag: t, shift: shift, date: getShiftDate(shift)}, ...production]); 
+    setTicket(''); 
+  };
+
+  const deleteEntry = (id) => setProduction(production.filter(i => i.id !== id));
+
+  const copySpecificDate = (d) => { 
+    const text = production.filter(p => p.date === d).map((p, i) => `${i + 1}. ${p.data} - ${p.tag}`).join('\n'); 
+    const el = document.createElement("textarea"); 
+    el.value = text; document.body.appendChild(el); 
+    el.select(); document.execCommand('copy'); 
+    document.body.removeChild(el); 
+    setCopyStatus(d); 
+    setTimeout(() => setCopyStatus(null), 2000); 
+  };
+
+  const groupedData = production.reduce((acc, obj) => { 
+    if (!acc[obj.date]) acc[obj.date] = []; 
+    acc[obj.date].push(obj); return acc; 
+  }, {});
+
+  const getStatsByDate = (d) => { 
+    const s = {}; 
+    production.filter(i => i.date === d).forEach(i => s[i.tag] = (s[i.tag] || 0) + 1); 
+    return s; 
+  };
+
+  const currentStats = getStatsByDate(selectedSummaryDate);
+  const totalCount = Object.values(currentStats).reduce((a, b) => a + b, 0);
+  const uniqueDates = Array.from(new Set(production.map(p => p.date)));
+  if (!uniqueDates.includes(getShiftDate(shift))) uniqueDates.push(getShiftDate(shift));
+
+  return (
+    <div className="min-h-screen bg-[#f4f7fa] text-slate-800 font-sans p-2 md:p-4 transition-all duration-500">
+      {/* Compact Header */}
+      <nav className="bg-white/90 backdrop-blur-xl border border-white/60 px-4 py-2 flex justify-between items-center rounded-2xl mb-3 shadow-sm sticky top-2 z-50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-md">
+            <Zap size={16} fill="currentColor"/>
+          </div>
+          <h1 className="text-[10px] font-black uppercase tracking-widest text-slate-800 leading-none hidden sm:block">
+            Pranto's Workspace <Sparkles size={10} className="inline text-amber-400 fill-amber-400"/>
+          </h1>
+        </div>
+
+        <a href="index.html" className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[9px] font-black text-slate-500 hover:bg-indigo-600 hover:text-white transition-all uppercase">
+          <Home size={12}/> Home
+        </a>
+
+        <div className="flex bg-slate-100/60 p-1 rounded-xl border border-slate-200/40">
+          <button onClick={() => setShift('Day')} className={`px-3 py-1 rounded-lg text-[9px] font-black flex items-center gap-1.5 transition-all ${shift === 'Day' ? 'bg-white text-indigo-600 shadow-sm scale-105' : 'text-slate-400'}`}>
+            <Sun size={12}/> DAY
+          </button>
+          <button onClick={() => setShift('Night')} className={`px-3 py-1 rounded-lg text-[9px] font-black flex items-center gap-1.5 transition-all ${shift === 'Night' ? 'bg-white text-indigo-600 shadow-sm scale-105' : 'text-slate-400'}`}>
+            <Moon size={12}/> NIGHT
+          </button>
+        </div>
+      </nav>
+
+      <main className="space-y-3">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+          {/* Left: Input Area */}
+          <div className="lg:col-span-7 xl:col-span-8">
+            <div className="bg-white rounded-2xl p-3 border border-slate-200/50 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] font-black text-indigo-500/70 uppercase tracking-widest flex items-center gap-1.5">
+                  <PlusCircle size={12} /> Entry
+                </span>
+              </div>
+              {/* Scrollbar hidden, height optimized */}
+              <textarea 
+                value={ticket} 
+                onChange={(e) => setTicket(e.target.value)} 
+                placeholder="Ticket ID..." 
+                className="w-full bg-slate-50/50 border border-slate-100 rounded-xl p-2 text-[11px] font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-50 focus:bg-white h-[38px] resize-none overflow-hidden transition-all shadow-inner"
+              />
+              <div className="flex flex-wrap gap-1 mt-2">
+                {tags.map((t) => (
+                  <button 
+                    key={t.name} 
+                    onClick={() => addEntry(t.name)} 
+                    disabled={!ticket.trim()} 
+                    className={`px-2.5 py-1.5 rounded-xl border text-[8px] font-black uppercase tracking-tighter transition-all active:scale-90 shadow-sm disabled:opacity-5
+                      ${!ticket.trim() ? 'bg-slate-50 border-slate-100 text-slate-300' : `bg-gradient-to-r ${t.color} text-white border-transparent shadow-md hover:brightness-110`}
+                    `}
+                  >
+                    {t.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Summary Panel */}
+          <div className="lg:col-span-5 xl:col-span-4">
+            <div className="bg-white rounded-2xl p-3 border border-slate-200/50 shadow-sm h-full">
+              <div className="flex items-center justify-between mb-3">
+                <select 
+                  className="bg-slate-50 border border-slate-100 rounded-lg px-2 py-1 text-[9px] font-black text-indigo-600 outline-none uppercase" 
+                  value={selectedSummaryDate} 
+                  onChange={(e) => setSelectedSummaryDate(e.target.value)}
+                >
+                  {uniqueDates.sort((a,b) => new Date(b) - new Date(a)).map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+                <div className="flex items-center gap-2 bg-slate-900 rounded-xl px-3 py-1 shadow-md">
+                  <BarChart3 size={12} className="text-indigo-400"/>
+                  <span className="text-[10px] font-black text-white">{totalCount}</span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-5 gap-1">
+                {tags.map(t => (
+                  <div key={t.name} className={`rounded-xl flex flex-col items-center justify-center border transition-all p-1.5 ${currentStats[t.name] > 0 ? `bg-gradient-to-br ${t.color} border-transparent text-white shadow-sm` : 'bg-slate-50 border-slate-100 opacity-20'}`}>
+                    <span className="text-[10px] font-black leading-none mb-0.5">{currentStats[t.name] || 0}</span>
+                    <span className="text-[5px] font-black uppercase tracking-tighter text-center opacity-80 truncate w-full">{t.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Timeline Log */}
+        <div className="bg-white rounded-2xl border border-slate-200/50 shadow-sm overflow-hidden">
+          <div className="bg-slate-50/50 px-4 py-2 border-b border-slate-100 flex items-center justify-between uppercase tracking-widest text-[9px] font-black text-slate-400">
+            <div className="flex items-center gap-2"><List size={12}/> Log</div>
+            <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div> Live</div>
+          </div>
+
+          <div className="overflow-y-auto max-h-[calc(100vh-250px)] p-2">
+            {Object.keys(groupedData).sort((a,b) => new Date(b) - new Date(a)).map((d) => (
+              <div key={d} className="mb-2 last:mb-0">
+                <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 flex items-center justify-between sticky top-0 z-10 border border-slate-100 rounded-xl shadow-xs mb-1.5">
+                  <div className="flex items-center gap-2 text-[9px] font-black text-slate-600 uppercase">
+                    <CalendarIcon size={12} className="text-indigo-400"/>
+                    {d} <span className="bg-indigo-600 text-white px-2 py-0.5 rounded-lg ml-1 font-bold">{groupedData[d].length}</span>
+                  </div>
+                  <button onClick={() => copySpecificDate(d)} className={`px-4 py-1 rounded-xl text-[9px] font-black uppercase transition-all shadow-sm active:scale-95 ${copyStatus === d ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white'}`}>
+                    {copyStatus === d ? <Check size={10}/> : <Copy size={10}/>}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1.5">
+                  {groupedData[d].map((item, idx) => (
+                    <div key={item.id} className="group flex flex-col border border-slate-50 p-2 rounded-xl bg-white hover:border-indigo-200 hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+                      <div className={`absolute left-0 top-0 w-1 h-full bg-gradient-to-b ${tags.find(t=>t.name===item.tag)?.color}`}></div>
+                      <div className="flex justify-between items-start mb-1 pl-1">
+                        <span className="text-[7px] font-black text-slate-200">#{groupedData[d].length - idx}</span>
+                        <button onClick={() => deleteEntry(item.id)} className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all"><Trash2 size={10}/></button>
+                      </div>
+                      <div className="flex flex-col pl-1">
+                        <span className="text-[9px] font-bold text-slate-700 truncate leading-tight mb-0.5">{item.data}</span>
+                        <span className="text-[6px] font-black uppercase text-slate-400 tracking-tighter">{item.tag}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      <footer className="mt-3 flex justify-between items-center px-4 py-2 bg-white/40 border border-white/60 rounded-xl opacity-60 text-[7px] font-black uppercase tracking-widest">
+        <span>PRANTO SYSTEMS</span>
+        <span className="text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-lg">v5.2 ELITE</span>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
