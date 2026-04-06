@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDR Premium Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#6366f1;--bg:#0f172a;--card:rgba(30,41,59,0.7)}
+body{font-family:'Inter',sans-serif;background-color:var(--bg);color:#f1f5f9;overflow:hidden}
+.glass{background:var(--card);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:16px}
+.input-box{background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.1);color:white;border-radius:8px;padding:8px 12px;font-size:13px;width:100%;transition:0.2s}
+.input-box:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(99,102,241,0.2)}
+.click-box{cursor:pointer;transition:0.2s}
+.click-box:hover{background:rgba(255,255,255,0.05);border-color:var(--accent)}
+.click-box:active{transform:scale(0.98)}
+@keyframes flash{0%{background:rgba(99,102,241,0.5)}100%{background:transparent}}
+.copy-flash{animation:flash 0.4s ease-out}
+.email-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;color:#000}
+.email-table th{background:#92c087;color:black;padding:8px;border:1px solid #000;font-weight:bold}
+.email-table td{border:1px solid #000;padding:6px 10px;color:black}
+.excel-table{width:100%;border-collapse:collapse;font-size:11px}
+.excel-table th{background:#1e293b;padding:10px;text-align:left;color:#94a3b8;text-transform:uppercase;font-weight:700;border-bottom:2px solid #334155}
+.excel-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.label-xs{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:4px;display:block}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:10px}
+#emailBox * { color: black !important; }
+</style>
+</head>
+<body class="h-screen flex flex-col">
+<nav class="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-slate-900/50">
+<div class="flex items-center gap-6">
+<a href="index.html" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+<span class="text-xs font-bold uppercase tracking-widest">Home</span>
+</a>
+<h1 class="text-lg font-extrabold tracking-tighter uppercase">Pranto's <span class="text-indigo-500">Fee Refund</span></h1>
+</div>
+<button onclick="clearAll()" class="text-[10px] font-bold bg-red-500/10 text-red-400 px-3 py-1.5 rounded-lg hover:bg-red-500 hover:text-white transition-all">RESET</button>
+</nav>
+<main class="flex-1 flex p-4 gap-4 overflow-hidden">
+<div class="w-[35%] flex flex-col gap-4 overflow-hidden">
+<div class="glass p-5 space-y-4 shrink-0">
+<div class="grid grid-cols-2 gap-3">
+<div><label class="label-xs">User Name</label><input type="text" id="uName" value="Pranto Rodrix" class="input-box" oninput="run()"></div>
+<div><label class="label-xs">Stage</label><select id="uStage" class="input-box" onchange="run()"><option value="">Select</option><option value="1st">1st Follow-up</option><option value="2nd">2nd Follow-up</option></select></div>
+</div>
+<div><label class="label-xs">Facility</label><select id="uFac" class="input-box" onchange="run()">
+<option value="">Choose Facility...</option>
+<option value="COLLEGE STATION ER LLC">COLLEGE STATION ER LLC</option>
+<option value="DFW LEWISVILLE EMERGENCY CENTER LLC">DFW LEWISVILLE EMERGENCY CENTER LLC</option>
+<option value="KILLEEN EMERGENCY CENTER LLC">KILLEEN EMERGENCY CENTER LLC</option>
+<option value="MIDLAND EMERGENCY CENTER LLC">MIDLAND EMERGENCY CENTER LLC</option>
+<option value="ODESSA EMERGENCY CENTER LLC">ODESSA EMERGENCY CENTER LLC</option>
+<option value="PFLUGERVILLE EMERGENCY CENTER LLC">PFLUGERVILLE EMERGENCY CENTER LLC</option>
+<option value="ROUND TABLE PHYSICIAN GROUP LLC">ROUND TABLE PHYSICIAN GROUP LLC</option>
+<option value="SOUTH AUSTIN EMERGENCY CENTER LLC">SOUTH AUSTIN EMERGENCY CENTER LLC</option>
+<option value="SIGNATURECARE EMERGENCY CENTER - TEXARKANA">SIGNATURECARE EMERGENCY CENTER - TEXARKANA</option>
+</select></div>
+<div><label class="label-xs">Raw Data Input</label><textarea id="uInput" class="input-box h-32 font-mono text-[11px]" placeholder="DISP-XXXX Date Status Fee" oninput="run()"></textarea></div>
+</div>
+<div class="glass flex-1 flex flex-col overflow-hidden">
+<div class="p-3 border-b border-white/5 bg-white/5 font-bold text-[10px] text-slate-400">EXCEL PREVIEW</div>
+<div class="overflow-auto flex-1"><table class="excel-table"><thead><tr><th>IDR</th><th>TKT</th><th>STATUS</th><th>FEE</th><th>DT</th></tr></thead><tbody id="exBody"></tbody></table></div>
+</div>
+</div>
+<div id="outPane" class="w-[65%] flex flex-col gap-3 opacity-20 pointer-events-none transition-all duration-500">
+<div class="grid grid-cols-3 gap-3 shrink-0">
+<div class="glass p-3 click-box" onclick="cp('to')"><label class="label-xs text-indigo-400">To</label><div id="to" class="text-[11px] font-bold truncate">IDREAccounting@improve.health</div></div>
+<div class="glass p-3 click-box" onclick="cp('cc')"><label class="label-xs text-indigo-400">CC</label><div id="cc" class="text-[10px] font-medium truncate">FederalIDRE@improve.health; sislam@roundtmc.com; tthomas@roundtmc.com; mislam@roundtmc.com; razo@leverngear.com; sufia@leverngear.com</div></div>
+<div class="glass p-3 click-box" onclick="cp('sub')"><label class="label-xs text-indigo-400">Subject</label><div id="sub" class="text-[11px] font-bold italic truncate">Waiting...</div></div>
+</div>
+<div class="glass flex-1 flex flex-col overflow-hidden relative group">
+<div class="absolute top-2 right-2 bg-indigo-600 text-[9px] px-2 py-1 rounded font-bold opacity-0 group-hover:opacity-100 transition-opacity">CLICK TO COPY BODY</div>
+<div id="emailBox" class="p-10 bg-white overflow-auto flex-1 click-box" onclick="cpBody()"></div>
+</div>
+</div>
+</main>
+<script>
+const FACS={
+"COLLEGE STATION ER LLC":{a:"817367696",r:"111000614"},"DFW LEWISVILLE EMERGENCY CENTER LLC":{a:"602851989",r:"111000614"},"KILLEEN EMERGENCY CENTER LLC":{a:"261639170",r:"111000614"},"MIDLAND EMERGENCY CENTER LLC":{a:"326223978",r:"111000614"},"ODESSA EMERGENCY CENTER LLC":{a:"326211957",r:"111000614"},"PFLUGERVILLE EMERGENCY CENTER LLC":{a:"612107729",r:"111000614"},"ROUND TABLE PHYSICIAN GROUP LLC":{a:"773088981",r:"111000614"},"SOUTH AUSTIN EMERGENCY CENTER LLC":{a:"128776033",r:"111000614"},"SIGNATURECARE EMERGENCY CENTER - TEXARKANA":{a:"326033096",r:"111000614"}
+};
+function run(){
+const f=document.getElementById('uFac').value, s=document.getElementById('uStage').value, i=document.getElementById('uInput').value.trim(), n=document.getElementById('uName').value, p=document.getElementById('outPane');
+if(f&&s&&i&&n){p.classList.remove('opacity-20','pointer-events-none');render(f,s,i,n);}else{p.classList.add('opacity-20','pointer-events-none');}
+}
+function render(f,s,i,n){
+const lines=i.split('\n').filter(l=>l.includes('DISP-')), data=lines.map(line=>{const p=line.split(/\t|\s{2,}/);return{id:p[0],dt:p[1],st:p[2]||'WIN',fe:p[3]||'$500.00'}});
+const today=new Date(), ds=`${String(today.getMonth()+1).padStart(2,'0')}/${String(today.getDate()).padStart(2,'0')}/${String(today.getFullYear()).slice(-2)}`;
+document.getElementById('sub').innerText=`${s} Follow-up: Mediation Fee Refund Status.`;
+const eb=document.getElementById('exBody');eb.innerHTML='';
+data.forEach(d=>{eb.innerHTML+=`<tr><td class="font-bold text-white">${d.id}</td><td style="background:#22c55e"></td><td>${d.st}</td><td>${d.fe}</td><td>${ds}</td></tr>`});
+const info=FACS[f];
+document.getElementById('emailBox').innerHTML=`
+<div style="font-family: Arial, sans-serif; color: black; background-color: white;">
+<p>Dear iMPROVe Health Accounting Team,</p>
+<p style="margin:15px 0">Please issue a refund of the mediation fees for the following disputes. We have won these cases, and according to the guidelines, the fees should be returned to us. Please find the dispute details and refund amounts in the table below:</p>
+<table class="email-table"><thead><tr style="background:#92c087"><th>IDR Number</th><th>Determination Received Date</th><th>WIN/LOSE</th><th>Mediator Fee</th></tr></thead>
+<tbody>${data.map(d=>`<tr><td>${d.id}</td><td>${d.dt}</td><td>${d.st}</td><td>${d.fe}</td></tr>`).join('')}</tbody></table>
+<p style="margin:15px 0">However, we have not yet received any updates or payment regarding this Mediation refund. If the payment has already been processed, please provide the relevant transaction documents or proof of payment. If the refund has not been issued yet, please process the payment within the next 7 business days.</p>
+<p>Thank you for your prompt attention to this matter.<b>I attached the voided check, account number, and routing number details.</b></p>
+<table class="email-table" style="max-width:550px"><thead><tr style="background:#92c087"><th>Facility Name</th><th>Acc. Num</th><th>Routing Number</th></tr></thead>
+<tbody><tr><td>${f}</td><td>${info.a}</td><td>${info.r}</td></tr></tbody></table>
+<p style="margin-top:20px"><b>For ACH Payment (preferred):</b><br>Account Name: <span style="color:blue;font-weight:bold">${f}</span><br>Bank Routing Number: ${info.r}<br>Account Number: ${info.a}</p>
+<p style="margin-top:20px"><b>Check:</b><br>If submitting payment via check, please overnight it to:<br><span style="color:blue;font-weight:bold">${f}</span><br>Attn: IDRE Accounting<br>11490 Westheimer Road, 10th Floor, Houston, TX 77077</p>
+<p style="margin-top:20px">Thank You,<br>-----------<br>${n}</p></div>`;
+}
+function cp(id){
+const t=document.getElementById(id).innerText,a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();
+document.execCommand('copy');document.body.removeChild(a);flash(document.getElementById(id).parentElement);
+}
+function cpBody(){
+const el=document.getElementById('emailBox');const r=document.createRange();r.selectNode(el);
+window.getSelection().removeAllRanges();window.getSelection().addRange(r);
+document.execCommand('copy');window.getSelection().removeAllRanges();flash(el.parentElement);
+}
+function flash(e){e.classList.add('copy-flash');setTimeout(()=>e.classList.remove('copy-flash'),400)}
+function clearAll(){
+document.getElementById('uFac').value='';document.getElementById('uStage').value='';document.getElementById('uInput').value='';
+document.getElementById('exBody').innerHTML='';document.getElementById('emailBox').innerHTML='';run();
+}
+</script>
+</body>
+</html>
