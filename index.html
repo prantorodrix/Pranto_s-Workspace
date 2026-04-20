@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
@@ -596,11 +597,8 @@ body {
         </div>
     </div>
 </div>
-<!--EmojiEffect-->
-<script>
-(function(){let c=document.getElementById('aura-canvas');if(!c){c=document.createElement('canvas');c.id='aura-canvas';Object.assign(c.style,{position:'fixed',top:'0',left:'0',width:'100%',height:'100%',zIndex:'9999',pointerEvents:'auto'});document.body.appendChild(c)}const ctx=c.getContext('2d');let w,h,m={x:-1e3,y:-1e3},o={x:100,y:100,r:18,h:190,tx:100,ty:100,eo:{x:0,y:0},held:!1,state:'idle'};function rs(){w=c.width=window.innerWidth;h=c.height=window.innerHeight;o.tx=w-100;o.ty=100}window.addEventListener('resize',rs);window.addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY;if(o.held){o.x=o.tx=m.x;o.y=o.ty=m.y}});window.addEventListener('mousedown',e=>{if(Math.hypot(e.clientX-o.x,e.clientY-o.y)<o.r+20){o.held=!0;o.state='angry'}});window.addEventListener('mouseup',()=>{if(o.held){o.held=!1;o.state='idle';o.tx=o.x;o.ty=o.y}});function gRP(){const p=100;return{x:p+Math.random()*(w-p*2),y:p+Math.random()*(h-p*2)}}function dS(x,y,r,h,state){ctx.save();let fY=Math.sin(Date.now()*.003)*5;ctx.translate(x,y+fY);let color=state==='angry'?'0,100%,50%':`${h},100%,65%`;ctx.shadowBlur=12;ctx.shadowColor=`hsla(${color},.4)`;ctx.fillStyle=state==='angry'?'#ff3333':`hsla(${h},100%,75%,1)`;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();ctx.strokeStyle=`hsla(${h},100%,40%,.3)`;ctx.lineWidth=1;ctx.stroke();ctx.fillStyle="white";let eS=state==='angry'?r*.35:r*.28,eX=r*.4,eY=-r*.2,isB=Math.sin(Date.now()*.01)>.97&&state!=='angry';if(!isB){ctx.beginPath();ctx.arc(-eX+o.eo.x,eY+o.eo.y,eS,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(eX+o.eo.x,eY+o.eo.y,eS,0,Math.PI*2);ctx.fill();ctx.fillStyle="#000";let mS=state==='angry'?eS*.7:eS*.5;ctx.beginPath();ctx.arc(-eX+o.eo.x*1.3,eY+o.eo.y*1.3,mS,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(eX+o.eo.x*1.3,eY+o.eo.y*1.3,mS,0,Math.PI*2);ctx.fill()}if(state==='angry'){ctx.strokeStyle="#000";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-eX-4,eY-4);ctx.lineTo(-eX+2,eY-1);ctx.moveTo(eX+4,eY-4);ctx.lineTo(eX-2,eY-1);ctx.stroke();ctx.beginPath();ctx.arc(0,r*.3,r*.3,Math.PI,0);ctx.stroke()}else{ctx.fillStyle="rgba(0,0,0,0.6)";ctx.beginPath();ctx.arc(0,r*.2,r*.25,0,Math.PI);ctx.fill()}ctx.restore()}function anim(){ctx.clearRect(0,0,w,h);const dx=m.x-o.x,dy=m.y-o.y,dist=Math.hypot(dx,dy);if(o.state==='idle'&&dist<70&&!o.held){const nP=gRP();o.tx=nP.x;o.ty=nP.y;o.h=(o.h+50)%360}if(!o.held){o.x+=(o.tx-o.x)*.07;o.y+=(o.ty-o.y)*.07}let a=Math.atan2(dy,dx),dC=Math.min(dist,60)/60;o.eo.x=Math.cos(a)*5*dC;o.eo.y=Math.sin(a)*5*dC;dS(o.x,o.y,o.r,o.h,o.state);requestAnimationFrame(anim)}rs();anim()})()
-</script>
-<!--CursorEffect-->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let app={p:{n:'PrantoAnthony',d:'Junior Associate',t:'BCBS',i:'LnG2110R0218',j:'2021-10-03',ph:'',cv:''},d:[]};
 const mN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
