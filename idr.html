@@ -14,8 +14,8 @@
         :root {
             --font-main: 'Poppins', sans-serif; --font-tech: 'Rajdhani', sans-serif;
             --sidebar-width: 320px; --header-height: 70px;
-            --bg-light: #eef2f6; --glass-light: rgba(255, 255, 255, 0.75); --border-light: rgba(255, 255, 255, 0.8); --text-light: #334155; --shadow-light: 0 8px 30px rgba(0,0,0,0.08);
-            --bg-dark: #0f172a; --glass-dark: rgba(30, 41, 59, 0.7); --border-dark: rgba(255, 255, 255, 0.08); --text-dark: #e2e8f0; --shadow-dark: 0 8px 30px rgba(0,0,0,0.3);
+            --bg-light: #eef2f6; --glass-light: rgba(255, 255, 255, 0.75); --border-light: rgba(0, 0, 0, 0.15); --text-light: #334155; --shadow-light: 4px 4px 15px rgba(0,0,0,0.05);
+            --bg-dark: #0f172a; --glass-dark: rgba(30, 41, 59, 0.7); --border-dark: rgba(255, 255, 255, 0.15); --text-dark: #e2e8f0; --shadow-dark: 4px 4px 15px rgba(0,0,0,0.3);
             --accent: #06b6d4; --accent-grad: linear-gradient(135deg, #06b6d4, #8b5cf6);
             --match-bg-light: #dcfce7; --match-text-light: #166534; --match-bg-dark: rgba(34,197,94,0.2); --match-text-dark: #4ade80;
             --mismatch-bg-light: #fee2e2; --mismatch-text-light: #991b1b; --mismatch-bg-dark: rgba(239,68,68,0.2); --mismatch-text-dark: #f87171;
@@ -26,62 +26,58 @@
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; overflow-y: auto; } .no-scrollbar::-webkit-scrollbar { display: none; }
         .copyable { cursor: pointer; } .section-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px; display: block; font-weight: 700; color: var(--accent); }
-        .glass-card { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--card-shadow); transition: transform 0.2s, box-shadow 0.2s; }
         
-        .form-control, .form-select { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-body); border-radius: 8px; font-family: monospace; font-size: 0.85rem; transition: 0.2s; }
-        .form-control:focus, .form-select:focus { background: rgba(255,255,255,0.08); border-color: var(--accent); box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2); color: var(--text-body); }
+        /* --- 2-Sided Border Design for Cards --- */
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(16px); border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-top: none; border-left: none; border-radius: 0 0 16px 0; box-shadow: var(--card-shadow); transition: transform 0.2s, box-shadow 0.2s; }
+        
+        /* --- 2-Sided Border Design for Inputs --- */
+        .form-control, .form-select { background: rgba(128,128,128,0.05); border-bottom: 2px solid var(--border-color) !important; border-right: 2px solid var(--border-color) !important; border-top: none !important; border-left: none !important; border-radius: 0 0 10px 0; color: var(--text-body); font-family: monospace; font-size: 0.85rem; transition: 0.3s; }
+        .form-control:focus, .form-select:focus { background: rgba(128,128,128,0.1); border-color: var(--accent) !important; box-shadow: none; color: var(--text-body); }
         .form-select option { background-color: var(--bg-body); color: var(--text-body); }
-        .form-control:not(:placeholder-shown) { background-color: rgba(6, 182, 212, 0.12) !important; border-color: rgba(6, 182, 212, 0.4) !important; box-shadow: inset 0 0 8px rgba(6, 182, 212, 0.05); }
+        /* Highlight input when data is present */
+        .form-control:not(:placeholder-shown):not([readonly]) { background-color: rgba(16, 185, 129, 0.08) !important; border-bottom-color: #10b981 !important; border-right-color: #10b981 !important; }
 
         .btn-glow { background: var(--accent-grad); border: none; color: white; border-radius: 50px; padding: 8px 24px; font-weight: 600; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4); transition: 0.3s; }
         .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6); color: white; }
-        .btn-icon { background: var(--glass-bg); border: 1px solid var(--border-color); color: var(--text-body); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-icon { background: var(--glass-bg); border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-top: none; border-left: none; color: var(--text-body); border-radius: 0 0 12px 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-icon:hover { background: var(--accent); color: white; border-color: var(--accent); }
         
         /* --- Separated Header Buttons --- */
-        .btn-action { padding: 8px 20px; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-radius: 8px; transition: all .3s; }
+        .btn-action { padding: 8px 20px; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-radius: 0 0 12px 0; transition: all .3s; border-top: none; border-left: none; border-bottom: 2px solid transparent; border-right: 2px solid transparent; }
         .btn-action i { transition: transform 0.3s; }
-        .btn-extract { background: rgba(6, 182, 212, 0.1); color: var(--accent); border: 1px solid rgba(6, 182, 212, 0.3); }
-        .btn-extract:hover { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4); transform: translateY(-2px); }
+        .btn-extract { background: rgba(6, 182, 212, 0.1); color: var(--accent); border-color: rgba(6, 182, 212, 0.3); }
+        .btn-extract:hover { background: var(--accent); color: white; box-shadow: 4px 4px 15px rgba(6, 182, 212, 0.4); transform: translateY(-2px); }
         .btn-extract:hover i { transform: scale(1.2) rotate(-10deg); }
-        .btn-clear-header { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .btn-clear-header:hover { background: #ef4444; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transform: translateY(-2px); }
+        .btn-clear-header { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+        .btn-clear-header:hover { background: #ef4444; color: white; box-shadow: 4px 4px 15px rgba(239, 68, 68, 0.4); transform: translateY(-2px); }
         .btn-clear-header:hover i { transform: scale(1.2) rotate(10deg); }
 
-        /* --- Custom Note Box Design (Top & Right Border Only) --- */
-        .note-box-custom {
-            border-top: 2px solid var(--accent) !important;
-            border-right: 2px solid var(--accent) !important;
-            border-bottom: none !important;
-            border-left: none !important;
-            border-radius: 0 16px 0 0 !important;
-            background: rgba(128,128,128,0.02) !important;
-            box-shadow: inset -5px 5px 15px rgba(0,0,0,0.02);
-            transition: color 0.3s, border-color 0.3s;
-        }
+        /* --- Custom Note Box Design (Bottom & Right Border Only) & Blink Animation --- */
+        .note-box-custom { border-bottom: 2px solid var(--accent) !important; border-right: 2px solid var(--accent) !important; border-top: none !important; border-left: none !important; border-radius: 0 0 16px 0 !important; background: rgba(128,128,128,0.02) !important; transition: all 0.3s; }
+        @keyframes blinkCopy { 0% { background-color: rgba(16, 185, 129, 0.4); border-color: #10b981; } 100% { background-color: rgba(128,128,128,0.02); border-color: var(--accent); } }
+        .blink-active { animation: blinkCopy 0.4s ease-out; }
 
         /* Layout */
-        #top-bar { position: fixed; top: 0; left: 0; right: 0; height: var(--header-height); z-index: 1040; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; background: var(--nav-bg); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        #top-bar { position: fixed; top: 0; left: 0; right: 0; height: var(--header-height); z-index: 1040; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; background: var(--nav-bg); backdrop-filter: blur(12px); border-bottom: 2px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         #main-wrapper { display: flex; height: 100vh; padding-top: var(--header-height); }
-        #sidebar { width: var(--sidebar-width); flex-shrink: 0; height: 100%; overflow-y: auto; border-right: 1px solid var(--border-color); background: var(--glass-bg); transition: width 0.3s; padding: 1rem; }
+        #sidebar { width: var(--sidebar-width); flex-shrink: 0; height: 100%; overflow-y: auto; border-right: 2px solid var(--border-color); background: var(--glass-bg); transition: width 0.3s; padding: 1rem; }
         #sidebar.collapsed { width: 0; padding: 0; overflow: hidden; border: none; }
         #content-area { flex-grow: 1; overflow-y: auto; padding: 1.5rem; }
         #resizer { width: 4px; cursor: col-resize; z-index: 100; } #resizer:hover { background: var(--accent); }
         
         /* Navbar menus */
         .nav-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; gap: 1rem; }
-        .btn-nav { background: transparent; border: none; color: var(--text-body); font-weight: 600; font-size: 0.9rem; opacity: 0.7; transition: 0.2s; text-decoration: none; padding: 5px 10px; border-radius: 8px; display: flex; align-items: center; gap: 5px; }
-        .btn-nav:hover, .btn-nav.active { opacity: 1; background: rgba(6, 182, 212, 0.1); color: var(--accent); }
+        .btn-nav { background: transparent; border: none; color: var(--text-body); font-weight: 600; font-size: 0.9rem; opacity: 0.7; transition: 0.2s; text-decoration: none; padding: 5px 10px; border-radius: 0 0 8px 0; border-bottom: 2px solid transparent; border-right: 2px solid transparent; display: flex; align-items: center; gap: 5px; }
+        .btn-nav:hover, .btn-nav.active { opacity: 1; background: rgba(6, 182, 212, 0.1); color: var(--accent); border-color: rgba(6, 182, 212, 0.3); }
         
         /* Widgets & IDR Cards */
-        #eob-display-bar { position: sticky; top: -10px; z-index: 1020; background: rgba(var(--bs-primary-rgb), 0.05); border: 1px solid var(--border-color); backdrop-filter: blur(20px); border-radius: 12px; padding: 10px 20px; margin-bottom: 20px; display: none; align-items: center; gap: 15px; flex-wrap: wrap; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 4px solid var(--accent); animation: slideDown 0.3s ease-out; }
+        #eob-display-bar { position: sticky; top: -10px; z-index: 1020; background: rgba(var(--bs-primary-rgb), 0.05); border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); backdrop-filter: blur(20px); border-radius: 0 0 16px 0; padding: 10px 20px; margin-bottom: 20px; display: none; align-items: center; gap: 15px; flex-wrap: wrap; box-shadow: var(--card-shadow); animation: slideDown 0.3s ease-out; }
         #eob-display-bar.visible { display: flex; } @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .idr-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 12px; position: relative; overflow: hidden; }
-        .idr-card::before { content:''; position: absolute; left:0; top:0; bottom:0; width: 3px; background: var(--accent); }
+        .idr-card { background: rgba(128,128,128,0.03); border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); border-radius: 0 0 12px 0; padding: 12px; margin-bottom: 12px; position: relative; overflow: hidden; transition: 0.3s; }
         .idr-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; }
         .idr-val { font-weight: 600; text-align: right; }
-        .bg-match { background: var(--match-bg); color: var(--match-text); border-radius: 4px; padding: 0 4px; font-weight: 700; }
-        .bg-mismatch { background: var(--mismatch-bg); color: var(--mismatch-text); border-radius: 4px; padding: 0 4px; font-weight: 700; }
+        .bg-match { background: var(--match-bg); color: var(--match-text); border-radius: 0 0 6px 0; padding: 0 4px; font-weight: 700; border-bottom: 1px solid var(--match-text); border-right: 1px solid var(--match-text); }
+        .bg-mismatch { background: var(--mismatch-bg); color: var(--mismatch-text); border-radius: 0 0 6px 0; padding: 0 4px; font-weight: 700; border-bottom: 1px solid var(--mismatch-text); border-right: 1px solid var(--mismatch-text); }
         .eob-table-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed rgba(128,128,128,0.2); font-size: 0.85rem; font-family: monospace; }
         .eob-table-row:last-child { border-bottom: none; } .eob-table-row span:last-child { font-weight: 600; }
         
@@ -96,19 +92,13 @@
             <span style="font-family: var(--font-tech); font-weight: 700; font-size: 1.6rem; background: var(--accent-grad); -webkit-background-clip: text; color: transparent; letter-spacing: 1px;">PRANTO'S WORKSPACE</span>
             <button id="toggle-sidebar" class="btn btn-sm btn-link text-muted"><i class="bi bi-grid-3x3-gap-fill"></i></button>
         </div>
-        <!-- Only Home Menu kept per request -->
         <div class="nav-center d-none d-md-flex">
             <a href="index.html" class="btn-nav active"><i class="bi bi-house-door-fill"></i> Home</a>
         </div>
-        <!-- Separated Action Buttons -->
         <div class="d-flex align-items-center gap-3">
-            <button id="processBtn" class="btn-action btn-extract">
-                <i class="bi bi-lightning-charge-fill"></i> Extract
-            </button>
-            <button id="clearBtn" class="btn-action btn-clear-header">
-                <i class="bi bi-trash3-fill"></i> Clear
-            </button>
-            <div style="width: 1px; height: 24px; background: var(--border-color); margin: 0 5px;"></div>
+            <button id="processBtn" class="btn-action btn-extract"><i class="bi bi-lightning-charge-fill"></i> Extract</button>
+            <button id="clearBtn" class="btn-action btn-clear-header"><i class="bi bi-trash3-fill"></i> Clear</button>
+            <div style="width: 2px; height: 24px; background: var(--border-color); margin: 0 5px;"></div>
             <button id="themeToggle" class="btn-icon"><i class="bi bi-palette"></i></button>
         </div>
     </header>
@@ -120,7 +110,7 @@
                 <span class="badge bg-primary bg-opacity-10 text-primary" id="res-count">0</span>
             </div>
             <div id="idr-results-container"></div>
-            <div id="sidebar-errors" class="alert alert-danger d-none mt-2 py-2 small fw-bold text-center border-0 bg-danger bg-opacity-10 text-danger"></div>
+            <div id="sidebar-errors" class="alert alert-danger d-none mt-2 py-2 small fw-bold text-center border-0 bg-danger bg-opacity-10 text-danger" style="border-radius: 0 0 10px 0;"></div>
         </aside>
         <div id="resizer"></div>
 
@@ -133,23 +123,23 @@
                         <div class="row g-2">
                             <div class="col-4 border-end border-secondary border-opacity-25">
                                 <span class="section-label text-success">2024-25 Format</span>
-                                <textarea id="idrTextInput1" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 1"></textarea>
-                                <textarea id="idrTextInput2" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 2"></textarea>
-                                <textarea id="idrTextInput3" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 3"></textarea>
+                                <textarea id="idrTextInput1" class="form-control no-scrollbar mb-2" rows="1" placeholder="Paste Row 1"></textarea>
+                                <textarea id="idrTextInput2" class="form-control no-scrollbar mb-2" rows="1" placeholder="Paste Row 2"></textarea>
+                                <textarea id="idrTextInput3" class="form-control no-scrollbar mb-2" rows="1" placeholder="Paste Row 3"></textarea>
                                 <textarea id="idrTextInput4" class="form-control no-scrollbar" rows="1" placeholder="Paste Row 4"></textarea>
                             </div>
                             <div class="col-4 border-end border-secondary border-opacity-25">
                                 <span class="section-label text-warning">2022-23 Format</span>
-                                <textarea id="idr2022TextInput1" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 1"></textarea>
-                                <textarea id="idr2022TextInput2" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 2"></textarea>
-                                <textarea id="idr2022TextInput3" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 3"></textarea>
+                                <textarea id="idr2022TextInput1" class="form-control no-scrollbar mb-2" rows="1" placeholder="Paste Row 1"></textarea>
+                                <textarea id="idr2022TextInput2" class="form-control no-scrollbar mb-2" rows="1" placeholder="Paste Row 2"></textarea>
+                                <textarea id="idr2022TextInput3" class="form-control no-scrollbar mb-2" rows="1" placeholder="Paste Row 3"></textarea>
                                 <textarea id="idr2022TextInput4" class="form-control no-scrollbar" rows="1" placeholder="Paste Row 4"></textarea>
                             </div>
                             <div class="col-4">
                                 <span class="section-label text-info">2026 Format <i class="bi bi-stars"></i></span>
-                                <textarea id="idr2026TextInput1" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 1"></textarea>
-                                <textarea id="idr2026TextInput2" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 2"></textarea>
-                                <textarea id="idr2026TextInput3" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 3"></textarea>
+                                <textarea id="idr2026TextInput1" class="form-control no-scrollbar mb-2" rows="1" placeholder="Paste Row 1"></textarea>
+                                <textarea id="idr2026TextInput2" class="form-control no-scrollbar mb-2" rows="1" placeholder="Paste Row 2"></textarea>
+                                <textarea id="idr2026TextInput3" class="form-control no-scrollbar mb-2" rows="1" placeholder="Paste Row 3"></textarea>
                                 <textarea id="idr2026TextInput4" class="form-control no-scrollbar" rows="1" placeholder="Paste Row 4"></textarea>
                             </div>
                         </div>
@@ -178,12 +168,11 @@
                 </div>
                 <div class="p-4 row g-4">
                     <div class="col-md-9">
-                        <!-- Custom Note Box applied here -->
                         <textarea id="note_Text" class="form-control copyable no-scrollbar note-box-custom" rows="11" readonly onclick="copyToClipboard(this)" placeholder="Generated note will appear here..."></textarea>
                         <div class="d-flex justify-content-end mt-1"><small class="text-muted fst-italic">*Click to copy</small></div>
                     </div>
                     <div class="col-md-3">
-                        <button id="genNoteBtn" class="btn-glow w-100 mb-3"><i class="bi bi-stars"></i> Generate</button>
+                        <button id="genNoteBtn" class="btn-glow w-100 mb-3" style="border-radius: 0 0 16px 0;"><i class="bi bi-stars"></i> Generate</button>
                         <span class="section-label">User Info</span>
                         <select id="note_Shift" class="form-select mb-2"><option value="Day">Day Shift (BDT)</option><option value="Night">Night Shift (US)</option></select>
                         <input type="text" id="note_Name" class="form-control mb-2" placeholder="Your Name (Required)">
@@ -271,19 +260,18 @@
             const eobTkt = globalData.eob ? globalData.eob.tkt : null;
 
             globalData.idrRows.forEach((r, i) => {
-                const card = document.createElement('div'); card.className = 'idr-card glass-card shadow-sm p-2 mb-2';
+                const card = document.createElement('div'); card.className = 'idr-card glass-card shadow-sm mb-3';
                 const isWin = r.wl === 'WIN', isClose = r.wl === 'CLOSED';
                 const refState = isWin || isClose ? '' : 'disabled'; const refPlace = isWin ? 'Required' : (isClose ? 'Optional' : 'Disabled');
-                const typeBadge = r.idrType ? `<span class="badge bg-warning text-dark me-1" style="font-size:0.65rem">${r.idrType}</span>` : '';
+                const typeBadge = r.idrType ? `<span class="badge bg-warning text-dark me-1" style="font-size:0.65rem; border-radius: 0 0 6px 0;">${r.idrType}</span>` : '';
                 
-                // Determine if ticket matches EOB ticket (or if multiple IDRs have different tickets)
                 let tktClass = 'bg-match';
                 if(eobTkt && r.ticket !== eobTkt) { tktClass = 'bg-mismatch'; }
 
                 let singleBatchHtml = '';
                 if(r.idrType === 'Single-Batch') {
                     singleBatchHtml = `
-                        <div class="mt-2 p-2 rounded bg-info bg-opacity-10 border border-info border-opacity-25 sb-container">
+                        <div class="mt-2 p-2 bg-info bg-opacity-10 border-bottom border-right border-info border-opacity-25 sb-container" style="border-radius: 0 0 8px 0;">
                             <span class="small fw-bold text-info mb-1 d-block">Single-Batch Requirements</span>
                             <input type="text" class="form-control form-control-sm mb-1 sb-cpts" placeholder="CPTs (e.g. 96374 96361)" required>
                             <input type="text" class="form-control form-control-sm mb-1 sb-amts" placeholder="Amounts (e.g. $452.00 $335.40)" required>
@@ -296,14 +284,14 @@
                 card.innerHTML = `
                     <div class="d-flex justify-content-between mb-2">
                         <span class="fw-bold text-primary small">#${r.idr}</span>
-                        <div>${typeBadge}<span class="badge bg-secondary bg-opacity-25 text-secondary" style="font-size:0.65rem">${r.type}</span></div>
+                        <div>${typeBadge}<span class="badge bg-secondary bg-opacity-25 text-secondary" style="font-size:0.65rem; border-radius: 0 0 6px 0;">${r.type}</span></div>
                     </div>
                     <div class="idr-row"><span>Ticket</span> <span class="idr-val ticket-val ${tktClass}">${r.ticket}</span></div>
                     <div class="idr-row"><span>Claim</span> <span class="idr-val">${r.claim}</span></div>
                     <div class="idr-row"><span>Addl</span> <span class="idr-val fw-bold idr-val-addl" id="idr-addl-${i}" data-addl="${parseMoney(r.addl)}">${r.addl}</span></div>
                     <div class="idr-row"><span>Date Status</span> <span class="idr-val ${r.addlStatus==='Received'?'text-success':'text-warning'}">${r.addlStatus}</span></div>
                     ${singleBatchHtml}
-                    <div class="mt-2 pt-2 border-top border-secondary border-opacity-25">
+                    <div class="mt-2 pt-2 border-top border-secondary border-opacity-10">
                         <div class="d-flex align-items-center justify-content-between mb-1">
                             <span class="small opacity-75">Status</span><input class="form-control form-control-sm py-0 w-50 text-end wl-in" value="${r.wl}" placeholder="W/L/C" data-i="${i}" oninput="handleWL(this)">
                         </div>
@@ -341,6 +329,15 @@
         window.handleRefund = (el) => { const v = el.value.toLowerCase(); if(v==='r') el.value='Received'; if(v==='w') el.value='Waiting'; if(el.value) el.classList.remove('is-invalid'); };
         function typeWriter(element, text, i = 0) { if(i===0) element.value=''; if(i<text.length){ element.value+=text.charAt(i); setTimeout(()=>typeWriter(element,text,i+1),3); } }
 
+        // --- Copy Logic With Blink ---
+        window.copyToClipboard = (el) => { 
+            el.select(); 
+            document.execCommand('copy'); 
+            el.classList.remove('blink-active');
+            void el.offsetWidth; // trigger reflow
+            el.classList.add('blink-active');
+        };
+
         document.getElementById('genNoteBtn').addEventListener('click', () => {
             const noteBox = document.getElementById('note_Text');
             const nameEl = document.getElementById('note_Name'); 
@@ -350,7 +347,7 @@
             let allTkts = [];
             const rows = [];
             
-            // --- Validations: EOB & Ticket Matching ---
+            // --- Validations ---
             if(!globalData.eob) {
                 errors.push("⚠️ EOB DETAILS MISSING: PLEASE EXTRACT EOB DATA FIRST.");
             } else {
@@ -361,13 +358,11 @@
                     const wl = card.querySelector('.wl-in').value.toLowerCase();
                     const ref = card.querySelector('.ref-in').value.toLowerCase();
                     
-                    // Win Refund Check
                     if(wl.includes('win') && !ref) {
                         card.querySelector('.ref-in').classList.add('is-invalid');
                         errors.push(`⚠️ REFUND MISSING: PLEASE ENTER REFUND STATUS FOR WIN IN IDR #${org.idr}.`);
                     }
 
-                    // Collect row data if no error yet
                     let addlRec = org.addlStatus === 'Received';
                     let sbText = '';
                     if(org.idrType === 'Single-Batch') {
@@ -387,7 +382,6 @@
                     rows.push({ wl: wl, ref: ref, addl: org.addl, addlRec: addlRec, idr: org.idr, cpt: org.cpt, med: org.mediator, isSb: org.idrType === 'Single-Batch', sbText: sbText });
                 });
 
-                // Ticket Matches Logic
                 const uniqueTkts = [...new Set(allTkts)];
                 if(uniqueTkts.length > 1) {
                     errors.push("⚠️ TICKET MISMATCH: MULTIPLE DIFFERENT TICKET NUMBERS FOUND IN IDR ROWS.");
@@ -397,19 +391,14 @@
                 }
             }
 
-            // Display Errors and Stop if any exist
             if(errors.length > 0) {
-                noteBox.style.color = '#ef4444'; // Red alert text
-                noteBox.style.borderColor = '#ef4444';
+                noteBox.style.color = '#ef4444'; noteBox.style.borderColor = '#ef4444';
                 typeWriter(noteBox, "ERROR ALERTS:\n\n" + errors.join('\n\n'));
                 return;
             }
 
-            // Reset box style if passing validation
-            noteBox.style.color = '';
-            noteBox.style.borderColor = 'var(--accent)';
+            noteBox.style.color = ''; noteBox.style.borderColor = 'var(--accent)';
 
-            // --- Generate Final Note ---
             let init = document.getElementById('note_Initial').value.trim();
             let allDone = true;
             rows.forEach(r => {
@@ -458,7 +447,6 @@
         });
 
         function setError(msg) { const el = els.errorDiv; if(msg) { el.innerText = msg; el.classList.remove('d-none'); } else el.classList.add('d-none'); }
-        window.copyToClipboard = (el) => { el.select(); document.execCommand('copy'); };
         function initTheme() { document.getElementById('themeToggle').addEventListener('click', () => { const n = document.documentElement.getAttribute('data-bs-theme')==='dark'?'light':'dark'; document.documentElement.setAttribute('data-bs-theme', n); localStorage.setItem('theme', n); }); }
         function initSidebar() {
             const sb = document.getElementById('sidebar'); document.getElementById('toggle-sidebar').addEventListener('click', () => sb.classList.toggle('collapsed'));
