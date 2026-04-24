@@ -1,321 +1,158 @@
-
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pranto's Workspace v4.1</title>
-    <link rel="icon" type="image/png" href="note.png"> 
-    
-    <!-- Fonts -->
+    <!-- Fonts, Bootstrap CSS & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
-    <script>
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-bs-theme', savedTheme);
-    </script>
-    
+    <script>const savedTheme = localStorage.getItem('theme') || 'dark'; document.documentElement.setAttribute('data-bs-theme', savedTheme);</script>
     <style>
+        /* --- CSS Variables & Themes --- */
         :root {
-            --font-main: 'Poppins', sans-serif;
-            --font-tech: 'Rajdhani', sans-serif;
-            --sidebar-width: 320px;
-            --header-height: 70px;
-            
-            /* Light Mode Palette */
-            --bg-light: #eef2f6;
-            --glass-light: rgba(255, 255, 255, 0.75);
-            --border-light: rgba(255, 255, 255, 0.8);
-            --text-light: #334155;
-            --shadow-light: 0 8px 30px rgba(0,0,0,0.08);
-            
-            /* Dark Mode Palette */
-            --bg-dark: #0f172a;
-            --glass-dark: rgba(30, 41, 59, 0.7);
-            --border-dark: rgba(255, 255, 255, 0.08);
-            --text-dark: #e2e8f0;
-            --shadow-dark: 0 8px 30px rgba(0,0,0,0.3);
-
-            --accent: #06b6d4;
-            --accent-grad: linear-gradient(135deg, #06b6d4, #8b5cf6);
-            --danger-grad: linear-gradient(135deg, #ef4444, #b91c1c); /* New Red Gradient */
+            --font-main: 'Poppins', sans-serif; --font-tech: 'Rajdhani', sans-serif;
+            --sidebar-width: 320px; --header-height: 70px;
+            --bg-light: #eef2f6; --glass-light: rgba(255, 255, 255, 0.75); --border-light: rgba(255, 255, 255, 0.8);
+            --text-light: #334155; --shadow-light: 0 8px 30px rgba(0,0,0,0.08);
+            --bg-dark: #0f172a; --glass-dark: rgba(30, 41, 59, 0.7); --border-dark: rgba(255, 255, 255, 0.08);
+            --text-dark: #e2e8f0; --shadow-dark: 0 8px 30px rgba(0,0,0,0.3);
+            --accent: #06b6d4; --accent-grad: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            --match-bg-light: #dcfce7; --match-text-light: #166534; --match-bg-dark: rgba(34,197,94,0.2); --match-text-dark: #4ade80;
+            --mismatch-bg-light: #fee2e2; --mismatch-text-light: #991b1b; --mismatch-bg-dark: rgba(239,68,68,0.2); --mismatch-text-dark: #f87171;
         }
-
-        [data-bs-theme="light"] { 
-            --bg-body: var(--bg-light); 
-            --glass-bg: var(--glass-light); 
-            --border-color: var(--border-light);
-            --text-body: var(--text-light);
-            --card-shadow: var(--shadow-light);
-            --nav-bg: rgba(255,255,255,0.9);
-        }
-        
-        [data-bs-theme="dark"] { 
-            --bg-body: var(--bg-dark); 
-            --glass-bg: var(--glass-dark); 
-            --border-color: var(--border-dark);
-            --text-body: var(--text-dark);
-            --card-shadow: var(--shadow-dark);
-            --nav-bg: rgba(15, 23, 42, 0.9);
-        }
-
-        body {
-            font-family: var(--font-main);
-            background-color: var(--bg-body);
-            color: var(--text-body);
-            overflow: hidden;
-            transition: background 0.3s ease;
-        }
-
+        [data-bs-theme="light"] { --bg-body: var(--bg-light); --glass-bg: var(--glass-light); --border-color: var(--border-light); --text-body: var(--text-light); --card-shadow: var(--shadow-light); --nav-bg: rgba(255,255,255,0.9); --match-bg: var(--match-bg-light); --match-text: var(--match-text-light); --mismatch-bg: var(--mismatch-bg-light); --mismatch-text: var(--mismatch-text-light); }
+        [data-bs-theme="dark"] { --bg-body: var(--bg-dark); --glass-bg: var(--glass-dark); --border-color: var(--border-dark); --text-body: var(--text-dark); --card-shadow: var(--shadow-dark); --nav-bg: rgba(15, 23, 42, 0.9); --match-bg: var(--match-bg-dark); --match-text: var(--match-text-dark); --mismatch-bg: var(--mismatch-bg-dark); --mismatch-text: var(--mismatch-text-dark); }
+        body { font-family: var(--font-main); background-color: var(--bg-body); color: var(--text-body); overflow: hidden; transition: background 0.3s, color 0.3s; }
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-
-        /* Glass Cards */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: var(--card-shadow);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .glass-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.15); transform: translateY(-2px); }
-
-        /* Header */
-        #top-bar {
-            position: fixed; top: 0; left: 0; right: 0; height: var(--header-height);
-            z-index: 1040; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between;
-            background: var(--nav-bg); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
-
-        /* Navigation Menu */
-        .nav-center {
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-            display: flex; gap: 1rem;
-        }
-        .btn-nav {
-            background: transparent; border: none; color: var(--text-body); font-weight: 600; font-size: 0.9rem;
-            opacity: 0.7; transition: 0.2s; text-decoration: none; padding: 5px 10px; border-radius: 8px;
-        }
-        .btn-nav:hover, .btn-nav.active { opacity: 1; background: rgba(6, 182, 212, 0.1); color: var(--accent); }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; overflow-y: auto; } .no-scrollbar::-webkit-scrollbar { display: none; }
+        .copyable { cursor: pointer; } .section-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px; display: block; font-weight: 700; color: var(--accent); }
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--card-shadow); transition: transform 0.2s, box-shadow 0.2s; }
         
-        /* Dropdowns */
-        .drop-box { position: relative; cursor: pointer; display: flex; align-items: center; }
-        .drop-menu {
-            position: absolute; top: 100%; left: 50%; transform: translateX(-50%) translateY(15px);
-            background: var(--glass-bg); color: var(--text-body); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 8px; min-width: 170px;
-            opacity: 0; visibility: hidden; transition: 0.2s cubic-bezier(0.2, 0, 0.2, 1);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 4px;
-        }
-        .drop-box:hover .drop-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(5px); }
-        .d-item { 
-            text-decoration: none; color: var(--text-body); font-size: 0.85rem; padding: 8px 12px; 
-            border-radius: 8px; transition: 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px; 
-        }
-        .d-item:hover { background: rgba(6, 182, 212, 0.15); color: var(--accent); }
-
-        /* Sidebar & Layout */
-        #main-wrapper { display: flex; height: 100vh; padding-top: var(--header-height); }
-        #sidebar {
-            width: var(--sidebar-width); flex-shrink: 0; height: 100%; overflow-y: auto;
-            border-right: 1px solid var(--border-color); background: var(--glass-bg);
-            transition: width 0.3s; padding: 1rem;
-        }
-        #sidebar.collapsed { width: 0; padding: 0; overflow: hidden; border: none; }
-        #content-area { flex-grow: 1; overflow-y: auto; padding: 1.5rem; }
+        .form-control, .form-select { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-body); border-radius: 8px; font-family: monospace; font-size: 0.85rem; transition: 0.2s; }
+        .form-control:focus, .form-select:focus { background: rgba(255,255,255,0.08); border-color: var(--accent); box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2); color: var(--text-body); }
+        .form-select option { background-color: var(--bg-body); color: var(--text-body); }
         
-        #resizer { width: 4px; cursor: col-resize; z-index: 100; }
-        #resizer:hover { background: var(--accent); }
+        /* Box fill highlight effect */
+        .form-control:not(:placeholder-shown) { background-color: rgba(6, 182, 212, 0.12) !important; border-color: rgba(6, 182, 212, 0.4) !important; box-shadow: inset 0 0 8px rgba(6, 182, 212, 0.05); }
 
-        /* Sticky Bar */
-        #eob-display-bar {
-            position: sticky; top: -10px; z-index: 1020;
-            background: rgba(var(--bs-primary-rgb), 0.1); 
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(20px); border-radius: 12px; padding: 10px 20px;
-            margin-bottom: 20px; display: none; align-items: center; gap: 15px; flex-wrap: wrap;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 4px solid var(--accent);
-            animation: slideDown 0.3s ease-out;
-        }
-        #eob-display-bar.visible { display: flex; }
-        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* Inputs */
-        .form-control, .form-select {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); 
-            color: var(--text-body); border-radius: 8px; font-family: monospace; font-size: 0.85rem;
-            transition: 0.2s;
-        }
-        .form-control:focus, .form-select:focus { 
-            background: rgba(255,255,255,0.08); border-color: var(--accent); 
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2); color: var(--text-body); 
-        }
-        /* Style for Select Option items (Dark mode fix) */
-        .form-select option { background-color: var(--bg-dark); color: var(--text-dark); }
-        [data-bs-theme="light"] .form-select option { background-color: var(--bg-light); color: var(--text-light); }
-
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; overflow-y: auto; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        .copyable { cursor: pointer; }
-        .section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-bottom: 5px; display: block; font-weight: 700; color: var(--accent); }
-
-        /* Buttons */
-        .btn-glow {
-            background: var(--accent-grad); border: none; color: white; border-radius: 50px;
-            padding: 8px 24px; font-weight: 600; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
-            transition: 0.3s;
-        }
+        .btn-glow { background: var(--accent-grad); border: none; color: white; border-radius: 50px; padding: 8px 24px; font-weight: 600; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4); transition: 0.3s; }
         .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6); color: white; }
-
-        /* New Clear Button Style (Red Vibes) */
-        .btn-glow-danger {
-            background: var(--danger-grad); border: none; color: white; border-radius: 50px;
-            padding: 8px 24px; font-weight: 600; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-            transition: 0.3s;
-        }
-        .btn-glow-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6); color: white; }
-        
         .btn-icon { background: var(--glass-bg); border: 1px solid var(--border-color); color: var(--text-body); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-icon:hover { background: var(--accent); color: white; border-color: var(--accent); }
+        
+        /* Inline Header Buttons */
+        .btn-extract { background: transparent; border: none; padding: 8px 16px; font-size: .8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #4f46e5; transition: all .3s; }
+        .btn-extract:hover { color: #1e1b4b; letter-spacing: 2px; } .btn-extract i { transition: transform .3s; } .btn-extract:hover i { transform: scale(1.3) rotate(-10deg); }
+        .btn-clear-header { background: transparent; border: none; padding: 8px 16px; font-size: .8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #e11d48; transition: all .3s; }
+        .btn-clear-header:hover { color: #4c0519; letter-spacing: 2px; } .btn-clear-header i { transition: transform .3s; } .btn-clear-header:hover i { transform: scale(1.3) rotate(10deg); }
 
-        /* Sidebar Results */
-        .idr-card {
-            background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 12px; margin-bottom: 12px; position: relative;
-            overflow: hidden;
-        }
+        /* Layout */
+        #top-bar { position: fixed; top: 0; left: 0; right: 0; height: var(--header-height); z-index: 1040; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; background: var(--nav-bg); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        #main-wrapper { display: flex; height: 100vh; padding-top: var(--header-height); }
+        #sidebar { width: var(--sidebar-width); flex-shrink: 0; height: 100%; overflow-y: auto; border-right: 1px solid var(--border-color); background: var(--glass-bg); transition: width 0.3s; padding: 1rem; }
+        #sidebar.collapsed { width: 0; padding: 0; overflow: hidden; border: none; }
+        #content-area { flex-grow: 1; overflow-y: auto; padding: 1.5rem; }
+        #resizer { width: 4px; cursor: col-resize; z-index: 100; } #resizer:hover { background: var(--accent); }
+        
+        /* Navbar menus */
+        .nav-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; gap: 1rem; }
+        .btn-nav { background: transparent; border: none; color: var(--text-body); font-weight: 600; font-size: 0.9rem; opacity: 0.7; transition: 0.2s; text-decoration: none; padding: 5px 10px; border-radius: 8px; }
+        .btn-nav:hover, .btn-nav.active { opacity: 1; background: rgba(6, 182, 212, 0.1); color: var(--accent); }
+        .drop-box { position: relative; cursor: pointer; display: flex; align-items: center; }
+        .drop-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%) translateY(15px); background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 8px; min-width: 170px; opacity: 0; visibility: hidden; transition: 0.2s; box-shadow: 0 10px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 4px; }
+        .drop-box:hover .drop-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(5px); }
+        .d-item { text-decoration: none; color: var(--text-body); font-size: 0.85rem; padding: 8px 12px; border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 8px; } .d-item:hover { background: rgba(6, 182, 212, 0.15); color: var(--accent); }
+        
+        /* Widgets */
+        #eob-display-bar { position: sticky; top: -10px; z-index: 1020; background: rgba(var(--bs-primary-rgb), 0.05); border: 1px solid var(--border-color); backdrop-filter: blur(20px); border-radius: 12px; padding: 10px 20px; margin-bottom: 20px; display: none; align-items: center; gap: 15px; flex-wrap: wrap; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 4px solid var(--accent); animation: slideDown 0.3s ease-out; }
+        #eob-display-bar.visible { display: flex; } @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* IDR Cards & Match Colors */
+        .idr-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 12px; position: relative; overflow: hidden; }
         .idr-card::before { content:''; position: absolute; left:0; top:0; bottom:0; width: 3px; background: var(--accent); }
         .idr-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; }
         .idr-val { font-weight: 600; text-align: right; }
+        .bg-match { background: var(--match-bg); color: var(--match-text); border-radius: 4px; padding: 0 4px; font-weight: 700; }
+        .bg-mismatch { background: var(--mismatch-bg); color: var(--mismatch-text); border-radius: 4px; padding: 0 4px; font-weight: 700; }
+        .eob-table-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed rgba(128,128,128,0.2); font-size: 0.85rem; font-family: monospace; }
+        .eob-table-row:last-child { border-bottom: none; } .eob-table-row span:last-child { font-weight: 600; }
         
-        .bg-match { background: rgba(34, 197, 94, 0.2); color: #4ade80; border-radius: 4px; padding: 0 4px; }
-        .bg-mismatch { background: rgba(239, 68, 68, 0.2); color: #f87171; border-radius: 4px; padding: 0 4px; }
-        
-        /* Tabs */
-        .nav-pills-glass .nav-link {
-            color: var(--text-body); background: transparent; border: 1px solid transparent;
-            margin-right: 5px; border-radius: 8px; opacity: 0.7; transition: 0.2s;
-        }
-        .nav-pills-glass .nav-link.active {
-            background: rgba(6, 182, 212, 0.15); color: var(--accent); border-color: rgba(6, 182, 212, 0.3); opacity: 1;
-        }
-
-        /* EOB Details Table */
-        .eob-table-row {
-            display: flex; justify-content: space-between; padding: 6px 0; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; font-family: monospace;
-        }
-        .eob-table-row:last-child { border-bottom: none; }
-        .eob-table-row span:last-child { font-weight: 600; }
-        
-        .loader { width: 18px; height: 18px; border: 2px solid #fff; border-bottom-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+        .loader { width: 16px; height: 16px; border: 2px solid #4f46e5; border-bottom-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes aura-flow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-@keyframes float-ui{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes click-ripple{to{transform:scale(4);opacity:0}}
-.ripple-fx{position:absolute;background:currentColor;border-radius:50%;transform:scale(0);animation:click-ripple .6s ease-out;pointer-events:none;opacity:.3}
+        @keyframes float-ui{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+        @keyframes click-ripple{to{transform:scale(4);opacity:0}}
+        .ripple-fx{position:absolute;background:currentColor;border-radius:50%;transform:scale(0);animation:click-ripple .6s ease-out;pointer-events:none;opacity:.3}
     </style>
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
-
+    
     <!-- Header -->
     <header id="top-bar">
         <div class="d-flex align-items-center gap-3">
-            <span style="font-family: var(--font-tech); font-weight: 700; font-size: 1.6rem; 
-                  background: var(--accent-grad); -webkit-background-clip: text; color: transparent; letter-spacing: 1px;">
-                PRANTO'S WORKSPACE
-            </span>
+            <span style="font-family: var(--font-tech); font-weight: 700; font-size: 1.6rem; background: var(--accent-grad); -webkit-background-clip: text; color: transparent; letter-spacing: 1px;">PRANTO'S WORKSPACE</span>
             <button id="toggle-sidebar" class="btn btn-sm btn-link text-muted"><i class="bi bi-grid-3x3-gap-fill"></i></button>
         </div>
-
-        <!-- Center Menu -->
         <div class="nav-center d-none d-md-flex">
             <a href="index.html" class="btn-nav active"><i class="bi bi-house-door-fill"></i> Home</a>
-            
             <div class="drop-box">
                 <span class="btn-nav">BCBS <i class="bi bi-chevron-down ms-1" style="font-size: 0.7em;"></i></span>
                 <div class="drop-menu">
                     <a href="index.html" class="d-item"><i class="bi bi-file-text"></i> IDR Tool</a>
                     <a href="nsa.html" class="d-item"><i class="bi bi-shield-lock"></i> NSA Tool</a>
-                    <a href="appeal.html" class="d-item"><i class="bi bi-arrow-repeat"></i> Appeal</a>
-                    <a href="email.html" class="d-item"><i class="bi bi-envelope"></i> IDR Email</a>
-                    <a href="accept.html" class="d-item"><i class="bi bi-check-circle"></i> Accepted Email</a>
                 </div>
             </div>
-            
-            <div class="drop-box">
-                <span class="btn-nav">Others <i class="bi bi-chevron-down ms-1" style="font-size: 0.7em;"></i></span>
-                <div class="drop-menu">
-                    <a href="typing.html" class="d-item"><i class="bi bi-keyboard"></i> Typing</a>
-                    <a href="cargame.html" class="d-item"><i class="bi bi-controller"></i> 3D Runner</a>
-                    <a href="flappygame.html" class="d-item"><i class="bi bi-send"></i> Flappy Bird</a>
-                </div>
-            </div>
-            
             <a href="index.html" class="btn-nav">Contact</a>
         </div>
-
         <div class="d-flex align-items-center gap-2">
-            <!-- Clear button made larger and red -->
             <div style="position:relative;display:inline-flex;padding:2px;border-radius:50px;background:linear-gradient(270deg,#3b82f6,#8b5cf6,#ec4899,#f59e0b,#3b82f6);background-size:400% 400%;animation:aura-flow 6s ease infinite,float-ui 3s ease-in-out infinite;box-shadow:0 15px 35px rgba(99,102,241,0.2)">
-<div style="display:flex;align-items:center;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-radius:50px;overflow:hidden;position:relative;padding:2px">
-<button id="processBtn" style="background:transparent;border:none;padding:8px 16px;font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;outline:none;display:flex;align-items:center;gap:10px;position:relative;z-index:2;color:#4f46e5;transition:all .3s cubic-bezier(0.4,0,0.2,1)" onmouseover="this.style.color='#1e1b4b';this.style.letterSpacing='2px';this.querySelector('i').style.transform='scale(1.3) rotate(-10deg)'" onmouseout="this.style.color='#4f46e5';this.style.letterSpacing='1.5px';this.querySelector('i').style.transform='scale(1) rotate(0deg)'" onclick="createRipple(event,this)">
-<i class="bi bi-lightning-charge-fill" style="transition:transform .3s"></i><span>Extract</span>
-</button>
-<div style="width:1.5px;height:24px;background:linear-gradient(to bottom,transparent,rgba(0,0,0,0.1),transparent)"></div>
-<button id="clearBtn" style="background:transparent;border:none;padding:8px 16px;font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;outline:none;display:flex;align-items:center;gap:10px;position:relative;z-index:2;color:#e11d48;transition:all .3s cubic-bezier(0.4,0,0.2,1)" onmouseover="this.style.color='#4c0519';this.style.letterSpacing='2px';this.querySelector('i').style.transform='scale(1.3) rotate(10deg)'" onmouseout="this.style.color='#e11d48';this.style.letterSpacing='1.5px';this.querySelector('i').style.transform='scale(1) rotate(0deg)'" onclick="createRipple(event,this)">
-<i class="bi bi-trash3-fill" style="transition:transform .3s"></i><span>Clear</span>
-</button>
-</div>
-</div>
+                <div style="display:flex;align-items:center;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-radius:50px;overflow:hidden;position:relative;padding:2px">
+                    <button id="processBtn" class="btn-extract" onclick="createRipple(event,this)">
+                        <i class="bi bi-lightning-charge-fill"></i><span>Extract</span>
+                    </button>
+                    <div style="width:1.5px;height:24px;background:linear-gradient(to bottom,transparent,rgba(0,0,0,0.1),transparent)"></div>
+                    <button id="clearBtn" class="btn-clear-header" onclick="createRipple(event,this)">
+                        <i class="bi bi-trash3-fill"></i><span>Clear</span>
+                    </button>
+                </div>
+            </div>
             <button id="themeToggle" class="btn-icon"><i class="bi bi-palette"></i></button>
         </div>
     </header>
 
     <div id="main-wrapper">
-        <!-- Sidebar -->
+        <!-- Sidebar: Results -->
         <aside id="sidebar">
-            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
                 <span class="small fw-bold text-muted">IDR RESULTS</span>
                 <span class="badge bg-primary bg-opacity-10 text-primary" id="res-count">0</span>
             </div>
             <div id="idr-results-container"></div>
             <div id="sidebar-errors" class="alert alert-danger d-none mt-2 py-2 small fw-bold text-center border-0 bg-danger bg-opacity-10 text-danger"></div>
         </aside>
-        
         <div id="resizer"></div>
 
-        <!-- Main Content -->
+        <!-- Main Workspace -->
         <main id="content-area">
+            <!-- Sticky EOB Bar -->
+            <div id="eob-display-bar"><div id="eob-content" class="d-flex gap-4 align-items-center w-100 text-nowrap" style="font-family: var(--font-tech); font-weight: 600; font-size: 1.1rem;"></div></div>
             
-            <!-- Sticky Bar -->
-            <div id="eob-display-bar">
-                <div id="eob-content" class="d-flex gap-4 align-items-center w-100 text-nowrap" style="font-family: var(--font-tech); font-weight: 600; font-size: 1.1rem;"></div>
-            </div>
-
-            <!-- Input Grid -->
             <div class="row g-3 mb-4">
-                
-                <!-- 1. IDR Inputs -->
+                <!-- Inputs -->
                 <div class="col-lg-7 order-lg-2">
                     <div class="glass-card p-3 h-100">
                         <div class="row g-2">
-                            <div class="col-4 border-end border-secondary border-opacity-10">
+                            <div class="col-4 border-end border-secondary border-opacity-25">
                                 <span class="section-label text-success">2024-25 Format</span>
                                 <textarea id="idrTextInput1" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 1"></textarea>
                                 <textarea id="idrTextInput2" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 2"></textarea>
                                 <textarea id="idrTextInput3" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 3"></textarea>
                                 <textarea id="idrTextInput4" class="form-control no-scrollbar" rows="1" placeholder="Paste Row 4"></textarea>
                             </div>
-                            <div class="col-4 border-end border-secondary border-opacity-10">
+                            <div class="col-4 border-end border-secondary border-opacity-25">
                                 <span class="section-label text-warning">2022-23 Format</span>
                                 <textarea id="idr2022TextInput1" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 1"></textarea>
                                 <textarea id="idr2022TextInput2" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 2"></textarea>
@@ -326,21 +163,18 @@
                                 <span class="section-label text-info">2026 Format <i class="bi bi-stars"></i></span>
                                 <textarea id="idr2026TextInput1" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 1"></textarea>
                                 <textarea id="idr2026TextInput2" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 2"></textarea>
-                                <div class="text-muted text-center mt-3" style="font-size:0.65rem; opacity:0.5;">Paste Excel rows directly into boxes</div>
+                                <textarea id="idr2026TextInput3" class="form-control no-scrollbar mb-1" rows="1" placeholder="Paste Row 3"></textarea>
+                                <textarea id="idr2026TextInput4" class="form-control no-scrollbar" rows="1" placeholder="Paste Row 4"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- 2. Updated EOB -->
                 <div class="col-lg-2 order-lg-1">
                     <div class="glass-card p-2 h-100 d-flex flex-column">
                         <span class="section-label text-primary ps-2">Updated EOB</span>
                         <textarea id="eobUpdatedInput" class="form-control no-scrollbar flex-grow-1" placeholder="Paste Full EOB Text here..."></textarea>
                     </div>
                 </div>
-
-                <!-- 3. EOB Breakdown -->
                 <div class="col-lg-3 order-lg-3">
                     <div class="glass-card p-3 h-100 d-flex flex-column">
                         <span class="section-label text-info">EOB Breakdown</span>
@@ -351,519 +185,264 @@
                 </div>
             </div>
 
-            <!-- Tabs & Output -->
+            <!-- Correspondence Section -->
             <div class="glass-card p-0 overflow-hidden">
-                <div class="p-3 border-bottom border-secondary border-opacity-10 bg-secondary bg-opacity-10">
-                    <ul class="nav nav-pills nav-pills-glass" id="noteTabs" role="tablist">
-                        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-corr"><i class="bi bi-pencil-square me-1"></i> Correspondence</button></li>
-                        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-refund"><i class="bi bi-cash-stack me-1"></i> Refund</button></li>
-                        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-ineligible"><i class="bi bi-slash-circle me-1"></i> Ineligible</button></li>
-                    </ul>
+                <div class="p-3 border-bottom border-secondary border-opacity-25 bg-secondary bg-opacity-10 d-flex align-items-center">
+                    <i class="bi bi-pencil-square me-2 text-accent"></i><strong style="color:var(--text-body);">CORRESPONDENCE NOTE</strong>
                 </div>
-                
-                <div class="tab-content p-4">
-                    <!-- Correspondence -->
-                    <div class="tab-pane fade show active" id="tab-corr">
-                        <div class="row g-4">
-                            <div class="col-md-9">
-                                <textarea id="note_Text" class="form-control copyable no-scrollbar" rows="10" readonly onclick="copyToClipboard(this)" placeholder="Generated note will appear here..."></textarea>
-                                <div class="d-flex justify-content-end mt-1"><small class="text-muted fst-italic">*Click to copy</small></div>
-                            </div>
-                            <!-- Updated User Info Panel -->
-                            <div class="col-md-3">
-                                <!-- Generate Button on TOP -->
-                                <button id="genNoteBtn" class="btn-glow w-100 mb-3"><i class="bi bi-stars"></i> Generate</button>
-                                
-                                <span class="section-label">User Info</span>
-                                <!-- Shift Selection -->
-                                <select id="note_Shift" class="form-select mb-2">
-                                    <option value="Day">Day Shift (BDT)</option>
-                                    <option value="Night">Night Shift (US)</option>
-                                </select>
-                                <input type="text" id="note_Name" class="form-control mb-2" placeholder="Your Name (Required)">
-                                <input type="text" id="note_Initial" class="form-control mb-3" placeholder="Initial (Auto)">
-                                
-                                <div id="adjustments" class="glass-card p-3 border-0 bg-primary bg-opacity-10 d-none">
-                                    <div class="d-flex justify-content-between mb-1 text-info small"><span>Adj w/ PT:</span> <span id="adj-pt" class="fw-bold">--</span></div>
-                                    <div class="d-flex justify-content-between text-info small"><span>Adj w/o PT:</span> <span id="adj-nopt" class="fw-bold">--</span></div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="p-4 row g-4">
+                    <div class="col-md-9">
+                        <textarea id="note_Text" class="form-control copyable no-scrollbar" rows="11" readonly onclick="copyToClipboard(this)" placeholder="Generated note will appear here..."></textarea>
+                        <div class="d-flex justify-content-end mt-1"><small class="text-muted fst-italic">*Click to copy</small></div>
                     </div>
-
-                    <!-- Refund -->
-                    <div class="tab-pane fade" id="tab-refund">
-                        <div class="row g-4">
-                            <div class="col-md-9">
-                                <textarea id="refund_Note_Text" class="form-control copyable no-scrollbar" rows="8" readonly onclick="copyToClipboard(this)"></textarea>
-                            </div>
-                            <div class="col-md-3">
-                                <span class="section-label">Refund Details</span>
-                                <input type="text" id="refund_Name" class="form-control mb-2" placeholder="Name">
-                                <input type="text" id="refund_Amount" class="form-control mb-2" placeholder="Amount ($)">
-                                <input type="text" id="refund_Date" class="form-control mb-2" placeholder="Date (MM/DD/YY)">
-                                <input type="text" id="refund_Dispute" class="form-control mb-3" placeholder="DISP-****">
-                                <button id="genRefundBtn" class="btn-glow w-100">Generate</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Ineligible -->
-                    <div class="tab-pane fade" id="tab-ineligible">
-                        <div class="row g-4">
-                            <div class="col-md-9">
-                                <textarea id="ineligible_Note_Text" class="form-control copyable no-scrollbar" rows="8" readonly onclick="copyToClipboard(this)"></textarea>
-                            </div>
-                            <div class="col-md-3">
-                                <span class="section-label">Details</span>
-                                <input type="text" id="ineligible_Name" class="form-control mb-2" placeholder="Name">
-                                <input type="text" id="ineligible_Dispute" class="form-control mb-3" placeholder="DISP-****">
-                                <button id="genIneligibleBtn" class="btn-glow w-100">Generate</button>
-                            </div>
-                        </div>
+                    <div class="col-md-3">
+                        <button id="genNoteBtn" class="btn-glow w-100 mb-3"><i class="bi bi-stars"></i> Generate</button>
+                        <span class="section-label">User Info</span>
+                        <select id="note_Shift" class="form-select mb-2"><option value="Day">Day Shift (BDT)</option><option value="Night">Night Shift (US)</option></select>
+                        <input type="text" id="note_Name" class="form-control mb-2" placeholder="Your Name (Required)">
+                        <input type="text" id="note_Initial" class="form-control mb-3" placeholder="Initial (Auto)">
                     </div>
                 </div>
             </div>
             <div style="height: 50px;"></div>
         </main>
     </div>
-    <!--Button Effect-->
-    <script>
-function createRipple(e,b){const r=document.createElement("span");const d=b.getBoundingClientRect();const s=Math.max(d.width,d.height);r.style.width=r.style.height=`${s}px`;r.style.left=`${e.clientX-d.left-s/2}px`;r.style.top=`${e.clientY-d.top-s/2}px`;r.classList.add("ripple-fx");const o=b.querySelector('.ripple-fx');if(o)o.remove();b.appendChild(r)}
-</script>
-<!-- Mouse Effect -->
-<canvas id="trail-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;pointer-events:none"></canvas><script>(function(){const canvas=document.getElementById('trail-canvas'),ctx=canvas.getContext('2d');let particles=[],pulses=[],globalHue=45,mouse={x:-100,y:-100};function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}window.addEventListener('resize',resize);window.addEventListener('mousemove',(e)=>{mouse.x=e.clientX;mouse.y=e.clientY;if(Math.random()>0.5)particles.push({x:mouse.x+(Math.random()-0.5)*10,y:mouse.y+(Math.random()-0.5)*10,vx:(Math.random()-0.5)*1,vy:(Math.random()-0.5)*-1.5,size:Math.random()*4+1,life:1,opacity:Math.random()*0.5+0.3})});window.addEventListener('mousedown',(e)=>{pulses.push({x:e.clientX,y:e.clientY,r:0,life:1})});function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);globalHue=(globalHue+0.2)%360;pulses.forEach((p,i)=>{ctx.beginPath();ctx.strokeStyle=`hsla(${globalHue},100%,75%,${p.life})`;ctx.lineWidth=2*p.life;ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.stroke();p.r+=4;p.life-=0.02;if(p.life<=0)pulses.splice(i,1)});particles.forEach((p,i)=>{ctx.beginPath();ctx.fillStyle=`hsla(${globalHue},100%,70%,${p.life*p.opacity})`;ctx.shadowBlur=15*p.life;ctx.shadowColor=`hsla(${globalHue},100%,60%,0.8)`;ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();p.x+=p.vx;p.y+=p.vy;p.life-=0.01;if(p.life<=0)particles.splice(i,1)});requestAnimationFrame(animate)}resize();animate()})()</script>   <!-- Script Bundle -->
+
+    <!-- UI Effects -->
+    <script>function createRipple(e,b){const r=document.createElement("span");const d=b.getBoundingClientRect();const s=Math.max(d.width,d.height);r.style.width=r.style.height=`${s}px`;r.style.left=`${e.clientX-d.left-s/2}px`;r.style.top=`${e.clientY-d.top-s/2}px`;r.classList.add("ripple-fx");const o=b.querySelector('.ripple-fx');if(o)o.remove();b.appendChild(r)}</script>
+    <canvas id="trail-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;pointer-events:none"></canvas>
+    <script>(function(){const canvas=document.getElementById('trail-canvas'),ctx=canvas.getContext('2d');let particles=[],pulses=[],globalHue=45,mouse={x:-100,y:-100};function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}window.addEventListener('resize',resize);window.addEventListener('mousemove',(e)=>{mouse.x=e.clientX;mouse.y=e.clientY;if(Math.random()>0.5)particles.push({x:mouse.x+(Math.random()-0.5)*10,y:mouse.y+(Math.random()-0.5)*10,vx:(Math.random()-0.5)*1,vy:(Math.random()-0.5)*-1.5,size:Math.random()*4+1,life:1,opacity:Math.random()*0.5+0.3})});window.addEventListener('mousedown',(e)=>{pulses.push({x:e.clientX,y:e.clientY,r:0,life:1})});function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);globalHue=(globalHue+0.2)%360;pulses.forEach((p,i)=>{ctx.beginPath();ctx.strokeStyle=`hsla(${globalHue},100%,75%,${p.life})`;ctx.lineWidth=2*p.life;ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.stroke();p.r+=4;p.life-=0.02;if(p.life<=0)pulses.splice(i,1)});particles.forEach((p,i)=>{ctx.beginPath();ctx.fillStyle=`hsla(${globalHue},100%,70%,${p.life*p.opacity})`;ctx.shadowBlur=15*p.life;ctx.shadowColor=`hsla(${globalHue},100%,60%,0.8)`;ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();p.x+=p.vx;p.y+=p.vy;p.life-=0.01;if(p.life<=0)particles.splice(i,1)});requestAnimationFrame(animate)}resize();animate()})();</script>   
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Core Application Logic -->
     <script>
-        // --- Init ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            initSidebar();
-            initPersistent();
-            initAnimations();
-        });
-
+        document.addEventListener('DOMContentLoaded', () => { initTheme(); initSidebar(); initPersistent(); initAnimations(); });
+        
         const els = {
-            process: document.getElementById('processBtn'),
-            clear: document.getElementById('clearBtn'),
-            eobIn: document.getElementById('eobUpdatedInput'),
-            results: document.getElementById('idr-results-container'),
-            eobBar: document.getElementById('eob-display-bar'),
-            eobContent: document.getElementById('eob-content'),
-            eobGrid: document.getElementById('eob-details-grid'),
-            resCount: document.getElementById('res-count'),
-            errorDiv: document.getElementById('sidebar-errors'),
-            idr24: [1,2,3,4].map(i => document.getElementById(`idrTextInput${i}`)),
-            idr22: [1,2,3,4].map(i => document.getElementById(`idr2022TextInput${i}`)),
-            idr26: [1,2].map(i => document.getElementById(`idr2026TextInput${i}`))
+            process: document.getElementById('processBtn'), clear: document.getElementById('clearBtn'), eobIn: document.getElementById('eobUpdatedInput'),
+            results: document.getElementById('idr-results-container'), eobBar: document.getElementById('eob-display-bar'), eobContent: document.getElementById('eob-content'),
+            eobGrid: document.getElementById('eob-details-grid'), resCount: document.getElementById('res-count'), errorDiv: document.getElementById('sidebar-errors'),
+            idr24: [1,2,3,4].map(i => document.getElementById(`idrTextInput${i}`)), idr22: [1,2,3,4].map(i => document.getElementById(`idr2022TextInput${i}`)), idr26: [1,2,3,4].map(i => document.getElementById(`idr2026TextInput${i}`))
         };
-
         let globalData = { eob: null, idrRows: [] };
 
-        // --- Formatters ---
         const fmtMoney = (n) => isNaN(n) ? '$0.00' : '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         const parseMoney = (s) => parseFloat((s||'').replace(/[$,\s]/g, '')) || 0;
-        
-        // --- Updated Date Function (Shift Aware) ---
         const getDate = () => {
-            const shift = document.getElementById('note_Shift').value;
-            // Day Shift = Asia/Dhaka, Night Shift = America/New_York
-            const timeZone = shift === 'Night' ? 'America/New_York' : 'Asia/Dhaka';
-            
-            try {
-                return new Date().toLocaleDateString('en-US', {
-                    timeZone: timeZone,
-                    year: '2-digit', month: '2-digit', day: '2-digit'
-                });
-            } catch (e) {
-                // Fallback to local if error
-                const d = new Date(); 
-                return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${String(d.getFullYear()).slice(-2)}`;
-            }
+            const tz = document.getElementById('note_Shift').value === 'Night' ? 'America/New_York' : 'Asia/Dhaka';
+            try { return new Date().toLocaleDateString('en-US', { timeZone: tz, year: '2-digit', month: '2-digit', day: '2-digit' }); } 
+            catch (e) { const d = new Date(); return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${String(d.getFullYear()).slice(-2)}`; }
         };
 
-        // --- Parsing: EOB ---
         function parseEOB(txt) {
             if(!txt) return null;
-            const getVal = (reg) => {
-                const match = txt.match(reg);
-                if(!match) return 0;
-                const sub = txt.substring(match.index + match[0].length);
-                return parseMoney(sub.split(/[\r\n]+/)[0].trim());
-            };
-
-            const billed = getVal(/(Total Bill|Billed Amount)\s*:?/i);
-            const paid = getVal(/(^|[\r\n])(Plan Payment|Total Payment|Plan Paid|Paid Amount|Total Paid)\s*:?/i);
-            const coins = getVal(/(Coinsurance Amount|Coinsurance)\s*:?/i);
-            const copay = getVal(/(Copay Amount|Copay)\s*:?/i);
-            const deduc = getVal(/(Deductible Amount|Deductible)\s*:?/i);
+            const getVal = (reg) => { const match = txt.match(reg); return match ? parseMoney(txt.substring(match.index + match[0].length).split(/[\r\n]+/)[0].trim()) : 0; };
+            const billed = getVal(/(Total Bill|Billed Amount)\s*:?/i), paid = getVal(/(^|[\r\n])(Plan Payment|Total Payment|Plan Paid|Paid Amount|Total Paid)\s*:?/i);
+            const coins = getVal(/(Coinsurance Amount|Coinsurance)\s*:?/i), copay = getVal(/(Copay Amount|Copay)\s*:?/i), deduc = getVal(/(Deductible Amount|Deductible)\s*:?/i);
             const addl = getVal(/(Insurance Current Paid Amount|Additional Paid)\s*:?/i);
-            
-            let ptResp = coins + copay + deduc;
-            if(ptResp === 0) ptResp = getVal(/(Copay\/Deductible Amount|Responsibility)\s*:?/i);
-
+            let ptResp = coins + copay + deduc; if(ptResp === 0) ptResp = getVal(/(Copay\/Deductible Amount|Responsibility)\s*:?/i);
             const tkt = (txt.match(/(Patient Account Number|Pt Acct No)\s*:?[\s\r\n]+([^\r\n]+)/i) || [])[2]?.trim() || 'N/A';
             const clm = (txt.match(/(Claim I?D|Claim No|Claim Number|Control Number)\s*:?[\s\r\n]+([^\r\n]+)/i) || [])[2]?.trim() || 'N/A';
-            const prov = (txt.match(/(Billing Provider Name|Provider Name)\s*:?[\s\r\n]+([^\r\n]+)/i) || [])[2]?.trim() || '';
-
-            return { tkt, clm, prov, billed, paid, ptResp, addl, coins, copay, deduc };
+            return { tkt, clm, prov: (txt.match(/(Billing Provider Name|Provider Name)\s*:?[\s\r\n]+([^\r\n]+)/i) || [])[2]?.trim() || '', billed, paid, ptResp, addl, coins, copay, deduc };
         }
 
-        // --- Parsing: IDR ---
         function parseIDR() {
-            const allInputs = [
-                ...els.idr24.map(e => ({ v: e.value, m: '24' })),
-                ...els.idr22.map(e => ({ v: e.value, m: '22' })),
-                ...els.idr26.map(e => ({ v: e.value, m: '26' }))
-            ];
-            
-            // Map Index: pd = Payment Date (Additional Received Date)
-            const maps = {
-                '24': { t:2, i:1, c:3, cpt:4, wl:17, add:18, pd:19, m:8 },
-                '22': { t:1, i:5, c:2, cpt:3, wl:19, add:20, pd:21, m:8 },
-                '26': { t:3, i:1, c:4, cpt:5, wl:20, add:21, pd:22, m:10 }
-            };
-
+            const allInputs = [...els.idr24.map(e=>({v:e.value, m:'24'})), ...els.idr22.map(e=>({v:e.value, m:'22'})), ...els.idr26.map(e=>({v:e.value, m:'26'}))];
+            const maps = { '24':{t:2,i:1,c:3,cpt:4,wl:17,add:18,pd:19,m:8}, '22':{t:1,i:5,c:2,cpt:3,wl:19,add:20,pd:21,m:8}, '26':{t:3,i:1,c:4,cpt:5,wl:20,add:21,pd:22,m:10} };
             const rows = [];
             allInputs.forEach((o, idx) => {
                 if(!o.v.trim()) return;
-                const cols = o.v.split(/\t/);
-                const map = maps[o.m];
-                const g = (i) => cols[i]?.trim() || '--';
+                const cols = o.v.split(/\t/); const map = maps[o.m]; const g = (i) => cols[i]?.trim() || '--';
+                const pmtDateVal = g(map.pd); const status = (pmtDateVal !== '--' && pmtDateVal !== '') ? 'Received' : 'Waiting';
+                let rawWl = g(map.wl).toLowerCase(), finalWl = '';
+                if(rawWl.includes('win') || rawWl === 'w') finalWl = 'WIN'; else if(rawWl.includes('lose') || rawWl === 'l') finalWl = 'LOSE'; else if(rawWl.includes('close') || rawWl === 'c') finalWl = 'CLOSED';
+                
+                let idrType = '';
+                if(o.m === '26') {
+                    const matchType = o.v.match(/(Single-Batch|Single Batch|Single|Batch|Bundle)/i);
+                    if(matchType) { idrType = matchType[1].replace(' ', '-'); idrType = idrType.charAt(0).toUpperCase() + idrType.slice(1).toLowerCase(); if(idrType.toLowerCase()==='single-batch') idrType='Single-Batch'; }
+                }
 
-                const pmtDateVal = g(map.pd);
-                const status = (pmtDateVal !== '--' && pmtDateVal !== '') ? 'Received' : 'Waiting';
-
-                rows.push({
-                    idx: idx,
-                    type: o.m === '26' ? '2026' : (o.m==='24'?'2024':'2022'),
-                    ticket: g(map.t), idr: g(map.i), claim: g(map.c), cpt: g(map.cpt),
-                    // WL initialized as empty as per request
-                    wl: '', 
-                    addl: g(map.add), 
-                    addlStatus: status, 
-                    mediator: g(map.m)
-                });
+                rows.push({ idx: idx, type: o.m === '26' ? '2026' : (o.m==='24'?'2024':'2022'), idrType: idrType, ticket: g(map.t), idr: g(map.i), claim: g(map.c), cpt: g(map.cpt), wl: finalWl, addl: g(map.add), addlStatus: status, mediator: g(map.m) });
             });
             return rows;
         }
 
-        // --- Processing ---
         els.process.addEventListener('click', () => {
-            const btn = els.process;
-            const old = btn.innerHTML;
-            btn.innerHTML = `<span class="loader"></span>`;
-            
-            setTimeout(() => {
-                setError(null);
-                globalData.eob = parseEOB(els.eobIn.value);
-                globalData.idrRows = parseIDR();
-                
-                renderEOB();
-                renderSidebar();
-                btn.innerHTML = old;
-            }, 300);
+            const btn = els.process; const old = btn.innerHTML; btn.innerHTML = `<span class="loader"></span>`;
+            setTimeout(() => { setError(null); globalData.eob = parseEOB(els.eobIn.value); globalData.idrRows = parseIDR(); renderEOB(); renderSidebar(); btn.innerHTML = old; }, 300);
         });
 
         function renderEOB() {
-            if(!globalData.eob) {
-                els.eobBar.classList.remove('visible');
-                els.eobGrid.innerHTML = `<div class="text-center text-muted small opacity-50">Waiting for extraction...</div>`;
-                return;
-            }
-            const e = globalData.eob;
-            const sep = `<span class="opacity-25 mx-2">|</span>`;
-            
-            // Sticky Bar
-            els.eobContent.innerHTML = `
-                <span class="text-info">${e.tkt}</span>${sep}
-                <span>${e.clm}</span>${sep}
-                <span class="text-warning">Bill: ${fmtMoney(e.billed)}</span>${sep}
-                <span class="text-success">Paid: ${fmtMoney(e.paid)}</span>${sep}
-                <span class="text-danger">PT: ${fmtMoney(e.ptResp)}</span>${sep}
-                <span id="bar-addl" class="fw-bold text-primary">Addl: ${fmtMoney(e.addl)}</span>
-                <span class="ms-auto small fw-normal opacity-50 text-truncate" style="max-width:150px">${e.prov}</span>
-            `;
+            if(!globalData.eob) { els.eobBar.classList.remove('visible'); els.eobGrid.innerHTML = `<div class="text-center text-muted small opacity-50">Waiting for extraction...</div>`; return; }
+            const e = globalData.eob, sep = `<span class="opacity-25 mx-2">|</span>`;
+            els.eobContent.innerHTML = `<span class="text-info">${e.tkt}</span>${sep}<span>${e.clm}</span>${sep}<span class="text-warning">Bill: ${fmtMoney(e.billed)}</span>${sep}<span class="text-success">Paid: ${fmtMoney(e.paid)}</span>${sep}<span class="text-danger">PT: ${fmtMoney(e.ptResp)}</span>${sep}<span id="bar-addl" class="fw-bold">Addl: ${fmtMoney(e.addl)}</span><span class="ms-auto small fw-normal opacity-50 text-truncate" style="max-width:150px">${e.prov}</span>`;
             els.eobBar.classList.add('visible');
-
-            // Breakdown Grid (Right Side)
-            els.eobGrid.innerHTML = `
-                <div class="eob-table-row"><span>Billed</span> <span>${fmtMoney(e.billed)}</span></div>
-                <div class="eob-table-row"><span>Paid</span> <span>${fmtMoney(e.paid)}</span></div>
-                <div class="eob-table-row"><span>Coins</span> <span>${fmtMoney(e.coins)}</span></div>
-                <div class="eob-table-row"><span>Copay</span> <span>${fmtMoney(e.copay)}</span></div>
-                <div class="eob-table-row"><span>Deduct</span> <span>${fmtMoney(e.deduc)}</span></div>
-                <div class="eob-table-row text-info"><span>Addl</span> <span>${fmtMoney(e.addl)}</span></div>
-            `;
+            els.eobGrid.innerHTML = `<div class="eob-table-row"><span>Billed</span> <span>${fmtMoney(e.billed)}</span></div><div class="eob-table-row"><span>Paid</span> <span>${fmtMoney(e.paid)}</span></div><div class="eob-table-row text-info mb-2"><span>Addl</span> <span>${fmtMoney(e.addl)}</span></div><div class="eob-table-row border-top border-secondary pt-2 text-warning"><span>Adj w/ PT</span> <span>${fmtMoney(e.billed - e.paid - e.ptResp)}</span></div><div class="eob-table-row text-danger"><span>Adj w/o PT</span> <span>${fmtMoney(e.billed - e.paid)}</span></div>`;
         }
 
         function renderSidebar() {
-            const div = els.results;
-            div.innerHTML = '';
-            els.resCount.innerText = globalData.idrRows.length;
-            
+            els.results.innerHTML = ''; els.resCount.innerText = globalData.idrRows.length;
             globalData.idrRows.forEach((r, i) => {
-                const isMatch = globalData.eob && globalData.eob.tkt === r.ticket;
+                const card = document.createElement('div'); card.className = 'idr-card glass-card shadow-sm p-2 mb-2';
+                const isWin = r.wl === 'WIN', isClose = r.wl === 'CLOSED';
+                const refState = isWin || isClose ? '' : 'disabled'; const refPlace = isWin ? 'Required' : (isClose ? 'Optional' : 'Disabled');
+                const typeBadge = r.idrType ? `<span class="badge bg-warning text-dark me-1" style="font-size:0.65rem">${r.idrType}</span>` : '';
                 
-                const card = document.createElement('div');
-                card.className = 'idr-card glass-card shadow-sm p-2 mb-2';
-                const addlColor = r.addlStatus === 'Received' ? 'text-success' : 'text-warning';
+                let singleBatchHtml = '';
+                if(r.idrType === 'Single-Batch') {
+                    singleBatchHtml = `
+                        <div class="mt-2 p-2 rounded bg-info bg-opacity-10 border border-info border-opacity-25 sb-container">
+                            <span class="small fw-bold text-info mb-1 d-block">Single-Batch Requirements</span>
+                            <input type="text" class="form-control form-control-sm mb-1 sb-cpts" placeholder="CPTs (e.g. 96374 96361 93005)" required>
+                            <input type="text" class="form-control form-control-sm mb-1 sb-amts" placeholder="Amounts (e.g. $452.00 $335.40 $773.00)" required>
+                            <select class="form-select form-select-sm sb-status" required>
+                                <option value="">Addl Status...</option><option value="Received">Received</option><option value="Waiting">Waiting</option>
+                            </select>
+                        </div>`;
+                }
 
-                // WL input is empty by default (r.wl was set to empty in parseIDR)
                 card.innerHTML = `
                     <div class="d-flex justify-content-between mb-2">
                         <span class="fw-bold text-primary small">#${r.idr}</span>
-                        <span class="badge bg-secondary bg-opacity-25 text-secondary" style="font-size:0.65rem">${r.type}</span>
+                        <div>${typeBadge}<span class="badge bg-secondary bg-opacity-25 text-secondary" style="font-size:0.65rem">${r.type}</span></div>
                     </div>
-                    <div class="idr-row"><span>Ticket</span> <span class="idr-val ${isMatch?'bg-match':'bg-mismatch'}">${r.ticket}</span></div>
+                    <div class="idr-row"><span>Ticket</span> <span class="idr-val">${r.ticket}</span></div>
                     <div class="idr-row"><span>Claim</span> <span class="idr-val">${r.claim}</span></div>
-                    <div class="idr-row"><span>Addl</span> <span class="idr-val fw-bold" data-addl="${parseMoney(r.addl)}">${r.addl}</span></div>
-                    <div class="idr-row"><span>Date Status</span> <span class="idr-val ${addlColor}">${r.addlStatus}</span></div>
-                    
-                    <div class="mt-2 pt-2 border-top border-secondary border-opacity-10">
+                    <div class="idr-row"><span>Addl</span> <span class="idr-val fw-bold idr-val-addl" id="idr-addl-${i}" data-addl="${parseMoney(r.addl)}">${r.addl}</span></div>
+                    <div class="idr-row"><span>Date Status</span> <span class="idr-val ${r.addlStatus==='Received'?'text-success':'text-warning'}">${r.addlStatus}</span></div>
+                    ${singleBatchHtml}
+                    <div class="mt-2 pt-2 border-top border-secondary border-opacity-25">
                         <div class="d-flex align-items-center justify-content-between mb-1">
-                            <span class="small opacity-75">Status (W/L/C)</span>
-                            <input class="form-control form-control-sm py-0 w-50 text-end wl-in" value="${r.wl}" placeholder="Empty" data-i="${i}" oninput="handleWL(this)">
+                            <span class="small opacity-75">Status (W/L/C)</span><input class="form-control form-control-sm py-0 w-50 text-end wl-in" value="${r.wl}" placeholder="Empty" data-i="${i}" oninput="handleWL(this)">
                         </div>
                         <div class="d-flex align-items-center justify-content-between">
-                            <span class="small opacity-75">Refund</span>
-                            <input class="form-control form-control-sm py-0 w-50 text-end ref-in" placeholder="Disabled" disabled data-i="${i}" onfocus="this.select()" oninput="handleRefund(this)">
+                            <span class="small opacity-75">Refund</span><input class="form-control form-control-sm py-0 w-50 text-end ref-in" placeholder="${refPlace}" ${refState} data-i="${i}" onfocus="this.select()" oninput="handleRefund(this)">
                         </div>
-                    </div>
-                `;
-                div.appendChild(card);
+                    </div>`;
+                els.results.appendChild(card);
             });
             
-            // Addl Sum Logic
-            if(globalData.eob) {
-                const sum = globalData.idrRows.reduce((a,b)=>a+parseMoney(b.addl),0);
+            if(globalData.eob && globalData.idrRows.length > 0) {
+                const eobAddl = globalData.eob.addl;
+                const totalIdrAddl = globalData.idrRows.reduce((a,b)=>a+parseMoney(b.addl),0);
                 const bar = document.getElementById('bar-addl');
-                if(Math.abs(sum - globalData.eob.addl) < 0.05) {
-                    bar?.classList.add('text-success'); bar?.classList.remove('text-primary');
-                    document.querySelectorAll('[data-addl]').forEach(e=>e.classList.add('bg-match'));
-                } else {
-                    bar?.classList.add('text-danger'); bar?.classList.remove('text-primary');
-                    document.querySelectorAll('[data-addl]').forEach(e=>e.classList.add('bg-mismatch'));
-                }
-            }
-        }
-
-        // --- 1. Updated handleWL (Shortcuts & Input Handling) ---
-window.handleWL = (el) => {
-    let v = el.value.toLowerCase();
-    
-    // Shortcuts Logic: Automatically replace single letters with full words
-    if (v === 'w') el.value = 'WIN';
-    else if (v === 'l') el.value = 'LOSE';
-    else if (v === 'c') el.value = 'CLOSED';
-    
-    const newVal = el.value.toLowerCase();
-    const grp = el.closest('.idr-card');
-    const ref = grp.querySelector('.ref-in');
-    
-    // Logic:
-    // W = Win -> Refund Required
-    // L = Lose -> Refund Disabled
-    // C = Closed -> Refund Optional (Enabled but not strict)
-    
-    if (newVal.includes('win')) {
-        ref.disabled = false;
-        ref.placeholder = "Required";
-        ref.classList.remove('is-invalid');
-    } else if (newVal.includes('close')) {
-        ref.disabled = false;
-        ref.placeholder = "Optional";
-        ref.classList.remove('is-invalid');
-    } else if (newVal.includes('lose')) {
-        ref.disabled = true; 
-        ref.value = ''; 
-        ref.placeholder = "Disabled";
-        ref.classList.remove('is-invalid');
-    } else {
-        // If empty or other, disable by default
-        ref.disabled = true;
-        ref.value = '';
-        ref.placeholder = "Disabled";
-    }
-};
-
-window.handleRefund = (el) => {
-    const v = el.value.toLowerCase();
-    if (v === 'r') el.value = 'Received';
-    if (v === 'w') el.value = 'Waiting';
-    if (el.value) el.classList.remove('is-invalid');
-};
-
-// --- Typewriter Effect Function ---
-function typeWriter(element, text, i = 0) {
-    if (i === 0) element.value = '';
-    if (i < text.length) {
-        element.value += text.charAt(i);
-        setTimeout(() => typeWriter(element, text, i + 1), 5); // Speed adjustment (5ms)
-    }
-}
-
-// --- 2. Note Generation (Updated Logic with Smooth Text) ---
-document.getElementById('genNoteBtn').addEventListener('click', () => {
-    const nameEl = document.getElementById('note_Name');
-    if(!nameEl.value.trim()) { nameEl.classList.add('is-invalid'); return; }
-    nameEl.classList.remove('is-invalid');
-
-    const rows = [];
-    let error = false;
-
-    document.querySelectorAll('.idr-card').forEach((card, i) => {
-        const wl = card.querySelector('.wl-in').value.toLowerCase();
-        const ref = card.querySelector('.ref-in').value.toLowerCase();
-        const org = globalData.idrRows[i];
-
-        // Error Check: WIN must have refund status
-        if(wl.includes('win') && !ref) {
-            card.querySelector('.ref-in').classList.add('is-invalid');
-            error = true;
-        }
-
-        rows.push({
-            wl: wl, ref: ref,
-            addl: org.addl,
-            addlRec: org.addlStatus === 'Received',
-            idr: org.idr, cpt: org.cpt, med: org.mediator
-        });
-    });
-
-    if(error) return;
-
-    // --- Updated Logic for Initial (Final Review vs Follow Up) ---
-    let init = document.getElementById('note_Initial').value.trim();
-    let allDone = true;
-    
-    rows.forEach(r => {
-        const isWin = r.wl.includes('win');
-        const isClose = r.wl.includes('close');
-        const isLose = r.wl.includes('lose');
-        
-        // Addl Logic: Win/Lose active hole Addl must be Received
-        if((isWin || isLose) && !r.addlRec) allDone = false;
-
-        // Refund Logic
-        if(isWin) {
-            if(!r.ref.startsWith('r')) allDone = false;
-        } else if(isClose) {
-            if(r.ref.startsWith('w')) allDone = false;
-        }
-    });
-
-    if(!init) init = allDone ? "FINAL REVIEW" : "IDR FOLLOW UP";
-
-    // Note Text Construction
-    const e = globalData.eob || { clm:rows[0]?.idr||'N/A', billed:0, paid:0, ptResp:0 };
-    let txt = `${getDate()}>${init}>${nameEl.value}>WORKING ON TRACKING SHEET. `;
-    txt += `CLAIM: ${e.clm}; TOTAL BILL ${fmtMoney(e.billed)}, INS PAID ${fmtMoney(e.paid)}, PT RESPONSIBLITY ${fmtMoney(e.ptResp)}. NEGOTIATION AND IDR DONE. `;
-    
-    rows.forEach(r => {
-        const wlUp = r.wl.toUpperCase();
-        
-        if(r.wl.includes('close')) {
-            txt += `${r.idr}: STATUS IS CLOSED. `;
-            if(r.ref.startsWith('r')) txt += "WE RECEIVED FEE REFUND. ";
-            else if(r.ref.startsWith('w')) txt += "WE ARE WAITING FOR FEE REFUND. ";
-        } 
-        else {
-            let statusTxt = r.wl.includes('win') ? "WIN" : (r.wl.includes('lose') ? "LOSE" : wlUp);
-            txt += `${r.idr}: IDR SUBMITTED ON CPT ${r.cpt} TO MEDIATOR ${r.med}. STATUS IS ${statusTxt} WITH ADDITIONAL ${r.addl}. `;
-            txt += r.addlRec ? "WE RECEIVED ADDITIONAL PAYMENT. " : "WE ARE WAITING FOR ADDITIONAL PAYMENT. ";
-            
-            if(r.wl.includes('win')) {
-                if(r.ref.startsWith('r')) txt += "WE RECEIVED FEE REFUND. ";
-                else txt += "WE ARE WAITING FOR FEE REFUND. ";
-            }
-        }
-    });
-
-    if(init === "FINAL REVIEW") {
-        txt += "NO FURTHER ACTION NEEDED. BALANCE TO BE ADJUSTED.";
-    } else {
-        txt += "WAITING TO COMPLETE THE IDR PROCESS BEFORE ADJUSTMENT.";
-    }
-
-    const noteBox = document.getElementById('note_Text');
-    // Calling Typewriter function for smooth text arrival
-    typeWriter(noteBox, txt.toUpperCase());
-});
-
-        // --- Core Helpers ---
-        function setError(msg) {
-            const el = els.errorDiv;
-            if(msg) { el.innerText = msg; el.classList.remove('d-none'); }
-            else el.classList.add('d-none');
-        }
-
-        function typeWriter(el, txt) {
-            el.value = ''; let i=0;
-            const t = () => { if(i<txt.length) { el.value+=txt.charAt(i); i++; setTimeout(t, 2); el.scrollTop=el.scrollHeight; } };
-            t();
-        }
-
-        window.copyToClipboard = (el) => { el.select(); document.execCommand('copy'); };
-
-        function initTheme() {
-            const t = document.getElementById('themeToggle');
-            t.addEventListener('click', () => {
-                const n = document.documentElement.getAttribute('data-bs-theme')==='dark'?'light':'dark';
-                document.documentElement.setAttribute('data-bs-theme', n); localStorage.setItem('theme', n);
-            });
-        }
-        
-        function initSidebar() {
-            const sb = document.getElementById('sidebar');
-            document.getElementById('toggle-sidebar').addEventListener('click', () => sb.classList.toggle('collapsed'));
-            
-            const r = document.getElementById('resizer');
-            let x=0, w=0, md=false;
-            r.onmousedown = e => { md=true; x=e.clientX; w=sb.offsetWidth; document.body.style.cursor='col-resize'; };
-            document.onmousemove = e => { if(md) sb.style.width = (w + e.clientX - x) + 'px'; };
-            document.onmouseup = () => { md=false; document.body.style.cursor=''; };
-        }
-
-        function initPersistent() {
-            // Added note_Shift to persistence
-            ['note_Name','note_Initial', 'note_Shift'].forEach(id => {
-                const e=document.getElementById(id);
-                if(e) {
-                    e.value = localStorage.getItem(id) || (id === 'note_Shift' ? 'Day' : '');
-                    // For select and inputs
-                    const evt = e.tagName === 'SELECT' ? 'change' : 'input';
-                    e.addEventListener(evt, () => localStorage.setItem(id, e.value));
-                }
-            });
-            
-            // Clear functionality - skips Name, Initial AND Shift
-            els.clear.addEventListener('click', () => {
-                document.querySelectorAll('textarea').forEach(t=>t.value='');
-                document.querySelectorAll('input:not([id*="note_Name"]):not([id*="note_Initial"])').forEach(i=>i.value='');
-                // Shift select is also skipped here automatically as it's a select, not input/textarea
                 
-                els.eobBar.classList.remove('visible');
-                els.results.innerHTML='';
-                els.eobGrid.innerHTML = `<div class="text-center text-muted small opacity-50">Waiting for extraction...</div>`;
-                globalData={eob:null, idrRows:[]};
-                setError(null);
-            });
+                if(Math.abs(totalIdrAddl - eobAddl) < 0.05 && totalIdrAddl !== 0) {
+                    bar.style.color = 'var(--match-text)';
+                    document.querySelectorAll('.idr-val-addl').forEach(el => el.classList.add('bg-match'));
+                } else {
+                    bar.style.color = 'var(--mismatch-text)';
+                    globalData.idrRows.forEach((r, i) => {
+                        const el = document.getElementById(`idr-addl-${i}`);
+                        if(Math.abs(parseMoney(r.addl) - eobAddl) < 0.05 && eobAddl !== 0) el.classList.add('bg-match'); 
+                        else el.classList.add('bg-mismatch');
+                    });
+                }
+            }
         }
 
+        window.handleWL = (el) => {
+            let v = el.value.toLowerCase(); if(v==='w') el.value='WIN'; else if(v==='l') el.value='LOSE'; else if(v==='c') el.value='CLOSED';
+            const newVal = el.value.toLowerCase(), ref = el.closest('.idr-card').querySelector('.ref-in');
+            if(newVal.includes('win')) { ref.disabled = false; ref.placeholder = "Required"; ref.classList.remove('is-invalid'); } 
+            else if(newVal.includes('close')) { ref.disabled = false; ref.placeholder = "Optional"; ref.classList.remove('is-invalid'); } 
+            else if(newVal.includes('lose')) { ref.disabled = true; ref.value = ''; ref.placeholder = "Disabled"; ref.classList.remove('is-invalid'); } 
+            else { ref.disabled = true; ref.value = ''; ref.placeholder = "Disabled"; }
+        };
+        window.handleRefund = (el) => { const v = el.value.toLowerCase(); if(v==='r') el.value='Received'; if(v==='w') el.value='Waiting'; if(el.value) el.classList.remove('is-invalid'); };
+        function typeWriter(element, text, i = 0) { if(i===0) element.value=''; if(i<text.length){ element.value+=text.charAt(i); setTimeout(()=>typeWriter(element,text,i+1),3); } }
+
+        document.getElementById('genNoteBtn').addEventListener('click', () => {
+            const nameEl = document.getElementById('note_Name'); if(!nameEl.value.trim()) { nameEl.classList.add('is-invalid'); return; } nameEl.classList.remove('is-invalid');
+            const rows = []; let error = false;
+            
+            document.querySelectorAll('.idr-card').forEach((card, i) => {
+                const wl = card.querySelector('.wl-in').value.toLowerCase(), ref = card.querySelector('.ref-in').value.toLowerCase(), org = globalData.idrRows[i];
+                if(wl.includes('win') && !ref) { card.querySelector('.ref-in').classList.add('is-invalid'); error = true; }
+                
+                let addlRec = org.addlStatus === 'Received';
+                let sbText = '';
+
+                if(org.idrType === 'Single-Batch') {
+                    const cptsIn = card.querySelector('.sb-cpts'), amtsIn = card.querySelector('.sb-amts'), stIn = card.querySelector('.sb-status');
+                    if(!cptsIn.value || !amtsIn.value || !stIn.value) { cptsIn.classList.add('is-invalid'); amtsIn.classList.add('is-invalid'); stIn.classList.add('is-invalid'); error = true; }
+                    else {
+                        cptsIn.classList.remove('is-invalid'); amtsIn.classList.remove('is-invalid'); stIn.classList.remove('is-invalid');
+                        const cArr = cptsIn.value.trim().split(/\s+/), aArr = amtsIn.value.trim().split(/\s+/);
+                        let tAmt = 0; sbText = "ADDITIONAL AMOUNTS OF ";
+                        for(let j=0; j<Math.min(cArr.length, aArr.length); j++) { sbText += `${aArr[j]} FOR CPT ${cArr[j]}; `; tAmt += parseMoney(aArr[j]); }
+                        sbText += `TOTAL ADDITIONAL AMOUNT (${fmtMoney(tAmt)}). `;
+                        addlRec = (stIn.value === 'Received');
+                    }
+                }
+                rows.push({ wl: wl, ref: ref, addl: org.addl, addlRec: addlRec, idr: org.idr, cpt: org.cpt, med: org.mediator, isSb: org.idrType === 'Single-Batch', sbText: sbText });
+            });
+            if(error) return;
+
+            let init = document.getElementById('note_Initial').value.trim();
+            let allDone = true;
+            rows.forEach(r => {
+                const isWin = r.wl.includes('win'), isClose = r.wl.includes('close'), isLose = r.wl.includes('lose');
+                if(isClose) { if(r.ref.startsWith('w')) allDone = false; } 
+                else if(isWin) { if(!r.addlRec || !r.ref.startsWith('r')) allDone = false; } 
+                else if(isLose) { if(!r.addlRec) allDone = false; } 
+                else allDone = false;
+            });
+
+            if(!init) {
+                if(allDone) init = "FINAL REVIEW";
+                else if(rows.length === 1) {
+                    if(rows[0].wl.includes('win')) init = "IDR WIN";
+                    else if(rows[0].wl.includes('lose')) init = "IDR LOSE";
+                    else init = "IDR FOLLOW UP";
+                } else init = "IDR FOLLOW UP";
+            }
+
+            const e = globalData.eob || { clm:rows[0]?.idr||'N/A', billed:0, paid:0, ptResp:0 };
+            let txt = `${getDate()}>${init}>${nameEl.value}>WORKING ON TRACKING SHEET. CLAIM: ${e.clm}; TOTAL BILL ${fmtMoney(e.billed)}, INS PAID ${fmtMoney(e.paid)}, PT RESPONSIBILITY ${fmtMoney(e.ptResp)}. NEGOTIATION AND IDR DONE. `;
+            
+            rows.forEach(r => {
+                const wlUp = r.wl.toUpperCase();
+                if(r.wl.includes('close')) {
+                    txt += `${r.idr}: STATUS IS CLOSED. `;
+                    if(r.ref.startsWith('r')) txt += "WE RECEIVED FEE REFUND. "; else if(r.ref.startsWith('w')) txt += "WE ARE WAITING FOR FEE REFUND. ";
+                } else {
+                    let statusTxt = r.wl.includes('win') ? "WIN" : (r.wl.includes('lose') ? "LOSE" : wlUp);
+                    if(r.isSb) { txt += `${r.idr}: IDR SUBMITTED TO MEDIATOR ${r.med}. STATUS IS ${statusTxt}. ${r.sbText}`; } 
+                    else { txt += `${r.idr}: IDR SUBMITTED ON CPT ${r.cpt} TO MEDIATOR ${r.med}. STATUS IS ${statusTxt} WITH ADDITIONAL ${r.addl}. `; }
+                    
+                    const isWin = r.wl.includes('win'), hasFee = r.ref.startsWith('r'), waitFee = r.ref.startsWith('w');
+                    if(isWin) {
+                        if(r.addlRec && hasFee) txt += "WE RECEIVED ADDITIONAL PAYMENT AND MEDIATION FEE REFUND. ";
+                        else if(!r.addlRec && hasFee) txt += "WE ARE WAITING FOR ADDITIONAL PAYMENT BUT WE RECEIVED MEDIATION FEE REFUND. ";
+                        else if(r.addlRec && waitFee) txt += "WE RECEIVED ADDITIONAL PAYMENT BUT WAITING FOR MEDIATION FEE REFUND. ";
+                        else txt += "WE ARE WAITING FOR ADDITIONAL PAYMENT AND MEDIATION FEE REFUND. ";
+                    } else {
+                        txt += r.addlRec ? "WE RECEIVED ADDITIONAL PAYMENT. " : "WE ARE WAITING FOR ADDITIONAL PAYMENT. ";
+                    }
+                }
+            });
+            txt += init === "FINAL REVIEW" ? "NO FURTHER ACTION NEEDED. BALANCE TO BE ADJUSTED." : "WAITING TO COMPLETE THE IDR PROCESS BEFORE ADJUSTMENT.";
+            typeWriter(document.getElementById('note_Text'), txt.toUpperCase());
+        });
+
+        function setError(msg) { const el = els.errorDiv; if(msg) { el.innerText = msg; el.classList.remove('d-none'); } else el.classList.add('d-none'); }
+        window.copyToClipboard = (el) => { el.select(); document.execCommand('copy'); };
+        function initTheme() { document.getElementById('themeToggle').addEventListener('click', () => { const n = document.documentElement.getAttribute('data-bs-theme')==='dark'?'light':'dark'; document.documentElement.setAttribute('data-bs-theme', n); localStorage.setItem('theme', n); }); }
+        function initSidebar() {
+            const sb = document.getElementById('sidebar'); document.getElementById('toggle-sidebar').addEventListener('click', () => sb.classList.toggle('collapsed'));
+            let x=0, w=0, md=false; document.getElementById('resizer').onmousedown = e => { md=true; x=e.clientX; w=sb.offsetWidth; document.body.style.cursor='col-resize'; };
+            document.onmousemove = e => { if(md) sb.style.width = (w + e.clientX - x) + 'px'; }; document.onmouseup = () => { md=false; document.body.style.cursor=''; };
+        }
+        function initPersistent() {
+            ['note_Name','note_Initial', 'note_Shift'].forEach(id => { const e=document.getElementById(id); if(e) { e.value = localStorage.getItem(id) || (id === 'note_Shift' ? 'Day' : ''); e.addEventListener(e.tagName === 'SELECT' ? 'change' : 'input', () => localStorage.setItem(id, e.value)); } });
+            els.clear.addEventListener('click', () => { document.querySelectorAll('textarea').forEach(t=>t.value=''); document.querySelectorAll('input:not([id*="note_Name"]):not([id*="note_Initial"])').forEach(i=>i.value=''); els.eobBar.classList.remove('visible'); els.results.innerHTML=''; els.eobGrid.innerHTML = `<div class="text-center text-muted small opacity-50">Waiting for extraction...</div>`; globalData={eob:null, idrRows:[]}; setError(null); });
+        }
         function initAnimations() {
-            const c=document.getElementById('bg-canvas'), x=c.getContext('2d');
-            let w,h,p=[]; const rs=()=>{w=c.width=innerWidth; h=c.height=innerHeight;};
-            window.onresize=rs; rs();
+            const c=document.getElementById('bg-canvas'), x=c.getContext('2d'); let w,h,p=[]; const rs=()=>{w=c.width=innerWidth; h=c.height=innerHeight;}; window.onresize=rs; rs();
             for(let i=0;i<35;i++) p.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,s:Math.random()*2});
-            const anim=()=>{
-                x.clearRect(0,0,w,h); 
-                x.fillStyle = getComputedStyle(document.body).getPropertyValue('--accent');
-                p.forEach(d=>{ d.x+=d.vx; d.y+=d.vy; if(d.x<0)d.x=w; if(d.x>w)d.x=0; if(d.y<0)d.y=h; if(d.y>h)d.y=0; 
-                x.globalAlpha=0.08; x.beginPath(); x.arc(d.x,d.y,d.s,0,6.28); x.fill(); });
-                requestAnimationFrame(anim);
-            };
-            anim();
+            const anim=()=>{ x.clearRect(0,0,w,h); x.fillStyle = getComputedStyle(document.body).getPropertyValue('--accent'); p.forEach(d=>{ d.x+=d.vx; d.y+=d.vy; if(d.x<0)d.x=w; if(d.x>w)d.x=0; if(d.y<0)d.y=h; if(d.y>h)d.y=0; x.globalAlpha=0.08; x.beginPath(); x.arc(d.x,d.y,d.s,0,6.28); x.fill(); }); requestAnimationFrame(anim); }; anim();
         }
     </script>
 </body>
