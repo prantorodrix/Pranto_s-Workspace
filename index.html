@@ -56,16 +56,7 @@
         /* =========================================
            GLOBAL & DYNAMIC BLUR BACKGROUNDS
            ========================================= */
-        body {
-            font-family: var(--font-body);
-            color: var(--text-main);
-            min-height: 100vh;
-            background-color: var(--bg-color);
-            transition: all 0.5s ease;
-            overflow-x: hidden;
-        }
-
-        /* Ambient glowing orbs (Mesh Background) */
+        body { font-family: var(--font-body); color: var(--text-main); min-height: 100vh; background-color: var(--bg-color); transition: all 0.5s ease; overflow-x: hidden; }
         .bg-mesh { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
         .blob { position: absolute; filter: blur(90px); opacity: 0.6; border-radius: 50%; animation: floatBlob 15s infinite alternate ease-in-out; }
         
@@ -84,122 +75,96 @@
         .text-gradient { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         /* Glass Panel Styling */
-        .glass-panel {
-            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--card-radius);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--card-radius); transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .glass-panel:hover { box-shadow: 0 15px 50px rgba(0,0,0,0.1); transform: translateY(-2px); }
         [data-bs-theme="dark"] .glass-panel:hover { box-shadow: 0 15px 50px rgba(0,0,0,0.5); }
-
         .btn-premium { background: linear-gradient(135deg, var(--primary), #818cf8); color: white !important; border: none; border-radius: 12px; padding: 10px 24px; font-weight: 700; transition: 0.3s; box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3); }
         .btn-premium:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.5); filter: brightness(1.1); }
 
         /* =========================================
-           NAVBAR (Unchanged structure, refined style)
+           NAVBAR
            ========================================= */
         #nav-container { position: fixed; top: 20px; left: 0; width: 100%; z-index: 1000; display: flex; justify-content: center; padding: 0 20px; }
         .nav-pill { width: 100%; max-width: 1400px; height: 65px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-radius: 100px; background: var(--glass-bg); backdrop-filter: blur(30px); border: var(--glass-border); box-shadow: 0 5px 25px rgba(0,0,0,0.05); }
         .nav-brand { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; }
-        
         .nav-links { display: flex; gap: 28px; align-items: center; }
         .nav-item { text-decoration: none; color: var(--text-sub); font-weight: 600; font-size: 0.85rem; transition: 0.3s; position: relative; text-transform: uppercase; letter-spacing: 0.5px; }
         .nav-item:hover, .nav-item.active { color: var(--primary); }
         .nav-item.active::after { content:''; position:absolute; bottom:-6px; left:0; width:100%; height:3px; background:var(--primary); border-radius:10px; }
-
-.nav-drop-menu { background: var(--glass-bg); backdrop-filter: blur(25px); border: var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow); padding: 10px; margin-top: 20px; min-width: 200px; overflow: hidden; }
+       .nav-drop-menu { background: var(--glass-bg); backdrop-filter: blur(25px); border: var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow); padding: 10px; margin-top: 20px; min-width: 200px; overflow: hidden; }
 .nav-drop-item { color: var(--text-main); font-size: 0.9rem; padding: 10px 15px; border-radius: 10px; transition: 0.2s; display: block; text-decoration: none; font-weight: 500; }
 .nav-drop-item:hover { background: rgba(var(--primary-rgb), 0.1); color: var(--primary); transform: translateX(5px); }
-
-        .user-pill { display: flex; align-items: center; gap: 15px; }
+  .user-pill { display: flex; align-items: center; gap: 15px; }
         .theme-tog { width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; transition: 0.3s; font-size: 1.1rem; }
         .theme-tog:hover { background: var(--primary); color: white; transform: rotate(15deg) scale(1.1); }
-        
-        /* Updated Nav Avatar */
         .user-av { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); padding: 2px; cursor: pointer; transition: 0.3s; background: var(--input-bg); }
         .user-av:hover { transform: scale(1.1); box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.4); }
 
         /* =========================================
-           MAIN WRAPPER 
+           MAIN WRAPPER & 8/4 GRID LAYOUT
            ========================================= */
         #main-wrapper { margin-top: 105px; padding-bottom: 50px; max-width: 1400px; margin-left: auto; margin-right: auto; padding-left: 20px; padding-right: 20px; }
 
-        /* =========================================
-           PROFILE SECTION (Bigger & Ultra Premium)
-           ========================================= */
-        .prof-banner-card { padding: 0; overflow: hidden; margin-bottom: 30px; position: relative; border-radius: 30px; }
-        .cover-area { height: 380px; width: 100%; position: relative; overflow: hidden; background: rgba(0,0,0,0.05); }
+        /* Left 8-Grid: Tall Profile Banner */
+        .prof-banner-card { padding: 0; overflow: hidden; position: relative; border-radius: 24px; display: flex; flex-direction: column; }
+        .cover-area { height: 360px; width: 100%; position: relative; overflow: hidden; background: rgba(0,0,0,0.05); }
         .cover-img { width: 100%; height: 100%; object-fit: cover; transition: transform 12s ease; }
         .prof-banner-card:hover .cover-img { transform: scale(1.08); }
         
-        .prof-info-wrapper { position: relative; padding: 0 40px 35px; margin-top: -85px; z-index: 10; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; }
+        .prof-info-wrapper { padding: 0 30px 30px; margin-top: -100px; z-index: 10; display: flex; flex-direction: column; justify-content: center; }
+        .prof-pic-container { position: relative; perspective: 1000px; margin-bottom: 15px; }
+        /* Ultra Large Avatar */
+        .prof-pic-main { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 6px solid var(--glass-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative; z-index: 3; animation: avatarFloat 6s ease-in-out infinite; background: var(--input-bg); }
+        .float-el-1 { position: absolute; top: 10px; right: 35%; width: 28px; height: 28px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 50%; animation: float3d 5s infinite ease-in-out; z-index: 4; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        .float-el-2 { position: absolute; bottom: 20px; left: 35%; width: 22px; height: 22px; background: linear-gradient(135deg, #f43f5e, #fb923c); border-radius: 50%; animation: float3dReverse 6s infinite ease-in-out; z-index: 1; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
         
-        /* Profile Image Enlarged */
-        .prof-pic-container { position: relative; perspective: 1000px; margin-right: 30px; }
-        .prof-pic-main { 
-            width: 170px; height: 170px; border-radius: 50%; object-fit: cover; 
-            border: 6px solid var(--glass-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-            position: relative; z-index: 3; animation: avatarFloat 6s ease-in-out infinite; background: var(--input-bg);
-        }
-        
-        .float-el-1 { position: absolute; top: -5px; right: -5px; width: 35px; height: 35px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 50%; animation: float3d 5s infinite ease-in-out; z-index: 4; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-        .float-el-2 { position: absolute; bottom: 15px; left: -10px; width: 25px; height: 25px; background: linear-gradient(135deg, #f43f5e, #fb923c); border-radius: 50%; animation: float3dReverse 6s infinite ease-in-out; z-index: 1; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        .prof-text-box { background: var(--glass-bg); backdrop-filter: blur(20px); padding: 25px 30px; border-radius: 16px; border: var(--glass-border); box-shadow: 0 5px 25px rgba(0,0,0,0.05); }
 
-        /* Profile details card */
-        .prof-text-box { background: var(--glass-bg); backdrop-filter: blur(20px); padding: 20px 30px; border-radius: 20px; border: var(--glass-border); box-shadow: 0 5px 25px rgba(0,0,0,0.05); margin-bottom: 10px; }
-        
         @keyframes avatarFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         @keyframes float3d { 0%, 100% { transform: translateZ(20px) translateY(0); } 50% { transform: translateZ(50px) translateY(-20px); } }
         @keyframes float3dReverse { 0%, 100% { transform: translateZ(-20px) translateY(0); } 50% { transform: translateZ(-50px) translateY(20px); } }
 
-        /* =========================================
-           STATS GRID 
-           ========================================= */
-        .dash-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 30px; }
-        @media(max-width: 992px) { .dash-grid-4 { grid-template-columns: repeat(2, 1fr); } }
-        @media(max-width: 576px) { .dash-grid-4 { grid-template-columns: 1fr; } }
+        /* Right 4-Grid: Stats, Weather, Calendar */
+        .stat-icon { border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .stat-icon-hover:hover .stat-icon { transform: scale(1.15) rotate(5deg); }
+        .stat-val-big { font-weight: 800; line-height: 1; font-family: var(--font-num); letter-spacing: -1px; }
 
-        .stat-card-flex { display: flex; flex-direction: column; justify-content: center; text-align: center; padding: 25px; min-height: 200px; }
-        .stat-icon { width: 55px; height: 55px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 15px; margin-left: auto; margin-right: auto; transition: 0.3s; }
-        .stat-card-flex:hover .stat-icon { transform: scale(1.15) rotate(5deg); }
-        .stat-val-big { font-size: 3rem; font-weight: 800; line-height: 1; font-family: var(--font-num); margin: 8px 0; letter-spacing: -2px; }
+        /* Custom scrollbar for lists */
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(var(--primary-rgb), 0.3); border-radius: 10px; }
 
-        .cal-mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 15px; }
-        .cal-mini-day { aspect-ratio: 1; border-radius: 8px; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.03); color: var(--text-sub); transition: 0.2s; }
+        .cal-mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
+        .cal-mini-day { aspect-ratio: 1; border-radius: 6px; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.03); color: var(--text-sub); transition: 0.2s; }
         [data-bs-theme="dark"] .cal-mini-day { background: rgba(255,255,255,0.03); }
         .cal-mini-day:hover { transform: scale(1.2); z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         /* =========================================
-           CONTROLS & VISUAL CHART & SUMMARY 
+           CONTROLS & VISUAL CHART & SUMMARY
            ========================================= */
         .mini-stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
-        .mini-box { padding: 15px; text-align: center; background: var(--input-bg); border-radius: 16px; border: var(--glass-border); transition: 0.3s; }
+        .mini-box { padding: 12px; text-align: center; background: var(--input-bg); border-radius: 16px; border: var(--glass-border); transition: 0.3s; }
         .mini-box:hover { background: var(--primary); transform: translateY(-4px); box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.3); border-color: transparent; }
         .mini-box:hover .mini-val, .mini-box:hover .mini-label { color: white !important; }
-        .mini-val { font-size: 1.5rem; font-weight: 800; font-family: var(--font-num); color: var(--text-main); transition: 0.2s; margin-bottom: 4px; }
-        .mini-label { font-size: 0.7rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; transition: 0.2s; }
-
-        .control-panel-select { background: var(--input-bg); color: var(--primary); border: var(--glass-border); font-size: 1.15rem; padding: 15px; border-radius: 14px; }
+        .mini-val { font-size: 1.4rem; font-weight: 800; font-family: var(--font-num); color: var(--text-main); transition: 0.2s; margin-bottom: 4px; }
+        .mini-label { font-size: 0.65rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; transition: 0.2s; }
+        
+        .control-panel-select { background: var(--input-bg); color: var(--primary); border: var(--glass-border); font-size: 1.1rem; padding: 12px; border-radius: 14px; }
         .control-panel-select:focus { box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15); }
 
-        /* Custom Attendance Chart inside Control Panel */
+        /* Attendance Chart (Hours) */
         .chart-bar-container { height: 12px; border-radius: 20px; background: rgba(0,0,0,0.05); overflow: hidden; display: flex; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
         [data-bs-theme="dark"] .chart-bar-container { background: rgba(255,255,255,0.05); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
         .chart-segment { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
 
         /* =========================================
-           EXPANDED REMARKS SECTION
+           EXPANDED REMARKS SECTION (INLINE FLEX)
            ========================================= */
-        .notes-container { padding: 20px; border-radius: 20px; margin-bottom: 30px; display: flex; flex-direction: column; gap: 10px; }
-        .notes-scroll-area { max-height: 140px; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .notes-scroll-area::-webkit-scrollbar { width: 6px; }
-        .notes-scroll-area::-webkit-scrollbar-thumb { background: rgba(var(--primary-rgb), 0.3); border-radius: 10px; }
+        .notes-container { padding: 20px; border-radius: 20px; margin-bottom: 30px; }
+        .notes-inline-area { display: flex; flex-wrap: wrap; gap: 10px; max-height: 180px; overflow-y: auto; padding-right: 5px; }
+        .note-chip { background: var(--input-bg); padding: 8px 16px; border-radius: 50px; font-size: 0.85rem; border: var(--glass-border); border-left: 4px solid var(--primary); display: inline-flex; align-items: center; gap: 8px; white-space: normal; line-height: 1.3; }
         
-        .note-card { background: var(--input-bg); padding: 10px 15px; border-radius: 12px; font-size: 0.85rem; border: var(--glass-border); border-left: 4px solid var(--primary); display: flex; gap: 10px; }
-        .note-date { font-weight: 800; color: var(--primary); min-width: 65px; }
-
         /* =========================================
-           TABLE & INPUTS 
+           TABLE & DYNAMIC INPUTS
            ========================================= */
         .table-container { padding: 25px; margin-bottom: 40px; border-radius: 24px; }
         .modern-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; }
@@ -209,8 +174,8 @@
         .modern-table td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; padding-right: 15px; }
         .tr-hover:hover td { background: rgba(var(--primary-rgb), 0.08); transform: scale(1.002); }
 
-        .t-inp { width: 100%; background: transparent; border: 1px solid transparent; text-align: center; color: var(--text-main); font-weight: 700; font-size: 0.85rem; padding: 6px; border-radius: 8px; transition: 0.2s; }
-        .t-inp:focus { outline: none; background: var(--glass-bg); border-color: var(--primary); box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15); }
+        .t-inp { width: 100%; background: transparent; border: 2px solid transparent; text-align: center; color: var(--text-main); font-weight: 700; font-size: 0.85rem; padding: 6px; border-radius: 8px; transition: all 0.3s; }
+        .t-inp:focus { outline: none; background: var(--glass-bg); border-color: rgba(var(--primary-rgb), 0.5); box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15); }
         .t-inp.text-start { text-align: left; }
 
         .badge-btn { border: none; padding: 6px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; width: 90px; text-transform: uppercase; transition: 0.2s; letter-spacing: 0.5px; }
@@ -231,16 +196,16 @@
         /* =========================================
            FOOTER & ANIMATIONS 
            ========================================= */
-        .footer-sec { margin-top: auto; padding: 60px 0 40px; background: var(--glass-bg); border-top: var(--glass-border); backdrop-filter: blur(30px); }
-        .footer-brand { font-family: var(--font-head); font-weight: 800; font-size: 1.8rem; }
-        .social-icon { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--input-bg); color: var(--primary); font-size: 1.2rem; transition: 0.3s; margin-right: 10px; }
-        .social-icon:hover { background: var(--primary); color: white; transform: translateY(-5px); }
+        .footer-sec { margin-top: auto; padding: 40px 0 30px; background: var(--glass-bg); border-top: var(--glass-border); backdrop-filter: blur(30px); }
+        .footer-brand { font-family: var(--font-head); font-weight: 800; font-size: 1.5rem; }
+        .social-icon { width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--input-bg); color: var(--primary); font-size: 1.1rem; transition: 0.3s; margin-right: 8px; }
+        .social-icon:hover { background: var(--primary); color: white; transform: translateY(-4px); }
 
         .anim { opacity: 0; transform: translateY(30px); animation: fadeInUp 0.7s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
         /* =========================================
-           PRINT PREVIEW (Unchanged)
+           PRINT PREVIEW 
            ========================================= */
         #print-view { display: none; position: fixed; inset: 0; background: #fff; color: #000; z-index: 9999; overflow-y: auto; padding: 40px; }
         .print-header { border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
@@ -255,19 +220,14 @@
 </head>
 <body>
 
-<!-- Animated Blurry Background Elements -->
-<div class="bg-mesh">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-</div>
+<!-- Dynamic Ambient Background -->
+<div class="bg-mesh"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
 
 <!-- NAVIGATION BAR -->
 <div id="nav-container" class="anim" style="animation-delay: 0s">
     <div class="nav-pill">
         <div class="nav-brand text-gradient">Pranto's Workspace</div>
-        
-        <div class="nav-links d-none d-lg-flex">
+<div class="nav-links d-none d-lg-flex">
             <a href="#" class="nav-item active">Home</a>
             <div class="dropdown">
                 <span class="nav-item dropdown-toggle" data-bs-toggle="dropdown">BCBS</span>
@@ -292,11 +252,9 @@
             </div>
             <a href="#" class="nav-item">Contact</a>
         </div>
-
         <div class="user-pill">
             <button id="t-tog" class="theme-tog"><i class="bi bi-moon-stars-fill"></i></button>
             <div class="dropdown">
-                <!-- Nav Avatar Updated automatically -->
                 <img id="nav-avatar" src="https://placehold.co/100/4f46e5/fff?text=PR" class="user-av" data-bs-toggle="dropdown">
                 <ul class="dropdown-menu dropdown-menu-end nav-drop-menu border-0 mt-3">
                     <li><a class="nav-drop-item text-danger" href="#" onclick="localStorage.clear();location.reload()"><i class="bi bi-trash3-fill me-2"></i>Reset System</a></li>
@@ -307,97 +265,113 @@
 </div>
 
 <div id="main-wrapper">
-
-    <!-- ULTRA PREMIUM PROFILE BANNER -->
-    <div class="glass-panel prof-banner-card anim" style="animation-delay: 0.1s">
-        <div class="cover-area">
-            <img id="cv-ph" src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop" class="cover-img">
-        </div>
+    <!-- TOP SECTION: 8/4 Grid Setup -->
+    <div class="row g-4 mb-4 anim" style="animation-delay: 0.1s">
         
-        <div class="prof-info-wrapper">
-            <div class="d-flex align-items-end flex-wrap gap-4">
-                <!-- Enlarged 3D Avatar -->
-                <div class="prof-pic-container">
-                    <div class="float-el-1"></div>
-                    <div class="float-el-2"></div>
-                    <img id="p-ph" src="https://placehold.co/200/4f46e5/fff?text=PR" class="prof-pic-main" alt="Avatar">
-                </div>
-                
-                <div class="prof-text-box">
-                    <h2 id="u-nm" class="font-head fw-bolder m-0" style="font-size: 2.2rem;">Setup Profile</h2>
-                    <p id="u-ds" class="text-gradient fw-bold mb-3 fs-5">Add Designation</p>
-                    <div class="d-flex gap-4 text-muted" style="font-size: 0.85rem; font-weight: 700;">
-                        <span><i class="bi bi-diagram-3-fill me-1 text-primary"></i> <span id="u-tm">Team</span></span>
-                        <span><i class="bi bi-fingerprint me-1 text-primary"></i> <span id="u-id">ID</span></span>
-                        <span><i class="bi bi-clock-history me-1 text-primary"></i> <span id="j-dur">--</span></span>
+        <!-- LEFT: 8-Grid (Tall Profile Section) -->
+        <div class="col-lg-8">
+            <div class="glass-panel prof-banner-card h-100">
+                <div class="cover-area"><img id="cv-ph" src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop" class="cover-img"></div>
+                <div class="prof-info-wrapper flex-grow-1">
+                    <div class="prof-pic-container text-center">
+                        <div class="float-el-1"></div>
+                        <div class="float-el-2"></div>
+                        <img id="p-ph" src="https://placehold.co/200/4f46e5/fff?text=PR" class="prof-pic-main mx-auto" alt="Avatar">
+                    </div>
+                    <div class="prof-text-box text-center mt-3 flex-grow-1 d-flex flex-column justify-content-center">
+                        <h2 id="u-nm" class="font-head fw-bolder m-0" style="font-size: 2rem;">Setup Profile</h2>
+                        <p id="u-ds" class="text-gradient fw-bold mb-3 fs-5">Add Designation</p>
+                        <div class="d-flex justify-content-center gap-4 text-muted flex-wrap mb-3" style="font-size: 0.85rem; font-weight: 700;">
+                            <span><i class="bi bi-diagram-3-fill me-1 text-primary"></i><span id="u-tm">Team</span></span>
+                            <span><i class="bi bi-fingerprint me-1 text-primary"></i><span id="u-id">ID</span></span>
+                            <span><i class="bi bi-clock-history me-1 text-primary"></i><span id="j-dur">--</span></span>
+                        </div>
+                        <button class="btn btn-premium w-100 fs-6 mt-auto" data-bs-toggle="modal" data-bs-target="#ed-mod"><i class="bi bi-sliders2 me-2"></i>Edit Setup</button>
                     </div>
                 </div>
             </div>
-            
-            <div class="mb-4">
-                <button class="btn btn-premium fs-6" data-bs-toggle="modal" data-bs-target="#ed-mod"><i class="bi bi-sliders2 me-2"></i>Edit Setup</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4-COLUMN STATS GRID -->
-    <div class="dash-grid-4 anim" style="animation-delay: 0.2s">
-        <div class="glass-panel stat-card-flex">
-            <div class="stat-icon" style="background:rgba(5, 150, 105, 0.1); color:var(--success)"><i class="bi bi-briefcase-fill"></i></div>
-            <div class="text-muted fw-bold text-uppercase" style="font-size: 0.75rem;">Working Days</div>
-            <div id="wd-cnt" class="stat-val-big text-success">0</div>
-            <div class="text-muted" style="font-size: 0.7rem; font-weight: 700;">Potential in period</div>
         </div>
         
-        <div class="glass-panel stat-card-flex">
-            <div class="stat-icon" style="background:rgba(79, 70, 229, 0.1); color:var(--primary)"><i class="bi bi-coin"></i></div>
-            <div class="text-muted fw-bold text-uppercase" style="font-size: 0.75rem;">COLA Status</div>
-            <div id="cola-st" class="stat-val-big text-primary">0/22</div>
-            <div class="progress w-75 mx-auto mt-3 rounded-pill" style="height:6px; background: rgba(0,0,0,0.05);"><div id="cola-bar" class="progress-bar rounded-pill" style="width:0%; background: var(--primary);"></div></div>
-        </div>
-        
-        <div class="glass-panel stat-card-flex">
-            <div class="stat-icon" style="background:rgba(217, 119, 6, 0.1); color:var(--warning)"><i class="bi bi-trophy-fill"></i></div>
-            <div class="text-muted fw-bold text-uppercase" style="font-size: 0.75rem;">Performance</div>
-            <div id="cat-st" class="stat-val-big text-warning">N/A</div>
-            <div id="cat-desc" class="text-muted mt-1" style="font-size: 0.7rem; font-weight: 700;">Attendance Rate: 0%</div>
-        </div>
+        <!-- RIGHT: 4-Grid (Stats, Weather, Calendar) -->
+        <div class="col-lg-4">
+            <div class="d-flex flex-column h-100" style="gap: 20px;">
+                
+                <!-- 1. Stats Row: Working Days & COLA -->
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="glass-panel stat-icon-hover d-flex flex-column justify-content-center align-items-center p-3 text-center h-100" style="min-height: 110px;">
+                            <div class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Work Days</div>
+                            <div id="wd-cnt" class="stat-val-big text-success" style="font-size: 1.8rem;">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="glass-panel stat-icon-hover d-flex flex-column justify-content-center align-items-center p-3 text-center h-100" style="min-height: 110px;">
+                            <div class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">COLA Stat</div>
+                            <div id="cola-st" class="stat-val-big text-primary" style="font-size: 1.8rem;">0/22</div>
+                            <div class="progress w-100 mt-2 rounded-pill" style="height:4px; background: rgba(0,0,0,0.05);"><div id="cola-bar" class="progress-bar rounded-pill" style="width:0%; background: var(--primary);"></div></div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="glass-panel p-4 h-100 d-flex flex-column">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="fw-bold text-muted text-uppercase" style="font-size: 0.75rem;">Month View</span>
-                <i class="bi bi-calendar-range text-primary fs-5"></i>
+                <!-- 2. Performance -->
+                <div class="glass-panel stat-icon-hover d-flex align-items-center justify-content-between p-3 px-4">
+                    <div>
+                        <div class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Performance Rate</div>
+                        <div id="cat-desc" class="text-muted" style="font-size: 0.7rem; font-weight: 700;">Rate: 0%</div>
+                    </div>
+                    <div id="cat-st" class="stat-val-big text-warning m-0" style="font-size: 1.8rem;">N/A</div>
+                </div>
+
+                <!-- 3. Dual Weather Widget -->
+                <div class="glass-panel p-3 px-4 d-flex justify-content-between align-items-center">
+                    <div class="text-center">
+                        <div class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Dhaka (BDT)</div>
+                        <div class="fw-bold text-primary font-num" style="font-size: 1.2rem;"><i class="bi bi-cloud-sun me-1"></i>32°C</div>
+                    </div>
+                    <div style="width: 1px; background: var(--text-sub); opacity: 0.3; height: 35px;"></div>
+                    <div class="text-center">
+                        <div class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">New York (EST)</div>
+                        <div class="fw-bold text-secondary font-num" style="font-size: 1.2rem;"><i class="bi bi-moon-stars me-1"></i>12°C</div>
+                    </div>
+                </div>
+
+                <!-- 4. Calendar -->
+                <div class="glass-panel p-4 flex-grow-1 d-flex flex-column justify-content-center">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-muted text-uppercase" style="font-size: 0.75rem;">Month View</span><i class="bi bi-calendar-range text-primary" style="font-size: 1.1rem;"></i>
+                    </div>
+                    <div class="d-flex justify-content-between px-1 mb-1 fw-bold" style="font-size:0.75rem; color:var(--text-sub)">
+                        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                    </div>
+                    <div id="cal-gr" class="cal-mini-grid flex-grow-1 mt-2"></div>
+                </div>
+                
             </div>
-            <div class="d-flex justify-content-between px-1 mb-2 fw-bold" style="font-size:0.7rem; color:var(--text-sub)">
-                <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-            </div>
-            <div id="cal-gr" class="cal-mini-grid flex-grow-1"></div>
         </div>
     </div>
 
     <!-- CONTROLS & VISUAL CHART & DETAILED SUMMARY -->
-    <div class="row g-4 mb-4 anim" style="animation-delay: 0.3s">
+    <div class="row g-4 mb-4 anim" style="animation-delay: 0.2s">
         <!-- Control Center & Chart -->
         <div class="col-lg-4">
             <div class="glass-panel p-4 h-100 d-flex flex-column">
-                <h6 class="font-head fw-bold mb-4 fs-5 d-flex align-items-center"><i class="bi bi-sliders me-2 text-primary"></i> Control Center</h6>
-                <select id="m-sel" class="form-select shadow-none control-panel-select mb-4 fw-bold"></select>
-                
-                <div class="d-flex justify-content-between p-3 rounded-3 mb-4" style="background:var(--input-bg); border: var(--glass-border);">
-                    <div><span class="d-block text-muted text-uppercase" style="font-size:0.65rem; font-weight:800;">From</span><span id="d-fr" class="fw-bold font-num fs-5">--</span></div>
-                    <div class="text-end"><span class="d-block text-muted text-uppercase" style="font-size:0.65rem; font-weight:800;">To</span><span id="d-to" class="fw-bold font-num fs-5">--</span></div>
+                <h6 class="font-head fw-bold mb-3 fs-5 d-flex align-items-center"><i class="bi bi-sliders me-2 text-primary"></i> Control Center</h6>
+                <select id="m-sel" class="form-select shadow-none control-panel-select mb-3 fw-bold"></select>
+                <div class="d-flex justify-content-between p-3 rounded-3 mb-3" style="background:var(--input-bg); border: var(--glass-border);">
+                    <div><span class="d-block text-muted text-uppercase" style="font-size:0.65rem; font-weight:800;">From</span><span id="d-fr" class="fw-bold font-num fs-6">--</span></div>
+                    <div class="text-end"><span class="d-block text-muted text-uppercase" style="font-size:0.65rem; font-weight:800;">To</span><span id="d-to" class="fw-bold font-num fs-6">--</span></div>
                 </div>
-                
-                <!-- Attendance Chart Addition -->
+                <!-- Attendance Chart (Hours based) -->
                 <div class="mt-auto">
-                    <span class="d-block text-muted text-uppercase mb-2" style="font-size:0.7rem; font-weight:800;">Attendance Visual</span>
+                    <span class="d-block text-muted text-uppercase mb-2" style="font-size:0.7rem; font-weight:800;">Attendance Visual (Hours)</span>
                     <div class="chart-bar-container">
                         <div class="chart-segment bg-success" id="chart-pr" style="width: 0%;" title="Present"></div>
-                        <div class="chart-segment bg-warning" id="chart-lt" style="width: 0%;" title="Late (Counts as present in chart but marked)"></div>
+                        <div class="chart-segment bg-warning" id="chart-lt" style="width: 0%;" title="Late"></div>
                         <div class="chart-segment bg-danger" id="chart-ab" style="width: 0%;" title="Absent"></div>
                     </div>
-                    <div class="d-flex justify-content-between mt-2" style="font-size: 0.7rem; font-weight: 700;">
+                    <div class="d-flex justify-content-between mt-2" style="font-size: 0.65rem; font-weight: 700;" id="chart-labels">
                         <span class="text-success"><i class="bi bi-circle-fill me-1"></i>Present</span>
+                        <span class="text-warning"><i class="bi bi-circle-fill me-1"></i>Late</span>
                         <span class="text-danger"><i class="bi bi-circle-fill me-1"></i>Absent</span>
                     </div>
                 </div>
@@ -407,7 +381,7 @@
         <!-- Detailed Breakdown -->
         <div class="col-lg-8">
             <div class="glass-panel p-4 h-100">
-                <h6 class="font-head fw-bold mb-4 fs-5 d-flex align-items-center"><i class="bi bi-grid-fill me-2 text-primary"></i> Data Breakdown</h6>
+                <h6 class="font-head fw-bold mb-3 fs-5 d-flex align-items-center"><i class="bi bi-grid-fill me-2 text-primary"></i> Data Breakdown</h6>
                 <div class="mini-stat-grid">
                     <div class="mini-box"><span class="mini-label">Hours</span><div id="s-hr" class="mini-val text-primary">0</div></div>
                     <div class="mini-box"><span class="mini-label">Late</span><div id="s-lt" class="mini-val text-danger">0</div></div>
@@ -424,21 +398,20 @@
         </div>
     </div>
 
-    <!-- EXPANDED REMARKS/NOTES SECTION -->
-    <div class="glass-panel notes-container anim" style="animation-delay: 0.35s">
-        <h6 class="font-head fw-bold m-0 fs-5 d-flex align-items-center text-primary border-bottom border-primary border-opacity-25 pb-3 mb-2">
+    <!-- EXPANDED REMARKS/NOTES SECTION (INLINE FLEX) -->
+    <div class="glass-panel notes-container anim" style="animation-delay: 0.3s">
+        <h6 class="font-head fw-bold m-0 fs-5 d-flex align-items-center text-primary border-bottom border-primary border-opacity-25 pb-2 mb-3">
             <i class="bi bi-journal-text me-2"></i> Activity Remarks
         </h6>
-        <!-- Scrollable full notes display -->
-        <div id="full-notes-area" class="notes-scroll-area text-muted">
-            <!-- Populated by JS. Cards will show full text without cutting off -->
-            <div class="text-center w-100 py-3 font-num">No remarks documented for this period.</div>
+        <!-- Inline flex container for notes -->
+        <div id="full-notes-area" class="notes-inline-area custom-scroll text-muted">
+            <div class="text-center w-100 py-2 font-num opacity-50">No remarks documented for this period.</div>
         </div>
     </div>
 
     <!-- MAIN DATA TABLE -->
     <div class="glass-panel table-container anim" style="animation-delay: 0.4s">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h6 class="font-head fw-bold m-0 fs-4 d-flex align-items-center"><i class="bi bi-list-columns-reverse me-2 text-primary"></i> Activity Logs</h6>
                 <span class="text-muted" style="font-size: 0.85rem; font-weight: 700;" id="att-sub">Loading...</span>
@@ -446,7 +419,7 @@
             <button class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold shadow-sm" onclick="openPrintView()"><i class="bi bi-printer-fill me-2"></i> Print Report</button>
         </div>
         
-        <div class="table-responsive">
+        <div class="table-responsive custom-scroll">
             <table class="modern-table align-middle">
                 <thead>
                     <tr>
@@ -460,25 +433,22 @@
         </div>
     </div>
 
-</div> <!-- End Main Wrapper -->
+</div>
 
 <!-- PREMIUM SAAS FOOTER -->
 <footer class="footer-sec">
     <div class="container px-4 text-center text-md-start">
-        <div class="row g-4 align-items-center">
-            <div class="col-md-6">
-                <div class="footer-brand mb-2">Pranto's <span class="text-primary">Workspace</span></div>
-                <p class="text-muted m-0" style="font-weight: 500; font-size: 0.95rem;">Precision Dashboard v3.0 Ultra. Designed for professional workflows.</p>
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="footer-brand mb-1">Pranto's <span class="text-primary">Workspace</span></div>
+                <p class="text-muted m-0" style="font-weight: 500; font-size: 0.85rem;">Precision Dashboard v3.0 Ultra. Professional SaaS UI.</p>
             </div>
             <div class="col-md-6 text-md-end">
-                <div class="mb-3">
+                <div class="mb-2">
                     <a href="#" class="social-icon"><i class="bi bi-github"></i></a>
                     <a href="#" class="social-icon"><i class="bi bi-linkedin"></i></a>
-                    <a href="#" class="social-icon"><i class="bi bi-envelope-fill"></i></a>
                 </div>
-                <div class="text-muted" style="font-weight: 700; font-size: 0.85rem;">
-                    &copy; 2026. All Rights Reserved.
-                </div>
+                <div class="text-muted" style="font-weight: 700; font-size: 0.8rem;">&copy; 2026. All Rights Reserved.</div>
             </div>
         </div>
     </div>
@@ -487,14 +457,8 @@
 <!-- PRINT PREVIEW OVERLAY -->
 <div id="print-view">
     <div class="print-header">
-        <div>
-            <h2 class="font-head fw-bolder m-0">Attendance Report</h2>
-            <p class="text-muted m-0 mt-1" id="p-sub-date">Period: --</p>
-        </div>
-        <div class="text-end">
-            <h4 class="font-head fw-bold m-0" id="p-u-name">--</h4>
-            <p class="text-muted m-0" id="p-u-id">--</p>
-        </div>
+        <div><h2 class="font-head fw-bolder m-0">Attendance Report</h2><p class="text-muted m-0 mt-1" id="p-sub-date">Period: --</p></div>
+        <div class="text-end"><h4 class="font-head fw-bold m-0" id="p-u-name">--</h4><p class="text-muted m-0" id="p-u-id">--</p></div>
     </div>
     <div class="print-grid">
         <div class="print-box"><strong>Work Days</strong><div class="fs-4 fw-bold font-num" id="p-wd">0</div></div>
@@ -506,10 +470,7 @@
         <thead><tr><th>Date</th><th>Day</th><th>Status</th><th>Hrs</th><th>Extra</th><th>Late</th><th>Grace</th><th>Note</th></tr></thead>
         <tbody id="p-table-body"></tbody>
     </table>
-    <div class="print-btn-float">
-        <button class="btn btn-secondary rounded-pill shadow" onclick="closePrintView()"><i class="bi bi-x-lg"></i> Close</button>
-        <button class="btn btn-primary rounded-pill shadow" onclick="window.print()"><i class="bi bi-printer me-2"></i> Print</button>
-    </div>
+    <div class="print-btn-float"><button class="btn btn-secondary rounded-pill shadow" onclick="closePrintView()"><i class="bi bi-x-lg"></i> Close</button><button class="btn btn-primary rounded-pill shadow" onclick="window.print()"><i class="bi bi-printer me-2"></i> Print</button></div>
 </div>
 
 <!-- EDIT PROFILE MODAL -->
@@ -524,13 +485,10 @@
                 <form id="ed-form">
                     <div class="mb-3"><label class="small text-muted fw-bold mb-1">Name</label><input id="in-nm" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div>
                     <div class="mb-3"><label class="small text-muted fw-bold mb-1">Designation</label><input id="in-ds" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div>
-                    <div class="row g-3 mb-3">
-                        <div class="col"><label class="small text-muted fw-bold mb-1">Team</label><input id="in-tm" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div>
-                        <div class="col"><label class="small text-muted fw-bold mb-1">ID</label><input id="in-id" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div>
-                    </div>
+                    <div class="row g-3 mb-3"><div class="col"><label class="small text-muted fw-bold mb-1">Team</label><input id="in-tm" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div><div class="col"><label class="small text-muted fw-bold mb-1">ID</label><input id="in-id" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div></div>
                     <div class="mb-3"><label class="small text-muted fw-bold mb-1">Joined Date</label><input type="date" id="in-jd" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div>
-                    <div class="mb-3"><label class="small text-muted fw-bold mb-1">Avatar Image (Square recommended)</label><input type="file" id="in-ph" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);" accept="image/*"></div>
-                    <div class="mb-4"><label class="small text-muted fw-bold mb-1">Cover Image (Wide recommended)</label><input type="file" id="in-cv" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);" accept="image/*"></div>
+                    <div class="mb-3"><label class="small text-muted fw-bold mb-1">Avatar Image</label><input type="file" id="in-ph" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);" accept="image/*"></div>
+                    <div class="mb-4"><label class="small text-muted fw-bold mb-1">Cover Image</label><input type="file" id="in-cv" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);" accept="image/*"></div>
                     <button type="submit" class="btn btn-premium w-100 py-2 fs-6">Save Profile</button>
                 </form>
             </div>
@@ -540,7 +498,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Empty Default State setup
 let app={p:{n:'',d:'',t:'',i:'',j:'',ph:'',cv:''},d:[]};
 const mN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -588,24 +545,18 @@ function load(){
 function save(){ localStorage.setItem('ws_data',JSON.stringify(app)); }
 
 function rProf(){
-    // Empty state handling
     document.getElementById('u-nm').textContent=app.p.n || 'Setup Profile';
     document.getElementById('u-ds').textContent=app.p.d || 'Add Designation';
     document.getElementById('u-tm').textContent=app.p.t || 'Team';
     document.getElementById('u-id').textContent=app.p.i || 'ID';
     
-    if(app.p.ph) {
-        document.getElementById('p-ph').src=app.p.ph;
-        document.getElementById('nav-avatar').src=app.p.ph; // Update nav avatar 
-    }
+    if(app.p.ph) { document.getElementById('p-ph').src=app.p.ph; document.getElementById('nav-avatar').src=app.p.ph; }
     if(app.p.cv) document.getElementById('cv-ph').src=app.p.cv;
     
     if(app.p.j) {
         const diff=new Date()-new Date(app.p.j), y=Math.floor(diff/31536000000), m=Math.floor((diff%31536000000)/2628000000), d=Math.floor((diff%2628000000)/86400000);
         document.getElementById('j-dur').textContent=`${y}y ${m}m ${d}d`;
-    } else {
-        document.getElementById('j-dur').textContent='Date not set';
-    }
+    } else { document.getElementById('j-dur').textContent='Date not set'; }
 }
 
 function upd(my){
@@ -620,10 +571,12 @@ function upd(my){
     
     let tWdPot=0, tP=0, tA=0, tH=0, tL=0, tNs=0, tDs=0, tGr=0, tWk=0, tHl=0;
     
+    let defaultShift = localStorage.getItem('ws_default_shift') || 'Day';
+    
     while(cur<=to){
         const iso=cur.toISOString().split('T')[0], day=cur.toLocaleDateString('en',{weekday:'short'});
         let r=app.d.find(d=>d.id===iso);
-        if(!r){ r={id:iso,date:cur.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),day,stat:'-',hr:'-',ex:'-',lt:'-',sh:'Day',gr:'-',nt:''}; app.d.push(r); }
+        if(!r){ r={id:iso,date:cur.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),day,stat:'-',hr:'-',ex:'-',lt:'-',sh:defaultShift,gr:'-',nt:''}; app.d.push(r); }
         
         const isW=cur.getDay()===0; 
         if(!isW && r.stat !== 'Weekend' && r.stat !== 'Holiday') tWdPot++;
@@ -633,8 +586,15 @@ function upd(my){
         else if(r.stat==='Weekend') { tWk++; if(!isW) tWdPot--; } 
         else if(r.stat==='Holiday') { tHl++; if(!isW) tWdPot--; }
 
-        // Store Full notes for the new display
         if(r.nt && r.nt.trim()) notesArray.push({date: r.date, note: r.nt});
+
+        let lowerNt = r.nt.toLowerCase();
+        let inpStyle = '';
+        if(lowerNt.includes('done')) {
+            inpStyle = 'border-color: var(--success) !important; color: var(--success); background: rgba(5,150,105,0.05); font-weight: bold;';
+        } else if(lowerNt.includes('shift change')) {
+            inpStyle = 'border-color: var(--accent) !important; color: var(--accent); background: rgba(225,29,72,0.05); font-weight: bold;';
+        }
 
         html+=`<tr class="tr-hover">
             <td class="${isW?'text-danger':''} font-num fw-bold">${r.date}</td>
@@ -646,7 +606,7 @@ function upd(my){
             <td><button class="badge-btn badge-toggle shadow-sm" style="width:60px" onclick="tgl('${iso}','sh')" ${r.stat!=='Present'?'disabled':''}>${r.sh}</button></td>
             <td><button class="badge-btn badge-toggle shadow-sm" style="width:50px" onclick="tgl('${iso}','gr')" ${r.stat!=='Present'?'disabled':''}>${r.gr}</button></td>
             <td>
-                <input class="t-inp text-start" value="${r.nt}" oninput="updNoteLive('${iso}', this.value)" onblur="save()" ${r.stat!=='Present'?'disabled':''} placeholder="Write a remark...">
+                <input class="t-inp text-start" style="${inpStyle}" value="${r.nt}" oninput="updNoteLive('${iso}', this.value, this)" onblur="save()" ${r.stat!=='Present'?'disabled':''} placeholder="Write a remark...">
             </td>
         </tr>`;
         cur.setDate(cur.getDate()+1);
@@ -671,15 +631,16 @@ function upd(my){
     
     animVal('wd-cnt', tWdPot);
     const tWdActual = tP + tA;
-    document.getElementById('cola-st').textContent=`${tP}/22`;
-    document.getElementById('cola-bar').style.width=`${Math.min((tP/22)*100, 100)}%`;
-    
+    let colaBar = document.getElementById('cola-bar');
+    let colaSt = document.getElementById('cola-st');
+    if (colaSt) colaSt.textContent=`${tP}/22`;
+    if (colaBar) colaBar.style.width=`${Math.min((tP/22)*100, 100)}%`;
     const presP = tWdActual>0 ? Math.round((tP/tWdActual)*100) : 0;
     
     let cat='N/A';
     if(tWdActual>0){ if(presP>=95) cat='A+'; else if(presP>=90) cat='A'; else if(presP>=85) cat='B'; else if(presP>=80) cat='C'; else cat='D'; }
     document.getElementById('cat-st').textContent=cat;
-    document.getElementById('cat-desc').textContent=`Attendance Rate: ${presP}%`;
+    document.getElementById('cat-desc').textContent=`Rate: ${presP}%`;
 
     document.getElementById('s-hr').textContent=tH.toFixed(1);
     document.getElementById('s-lt').textContent=tL;
@@ -692,23 +653,52 @@ function upd(my){
     document.getElementById('s-ds').textContent=tDs;
     document.getElementById('s-gr').textContent=tGr;
     
-    // Update visual chart
-    let totalChartDays = tP + tA;
-    let prPct = totalChartDays > 0 ? (tP / totalChartDays) * 100 : 0;
-    let abPct = totalChartDays > 0 ? (tA / totalChartDays) * 100 : 0;
-    // Late count visually highlighted inside the present bar logically (just as an indicator)
-    let ltPct = tP > 0 ? (tL / totalChartDays) * 100 : 0;
+    // Updated visual chart mapping (Hours based)
+    let totalPresentHours = tH; 
+    let totalLateHours = tL; 
+    let totalAbsentHours = tA * 9; 
+    let totalChartHours = totalPresentHours + totalAbsentHours + totalLateHours;
     
-    document.getElementById('chart-pr').style.width = `${Math.max(0, prPct - ltPct)}%`;
-    document.getElementById('chart-lt').style.width = `${ltPct}%`;
-    document.getElementById('chart-ab').style.width = `${abPct}%`;
+    let prPct = totalChartHours > 0 ? (totalPresentHours / totalChartHours) * 100 : 0;
+    let abPct = totalChartHours > 0 ? (totalAbsentHours / totalChartHours) * 100 : 0;
+    let ltPct = totalChartHours > 0 ? (totalLateHours / totalChartHours) * 100 : 0;
+    
+    // Safety check for null elements before assigning style
+    let chartPr = document.getElementById('chart-pr');
+    let chartLt = document.getElementById('chart-lt');
+    let chartAb = document.getElementById('chart-ab');
+    
+    if(chartPr) chartPr.style.width = `${Math.max(0, prPct - ltPct)}%`;
+    if(chartLt) chartLt.style.width = `${ltPct}%`;
+    if(chartAb) chartAb.style.width = `${abPct}%`;
+
+    const chartLabels = document.getElementById('chart-labels');
+    if (chartLabels) {
+        chartLabels.innerHTML = `
+            <span class="text-success"><i class="bi bi-circle-fill me-1"></i>Present (${totalPresentHours}h)</span>
+            <span class="text-warning"><i class="bi bi-circle-fill me-1"></i>Late (${totalLateHours}h)</span>
+            <span class="text-danger"><i class="bi bi-circle-fill me-1"></i>Absent (${totalAbsentHours}h)</span>
+        `;
+    }
 
     save();
 }
 
-function updNoteLive(id, val) {
+function updNoteLive(id, val, el) {
     const r = app.d.find(d => d.id === id);
     if(r) r.nt = val;
+    
+    let lowerVal = val.toLowerCase();
+    if(lowerVal.includes('done')) {
+        el.style.borderColor = 'var(--success)'; el.style.color = 'var(--success)';
+        el.style.background = 'rgba(5,150,105,0.05)'; el.style.fontWeight = 'bold';
+    } else if(lowerVal.includes('shift change')) {
+        el.style.borderColor = 'var(--accent)'; el.style.color = 'var(--accent)';
+        el.style.background = 'rgba(225,29,72,0.05)'; el.style.fontWeight = 'bold';
+    } else {
+        el.style.borderColor = 'transparent'; el.style.color = 'var(--text-main)';
+        el.style.background = 'transparent'; el.style.fontWeight = '700';
+    }
     refreshTickerOnly();
 }
 
@@ -725,18 +715,14 @@ function refreshTickerOnly() {
     updTickerUI(notes);
 }
 
-// Expanded Notes Render function
 function updTickerUI(arr) {
     const el = document.getElementById('full-notes-area');
     if(arr.length > 0) {
         let h = '';
-        arr.forEach(item => {
-            h += `<div class="note-card"><div class="note-date font-num">${item.date}:</div><div class="note-text text-wrap fw-semibold" style="word-break: break-word;">${item.note}</div></div>`;
-        });
+        arr.forEach(item => { h += `<div class="note-chip"><span class="text-primary fw-bolder font-num">${item.date}:</span> <span class="fw-semibold">${item.note}</span></div>`; });
         el.innerHTML = h;
-    }
-    else {
-        el.innerHTML = '<div class="text-center w-100 py-3 font-num opacity-50">No remarks documented for this period.</div>';
+    } else {
+        el.innerHTML = '<div class="text-center w-100 py-2 font-num opacity-50">No remarks documented for this period.</div>';
     }
 }
 
@@ -746,11 +732,30 @@ function cyc(id){
     if(r.stat==='Present'){r.hr=9;r.lt=0;r.ex=0;} else {r.hr='-';r.lt='-';r.ex='-';}
     save(); upd(document.getElementById('m-sel').value);
 }
+
 function tgl(id,k){
-    const r=app.d.find(d=>d.id===id); 
-    r[k]=(k==='sh'?(r[k]==='Day'?'Night':'Day'):(r[k]==='-'?'Yes':'-')); 
+    if(k === 'sh') {
+        const idx = app.d.findIndex(d => d.id === id);
+        const r = app.d[idx];
+        const newSh = r.sh === 'Day' ? 'Night' : 'Day';
+        
+        r.sh = newSh;
+        if(!r.nt.toLowerCase().includes('shift change') && r.stat === 'Present') {
+            r.nt = (r.nt ? r.nt + ' | ' : '') + 'Shift change';
+        }
+
+        localStorage.setItem('ws_default_shift', newSh);
+
+        app.d.forEach(d => {
+            if(d.id > id) { d.sh = newSh; }
+        });
+    } else {
+        const r = app.d.find(d => d.id === id);
+        r[k] = (r[k] === '-' ? 'Yes' : '-'); 
+    }
     save(); upd(document.getElementById('m-sel').value);
 }
+
 function edt(id,k,v){
     const r=app.d.find(d=>d.id===id); r[k]=v; 
     if(k==='lt'){ r.hr=9-(parseFloat(v)||0); }
@@ -820,7 +825,6 @@ function openPrintView() {
 }
 
 function closePrintView() { document.getElementById('print-view').style.display = 'none'; }
-
 function obs(){const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting)i.target.classList.add('vis')})},{threshold:0.1}); document.querySelectorAll('.anim').forEach(s=>o.observe(s));}
 </script>
 </body>
