@@ -1,184 +1,266 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pranto's Pro Tracker | Elite Edition</title>
+    <title>Pranto's Workspace - Report Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        /* =========================================
+           PURE DARK PREMIUM VARIABLES & FONTS
+           ========================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
+        :root {
+            --font-head: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-num: 'Space Grotesk', monospace;
+/* Primary Colors - Original tone but slightly more vibrant */
+    --primary: #6366f1;       
+    --primary-rgb: 99, 102, 241;
+    --secondary: #0ea5e9;     
+    --accent: #f43f5e;        
+    
+    /* Soft Dark Background (Not pure black) */
+    --bg-color: #121218; /* Halka navy-gray mixed deep dark */
+    --glass-bg: rgba(30, 30, 40, 0.6); /* Card gulo ekhon ektu light hobe */
+    --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    --input-bg: rgba(40, 40, 50, 0.7); /* Input field gulo background theke arektu light */
+    
+    /* Text Colors */
+    --text-main: #e2e8f0; /* Pure white na, soft white */
+    --text-sub: #94a3b8;
         }
 
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-x: hidden; 
         }
 
-        .card-hover {
-            transition: all 0.2s ease-in-out;
-        }
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
+        /* Ambient Background */
+        .bg-mesh { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; filter: blur(100px); opacity: 0.3; border-radius: 50%; animation: floatBlob 20s infinite alternate ease-in-out; }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: rgba(99, 102, 241, 0.15); }
+        .blob-2 { bottom: -20%; right: -10%; width: 600px; height: 600px; background: rgba(244, 63, 94, 0.1); }
+        .blob-3 { top: 40%; left: 40%; width: 400px; height: 400px; background: rgba(14, 165, 233, 0.1); }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
 
-        /* Excel-like Table Styling */
-        .excel-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        .excel-table th {
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            padding: 8px 12px;
-            text-align: left;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .excel-table td {
-            border: 1px solid #e2e8f0;
-            padding: 8px 12px;
-            background: white;
-        }
-        .excel-table tr:hover td {
-            background: #f8fafc;
-        }
+        .font-head { font-family: var(--font-head); }
+        .font-num { font-family: var(--font-num); letter-spacing: -0.5px; }
+        .text-gradient { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .tag-disabled {
-            background: #f1f5f9 !important;
-            color: #94a3b8 !important;
-            border-color: #e2e8f0 !important;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .tag-enabled {
-            cursor: pointer;
-            opacity: 1;
+        /* Glass Panel */
+        .glass-panel { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border: var(--glass-border); 
+            box-shadow: var(--glass-shadow); 
+            border-radius: 16px; 
+            transition: all 0.3s ease; 
         }
         
-        .entry-tag {
+        /* Navbar */
+        .nav-wrapper { position: fixed; top: 15px; left: 0; width: 100%; z-index: 50; display: flex; justify-content: center; padding: 0 20px; }
+        .nav-pill { width: 100%; max-width: 1400px; height: 55px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-radius: 100px; background: var(--glass-bg); backdrop-filter: blur(30px); border: var(--glass-border); box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
+        .nav-item { text-decoration: none; color: var(--text-sub); font-weight: 700; font-size: 0.85rem; transition: 0.3s; position: relative; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item:hover, .nav-item.active { color: var(--primary); }
+        .nav-item.active::after { content:''; position:absolute; bottom:-6px; left:0; width:100%; height:3px; background:var(--primary); border-radius:10px; }
+
+        /* Clock */
+        .live-clock { font-family: var(--font-num); font-weight: 700; font-size: 0.9rem; color: var(--secondary); background: rgba(14, 165, 233, 0.1); padding: 5px 16px; border-radius: 20px; border: 1px solid rgba(14, 165, 233, 0.2); letter-spacing: 1px; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.4); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.8); }
+
+        /* Input area */
+        .custom-input {
+            background: rgb(0 0 0 / 80%);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+        .custom-input:focus {
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            outline: none;
+        }
+        
+        .tag-btn {
             transition: all 0.2s ease;
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(0.8);
+            flex-shrink: 0;
         }
+        .tag-btn.enabled {
+            opacity: 1;
+            cursor: pointer;
+            filter: grayscale(0);
+        }
+        .tag-btn.enabled:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .tag-btn:active { transform: scale(0.95); }
+
+        /* Accordion Header */
+        .date-header {
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(15, 15, 20, 0.6);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .date-header:hover { background: rgba(25, 25, 30, 0.9); }
+        .date-icon { transition: transform 0.3s ease; }
+        .date-collapsed .date-icon { transform: rotate(-90deg); }
+        .date-content { transition: max-height 0.3s ease-out; overflow: hidden; }
+        .date-collapsed + .date-content { max-height: 0 !important; }
+
+        /* Grid Data Items */
+        .data-item {
+            background: rgba(15, 15, 20, 0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.2s;
+        }
+        .data-item:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn-action { transition: all 0.2s; }
+        .btn-action:hover { transform: scale(1.15); color: var(--accent); }
     </style>
 </head>
-<body class="p-4 md:p-6 min-h-screen">
+<body>
 
-    <!-- Navbar -->
-    <nav class="glass-nav border border-slate-200 px-6 py-3 flex justify-between items-center rounded-2xl mb-6 shadow-sm sticky top-4 z-50">
-        <div class="flex items-center gap-4 w-1/3">
-            <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-xl flex items-center justify-center text-white shadow-lg">
-                <i class="fas fa-bolt text-lg"></i>
+    <!-- Ambient Background -->
+    <div class="bg-mesh">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-wrapper">
+        <div class="nav-pill">
+            <div class="font-head fw-bold text-xl text-gradient tracking-tight">Pranto's Workspace</div>
+            
+            <div class="flex gap-6 items-center">
+                <a href="index.html" class="nav-item"><i class="fas fa-home mr-1"></i> Home</a>
+                <a href="#" class="nav-item active"><i class="fas fa-chart-bar mr-1"></i> Report Pro</a>
             </div>
-            <div class="hidden sm:block">
-                <h1 class="text-sm font-bold uppercase tracking-wider text-slate-900 leading-tight">Pranto's Workspace</h1>
-                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Elite Productivity</p>
-            </div>
-        </div>
-
-        <div class="flex justify-center w-1/3">
-            <a href="index.html" class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-indigo-600 transition-all shadow-md active:scale-95">
-                <i class="fas fa-home"></i>
-                <span class="hidden md:inline">HOME</span>
-            </a>
-        </div>
-
-        <div class="flex justify-end w-1/3">
-            <div class="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-                <button id="dayBtn" onclick="setShift('Day')" class="shift-btn px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all bg-white text-indigo-600 shadow-sm">
-                    <i class="fas fa-sun text-sm"></i> DAY
-                </button>
-                <button id="nightBtn" onclick="setShift('Night')" class="shift-btn px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all text-slate-500">
-                    <i class="fas fa-moon text-sm"></i> NIGHT
-                </button>
+            
+            <div class="flex items-center gap-4">
+                <!-- Shift Toggle -->
+                <div class="flex bg-[rgba(15,15,20,0.8)] p-1 rounded-full border border-[rgba(255,255,255,0.1)]">
+                    <button id="dayBtn" onclick="setShift('Day')" class="px-3 py-1 rounded-full text-[10px] font-bold transition-all bg-[#6366f1] text-white shadow-md">
+                        <i class="fas fa-sun mr-1"></i> Day
+                    </button>
+                    <button id="nightBtn" onclick="setShift('Night')" class="px-3 py-1 rounded-full text-[10px] font-bold transition-all text-[var(--text-sub)] hover:text-white">
+                        <i class="fas fa-moon mr-1"></i> Night
+                    </button>
+                </div>
+                <!-- Live Clock -->
+                <div id="liveClock" class="live-clock shadow-lg">00:00:00</div>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto space-y-6">
-        <!-- Input & Summary Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-8">
-                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-                    <div class="flex items-center gap-2 mb-4">
-                        <i class="fas fa-plus-circle text-indigo-500"></i>
-                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">New Entry</span>
-                    </div>
-                    <textarea id="ticketInput" oninput="handleInput()" placeholder="Enter Ticket ID here..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium text-slate-700 outline-none h-20 resize-none transition-all placeholder:text-slate-400"></textarea>
-                    <div id="tagContainer" class="flex flex-wrap gap-2 mt-4"></div>
+    <!-- Main Content -->
+    <main class="w-full max-w-[1400px] mx-auto mt-[90px] mb-8 px-4 flex-grow flex flex-col gap-4">
+        
+        <!-- TOP SECTION: Expanded Input, Visible Tags & Summary Grid -->
+        <div class="glass-panel p-5 flex flex-col lg:flex-row gap-6 items-start">
+            
+            <!-- 1. Compact Input Box (Larger Width) -->
+            <div class="w-full lg:w-[30%]">
+                <div class="text-[11px] font-bold text-[var(--text-sub)] uppercase tracking-widest mb-2 ml-1"><i class="fas fa-keyboard mr-1 text-[#6366f1]"></i> Paste IDs</div>
+                <input type="text" id="ticketInput" oninput="handleInput()" placeholder="Space or comma separated..." class="custom-input w-full rounded-xl px-4 py-3 text-[13px] font-num shadow-inner min-h-[150px]">
+            </div>
+
+            <!-- 2. Fully Visible Tags (Flex Wrap) -->
+            <div class="w-full lg:w-[45%]">
+                <div class="text-[11px] font-bold text-[var(--text-sub)] uppercase tracking-widest mb-2 ml-1"><i class="fas fa-tags mr-1 text-[#0ea5e9]"></i> Select Category</div>
+                <div id="tagContainer" class="flex flex-wrap gap-2 w-full">
+                    <!-- Tags generated by JS -->
                 </div>
             </div>
 
-            <div class="lg:col-span-4">
-                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm h-full">
-                    <div class="flex items-center justify-between mb-5">
-                        <select id="dateFilter" onchange="updateSummary()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-indigo-600 outline-none uppercase"></select>
-                        <div class="flex items-center gap-2 bg-slate-900 rounded-xl px-4 py-1.5 shadow-lg">
-                            <i class="fas fa-chart-pie text-indigo-400 text-xs"></i>
-                            <span id="totalCount" class="text-sm font-bold text-white">0</span>
-                        </div>
-                    </div>
-                    <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+            <!-- 3. Summary (Grid of All Categories) -->
+            <div class="w-full lg:w-[25%] lg:border-l border-[rgba(255,255,255,0.1)] lg:pl-6">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[11px] font-bold text-[var(--text-sub)] uppercase tracking-widest"><i class="fas fa-chart-pie mr-1 text-[#f43f5e]"></i> Summary</span>
+                    <span id="totalCount" class="font-num font-bold text-white bg-[#6366f1] px-2.5 py-0.5 rounded text-xs shadow-md border border-[rgba(255,255,255,0.1)]">0</span>
+                </div>
+                <div id="statsGrid" class="grid grid-cols-2 gap-2">
+                    <!-- Stats generated by JS -->
                 </div>
             </div>
         </div>
 
-        <!-- History Log with View Switcher -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest">
-                    <i class="fas fa-history"></i> Production Log
-                </div>
-                
-                <!-- View Switcher -->
-                <div class="flex bg-slate-200/50 p-1 rounded-xl border border-slate-200 self-start">
-                    <button id="viewGrid" onclick="setView('grid')" class="view-btn px-4 py-1.5 rounded-lg text-[10px] font-black flex items-center gap-2 transition-all bg-white text-indigo-600 shadow-sm">
-                        <i class="fas fa-th-large"></i> GRID VIEW
-                    </button>
-                    <button id="viewTable" onclick="setView('table')" class="view-btn px-4 py-1.5 rounded-lg text-[10px] font-black flex items-center gap-2 transition-all text-slate-500">
-                        <i class="fas fa-table"></i> TABLE VIEW (EXCEL)
-                    </button>
-                </div>
+        <!-- History Log (Collapsible by Date & 5-Column Data) -->
+        <div class="glass-panel overflow-hidden flex flex-col flex-grow mt-2 shadow-lg">
+            <div class="px-5 py-4 border-b border-[rgba(255,255,255,0.05)] flex justify-between items-center bg-[rgba(15,15,20,0.5)]">
+                <h3 class="font-head font-bold text-[14px] text-[var(--text-sub)] uppercase tracking-widest"><i class="fas fa-history text-[#f43f5e] mr-2"></i> Production History</h3>
             </div>
-
-            <div id="historyContainer" class="p-6 space-y-8 overflow-x-auto min-h-[300px]">
-                <!-- Log content will render here -->
+            
+            <div id="historyContainer" class="p-4 flex-grow overflow-y-auto custom-scroll h-[65vh]">
+                <!-- Date headers and grids generated by JS -->
             </div>
         </div>
+
     </main>
 
-    <footer class="mt-8 flex justify-between items-center px-6 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-        <span>&copy; 2024 PRANTO SYSTEMS</span>
-        <span class="text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full italic">v6.0 Excel Edition</span>
+    <!-- Footer -->
+    <footer class="py-4 bg-[rgba(20,20,25,0.4)] backdrop-blur-md border-t border-[rgba(255,255,255,0.05)] mt-auto text-center">
+        <div class="font-head font-bold text-sm text-gradient mb-1">Pranto's Workspace &copy; 2026</div>
     </footer>
 
+    <!-- Scripts -->
     <script>
         const tags = [
-            { name: 'Appeal', color: 'from-blue-500 to-indigo-600' },
-            { name: 'Claim Review', color: 'from-purple-500 to-violet-600' },
-            { name: 'Negotiation', color: 'from-emerald-500 to-teal-600' },
-            { name: 'IDR', color: 'from-rose-500 to-pink-600' },
-            { name: 'TDI', color: 'from-orange-500 to-amber-600' },
-            { name: 'Offer letter', color: 'from-cyan-500 to-blue-600' },
-            { name: 'Complaint', color: 'from-red-500 to-orange-600' },
-            { name: 'PT Letter', color: 'from-indigo-600 to-violet-700' },
-            { name: 'Follow-up', color: 'from-teal-500 to-green-600' },
-            { name: 'Final Review', color: 'from-amber-500 to-orange-600' }
+            { name: 'Appeal', color: 'from-blue-600 to-indigo-600' },
+            { name: 'Claim Review', color: 'from-purple-600 to-violet-600' },
+            { name: 'Negotiation', color: 'from-emerald-600 to-teal-600' },
+            { name: 'IDR', color: 'from-rose-600 to-pink-600' },
+            { name: 'TDI', color: 'from-orange-600 to-amber-600' },
+            { name: 'Offer letter', color: 'from-cyan-600 to-blue-600' },
+            { name: 'Complaint', color: 'from-red-600 to-orange-600' },
+            { name: 'PT Letter', color: 'from-indigo-600 to-purple-600' },
+            { name: 'Follow-up', color: 'from-teal-600 to-emerald-600' },
+            { name: 'Final Review', color: 'from-amber-600 to-red-600' }
         ];
 
         let shift = 'Day';
-        let currentView = 'grid'; // Default view
-        let production = JSON.parse(localStorage.getItem('pranto_production')) || [];
+        let production = JSON.parse(localStorage.getItem('pranto_report_pro_v2')) || [];
+        let expandedDates = new Set(); 
+
+        // Clock Function
+        function updateClock() {
+            const now = new Date();
+            const clockEl = document.getElementById('liveClock');
+            if(clockEl) {
+                clockEl.innerText = now.toLocaleTimeString('en-US', { hour12: false });
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        const todayStr = getShiftDate(shift);
+        if(!expandedDates.has(todayStr)) expandedDates.add(todayStr);
 
         function getShiftDate(s) {
             return new Intl.DateTimeFormat('en-GB', {
@@ -189,120 +271,134 @@
 
         function setShift(s) {
             shift = s;
-            document.querySelectorAll('.shift-btn').forEach(btn => {
-                btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
-                btn.classList.add('text-slate-500');
-            });
-            const activeBtn = s === 'Day' ? document.getElementById('dayBtn') : document.getElementById('nightBtn');
-            activeBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
-            activeBtn.classList.remove('text-slate-500');
+            const dayBtn = document.getElementById('dayBtn');
+            const nightBtn = document.getElementById('nightBtn');
+            const activeClasses = ['bg-[#6366f1]', 'text-white', 'shadow-md'];
+            const inactiveClasses = ['text-[var(--text-sub)]', 'hover:text-white', 'bg-transparent'];
+
+            if(s === 'Day') {
+                dayBtn.classList.add(...activeClasses); dayBtn.classList.remove(...inactiveClasses);
+                nightBtn.classList.add(...inactiveClasses); nightBtn.classList.remove(...activeClasses);
+            } else {
+                nightBtn.classList.add(...activeClasses); nightBtn.classList.remove(...inactiveClasses);
+                dayBtn.classList.add(...inactiveClasses); dayBtn.classList.remove(...activeClasses);
+            }
+            
+            const newToday = getShiftDate(shift);
+            expandedDates.add(newToday);
             renderAll();
         }
 
-        function setView(view) {
-            currentView = view;
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
-                btn.classList.add('text-slate-500');
-            });
-            const activeBtn = view === 'grid' ? document.getElementById('viewGrid') : document.getElementById('viewTable');
-            activeBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
-            activeBtn.classList.remove('text-slate-500');
-            renderHistory();
-        }
-
         function handleInput() {
-            const val = document.getElementById('ticketInput').value.trim();
-            document.querySelectorAll('.entry-tag').forEach(btn => {
-                if (val.length > 0) { btn.classList.remove('tag-disabled'); btn.classList.add('tag-enabled'); }
-                else { btn.classList.add('tag-disabled'); btn.classList.remove('tag-enabled'); }
+            const ticketInput = document.getElementById('ticketInput');
+            if(!ticketInput) return;
+            const val = ticketInput.value.trim();
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                if (val.length > 0) { btn.classList.add('enabled'); }
+                else { btn.classList.remove('enabled'); }
             });
         }
 
         function addEntry(tagName) {
             const ticketInput = document.getElementById('ticketInput');
-            const val = ticketInput.value.trim();
-            if(!val) return;
+            const rawVal = ticketInput.value.trim();
+            if(!rawVal) return;
 
-            const entry = {
-                id: Date.now(),
-                data: val,
-                tag: tagName,
-                shift: shift,
-                date: getShiftDate(shift),
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
+            // Split by space, newline, or comma
+            const dataArray = rawVal.split(/[\s\n,]+/).filter(item => item.trim() !== '');
+            const currentDate = getShiftDate(shift);
+            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            production.unshift(entry);
-            localStorage.setItem('pranto_production', JSON.stringify(production));
+            dataArray.forEach(dataItem => {
+                production.unshift({
+                    id: Date.now() + Math.random(), 
+                    data: dataItem,
+                    tag: tagName,
+                    shift: shift,
+                    date: currentDate,
+                    time: currentTime
+                });
+            });
+
+            localStorage.setItem('pranto_report_pro_v2', JSON.stringify(production));
             ticketInput.value = '';
+            expandedDates.add(currentDate); 
             handleInput(); 
             renderAll();
         }
 
         function deleteEntry(id) {
             production = production.filter(p => p.id !== id);
-            localStorage.setItem('pranto_production', JSON.stringify(production));
+            localStorage.setItem('pranto_report_pro_v2', JSON.stringify(production));
             renderAll();
         }
 
-        function copyDate(d) {
+        function copyDate(d, e) {
+            e.stopPropagation(); 
             const text = production.filter(p => p.date === d).map((p, i) => `${i + 1}. ${p.data} - ${p.tag}`).join('\n');
             const el = document.createElement("textarea"); el.value = text;
             document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
             
-            const btn = document.querySelector(`[data-date="${d}"]`);
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied';
-            btn.classList.replace('bg-slate-900', 'bg-emerald-600');
-            setTimeout(() => { btn.innerHTML = original; btn.classList.replace('bg-emerald-600', 'bg-slate-900'); }, 2000);
+            const btn = document.querySelector(`[data-copy-btn="${d}"]`);
+            if(btn) {
+                const icon = btn.querySelector('i');
+                if(icon) {
+                    icon.className = 'fas fa-check text-green-400';
+                    setTimeout(() => { icon.className = 'fas fa-copy text-[#0ea5e9]'; }, 2000);
+                }
+            }
+        }
+
+        function toggleDate(d) {
+            if(expandedDates.has(d)) {
+                expandedDates.delete(d);
+            } else {
+                expandedDates.add(d);
+            }
+            renderHistory();
         }
 
         function renderAll() {
             renderTags();
-            updateDateFilter();
             updateSummary();
             renderHistory();
         }
 
         function renderTags() {
             const container = document.getElementById('tagContainer');
+            if(!container) return;
             container.innerHTML = '';
-            const val = document.getElementById('ticketInput').value.trim();
+            const ticketInput = document.getElementById('ticketInput');
+            const val = ticketInput ? ticketInput.value.trim() : '';
             tags.forEach(t => {
                 const btn = document.createElement('button');
-                btn.className = `entry-tag px-4 py-2 rounded-xl border text-[11px] font-bold uppercase tracking-wider transition-all active:scale-95 shadow-sm bg-gradient-to-r ${t.color} text-white border-transparent hover:brightness-110 ${val.length === 0 ? 'tag-disabled' : 'tag-enabled'}`;
+                // Removed overflow restrictions, allowed full wrapping
+                btn.className = `tag-btn px-3.5 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider bg-gradient-to-r ${t.color} text-white border border-transparent shadow-sm ${val.length > 0 ? 'enabled' : ''}`;
                 btn.innerText = t.name;
-                btn.onclick = () => addEntry(t.name);
+                btn.onclick = () => { if(btn.classList.contains('enabled')) addEntry(t.name); };
                 container.appendChild(btn);
             });
         }
 
-        function updateDateFilter() {
-            const filter = document.getElementById('dateFilter');
-            const currentSelected = filter.value;
-            const uniqueDates = [...new Set(production.map(p => p.date))];
-            const today = getShiftDate(shift);
-            if(!uniqueDates.includes(today)) uniqueDates.push(today);
-            uniqueDates.sort((a,b) => new Date(b) - new Date(a));
-            filter.innerHTML = uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('');
-            filter.value = (currentSelected && uniqueDates.includes(currentSelected)) ? currentSelected : today;
-        }
-
         function updateSummary() {
-            const selectedDate = document.getElementById('dateFilter').value;
             const statsGrid = document.getElementById('statsGrid');
-            const filtered = production.filter(p => p.date === selectedDate);
+            if(!statsGrid) return;
+            const today = getShiftDate(shift);
+            const filtered = production.filter(p => p.date === today);
+            
             const counts = {};
             filtered.forEach(p => counts[p.tag] = (counts[p.tag] || 0) + 1);
-            document.getElementById('totalCount').innerText = filtered.length;
             
+            const tc = document.getElementById('totalCount');
+            if(tc) tc.innerText = filtered.length;
+            
+            // Show all tags in the summary grid
             statsGrid.innerHTML = tags.map(t => {
                 const count = counts[t.name] || 0;
                 return `
-                    <div class="rounded-xl flex flex-col items-center justify-center border transition-all p-3 ${count > 0 ? `bg-gradient-to-br ${t.color} border-transparent text-white shadow-md` : 'bg-slate-50 border-slate-100 opacity-40'}">
-                        <span class="text-lg font-bold leading-none mb-1">${count}</span>
-                        <span class="text-[9px] font-bold uppercase tracking-widest text-center opacity-90 truncate w-full">${t.name}</span>
+                    <div class="rounded-md px-2.5 py-1.5 flex justify-between items-center border transition-all ${count > 0 ? `bg-gradient-to-r ${t.color} border-transparent text-white shadow-sm` : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] text-[var(--text-sub)]'}">
+                        <span class="text-[9px] font-bold uppercase tracking-wider truncate mr-2">${t.name}</span>
+                        <span class="font-num font-bold text-[10px] ${count > 0 ? 'bg-white/20 text-white' : 'bg-black/30 text-[var(--text-sub)]'} px-1.5 rounded">${count}</span>
                     </div>
                 `;
             }).join('');
@@ -310,94 +406,66 @@
 
         function renderHistory() {
             const container = document.getElementById('historyContainer');
+            if(!container) return;
             container.innerHTML = '';
             const grouped = {};
             production.forEach(p => { if(!grouped[p.date]) grouped[p.date] = []; grouped[p.date].push(p); });
             const sortedDates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a));
             
             if(sortedDates.length === 0) {
-                container.innerHTML = `<div class="py-20 text-center text-slate-400 font-medium italic">No production recorded yet.</div>`;
+                container.innerHTML = `<div class="py-12 text-center text-[var(--text-sub)] font-medium font-num opacity-50">No data recorded yet. Start tracking!</div>`;
                 return;
             }
 
             sortedDates.forEach(d => {
+                const isExpanded = expandedDates.has(d);
                 const section = document.createElement('div');
-                section.className = "space-y-4";
+                section.className = "mb-3 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)] bg-[rgba(15,15,20,0.3)] shadow-sm";
                 
+                // Accordion Header
                 const header = `
-                    <div class="flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-md py-3 z-10 border-b border-slate-100">
+                    <div class="date-header px-5 py-3 flex justify-between items-center ${!isExpanded ? 'date-collapsed' : ''}" onclick="toggleDate('${d}')">
                         <div class="flex items-center gap-3">
-                            <h3 class="text-sm font-black text-slate-800 uppercase tracking-tighter">${d}</h3>
-                            <span class="text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">${grouped[d].length} TOTAL UNITS</span>
+                            <i class="fas fa-chevron-down date-icon text-[#6366f1] text-[12px]"></i>
+                            <h3 class="font-num font-bold text-[14px] tracking-wide text-white"><i class="fas fa-calendar-day mr-2 text-[var(--text-sub)]"></i>${d}</h3>
+                            <span class="text-[10px] font-bold text-white bg-[rgba(99,102,241,0.2)] px-2.5 py-0.5 rounded-md border border-[rgba(99,102,241,0.3)]">${grouped[d].length} Items</span>
                         </div>
-                        <button data-date="${d}" onclick="copyDate('${d}')" class="px-5 py-2 rounded-xl text-[10px] font-black uppercase transition-all shadow-md bg-slate-900 text-white hover:bg-slate-800 active:scale-95 flex items-center gap-2">
-                            <i class="fas fa-copy"></i> Copy Data
+                        <button data-copy-btn="${d}" onclick="copyDate('${d}', event)" class="btn-action text-[var(--text-sub)] hover:text-white p-1.5 bg-[rgba(255,255,255,0.05)] rounded-lg transition-colors shadow-sm" title="Copy All">
+                            <i class="fas fa-copy text-[#0ea5e9] text-sm"></i>
                         </button>
                     </div>
                 `;
                 
-                let content = '';
-                if(currentView === 'grid') {
-                    content = `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                        ${grouped[d].map((item, idx) => `
-                            <div class="group flex flex-col border border-slate-100 p-4 rounded-2xl bg-white card-hover relative overflow-hidden border-l-4 ${'border-l-' + tags.find(t=>t.name===item.tag)?.color.split('-')[1] + '-500'}">
-                                <div class="flex justify-between items-start mb-2">
-                                    <span class="text-[10px] font-black text-slate-300">#${grouped[d].length - idx}</span>
-                                    <button onclick="deleteEntry(${item.id})" class="text-slate-300 hover:text-rose-500 transition-colors"><i class="fas fa-trash-alt text-xs"></i></button>
+                // Exactly 5-Column Grid Content (responsive)
+                let contentHTML = '';
+                if(isExpanded) {
+                    contentHTML = `
+                        <div class="p-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                            ${grouped[d].map((item, idx) => `
+                                <div class="data-item rounded-xl p-3 flex justify-between items-center group relative overflow-hidden">
+                                    <div class="flex items-center gap-2 overflow-hidden w-full pr-7">
+                                        <span class="text-[11px] font-black text-[#6366f1] w-5 text-right flex-shrink-0">#${grouped[d].length - idx}</span>
+                                        <span class="font-num text-[13px] text-white truncate font-semibold" style="max-width:calc(100% - 70px);">${item.data}</span>
+                                        <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-gradient-to-r ${tags.find(t=>t.name===item.tag)?.color} text-white flex-shrink-0 absolute right-[32px] shadow-sm">
+                                            ${item.tag.substring(0,6)}${item.tag.length>6?'..':''}
+                                        </span>
+                                    </div>
+                                    <button onclick="deleteEntry(${item.id})" class="btn-action text-[rgba(255,255,255,0.2)] group-hover:text-[#f43f5e] absolute right-2 p-1.5">
+                                        <i class="fas fa-times text-[11px]"></i>
+                                    </button>
                                 </div>
-                                <h4 class="text-sm font-bold text-slate-800 break-all leading-snug mb-2">${item.data}</h4>
-                                <div class="flex items-center justify-between mt-auto">
-                                    <span class="text-[9px] font-black uppercase tracking-widest text-indigo-500">${item.tag}</span>
-                                    <span class="text-[9px] font-bold text-slate-400 italic">${item.time}</span>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>`;
-                } else {
-                    // Excel Table View
-                    content = `
-                        <div class="overflow-hidden border border-slate-200 rounded-xl shadow-sm">
-                            <table class="excel-table">
-                                <thead>
-                                    <tr>
-                                        <th width="50">#</th>
-                                        <th>Ticket ID / Data</th>
-                                        <th width="150">Category (Tag)</th>
-                                        <th width="100">Time</th>
-                                        <th width="100">Shift</th>
-                                        <th width="80">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${grouped[d].map((item, idx) => `
-                                        <tr>
-                                            <td class="font-bold text-slate-400 text-center">${grouped[d].length - idx}</td>
-                                            <td class="font-bold text-slate-800">${item.data}</td>
-                                            <td>
-                                                <span class="px-2 py-1 rounded-md text-[10px] font-black uppercase bg-gradient-to-r ${tags.find(t=>t.name===item.tag)?.color} text-white">
-                                                    ${item.tag}
-                                                </span>
-                                            </td>
-                                            <td class="text-slate-500 font-medium">${item.time}</td>
-                                            <td class="text-slate-500 font-medium uppercase">${item.shift}</td>
-                                            <td class="text-center">
-                                                <button onclick="deleteEntry(${item.id})" class="text-slate-300 hover:text-rose-500 transition-colors">
-                                                    <i class="fas fa-trash-alt text-xs"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
+                            `).join('')}
                         </div>
                     `;
                 }
 
-                section.innerHTML = header + content;
+                section.innerHTML = header + `<div class="date-content" style="max-height: ${isExpanded ? '5000px' : '0'};">${contentHTML}</div>`;
                 container.appendChild(section);
             });
         }
 
+        // Init
+        handleInput();
         renderAll();
     </script>
 </body>
