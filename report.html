@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
@@ -398,7 +399,7 @@
                 return `
                     <div class="rounded-md px-2.5 py-1.0 flex justify-between items-center border transition-all ${count > 0 ? `bg-gradient-to-r ${t.color} border-transparent text-white shadow-sm` : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] text-[var(--text-sub)]'}">
                         <span class="text-[12px] font-bold uppercase tracking-wider truncate mr-2">${t.name}</span>
-                        <span class="font-num font-bold text-[10px] ${count > 0 ? 'bg-white/20 text-white' : 'bg-black/30 text-[var(--text-sub)]'} px-1.5 rounded">${count}</span>
+                        <span class="font-num font-bold text-[15px] ${count > 0 ? 'bg-white/20 text-white' : 'bg-black/30 text-[var(--text-sub)]'} px-1.5 rounded">${count}</span>
                     </div>
                 `;
             }).join('');
