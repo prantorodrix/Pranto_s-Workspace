@@ -4,158 +4,231 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pranto's Workspace - Comm Center</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* --- PREMIUM VARIABLES & PURE DARK THEME --- */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
-        :root {
-            --font-head: 'Outfit', sans-serif; --font-body: 'Inter', sans-serif;
-            --primary: #6366f1; --primary-rgb: 99, 102, 241; --secondary: #0ea5e9; --accent: #f43f5e;
-            --bg-color: #050505; --glass-bg: rgba(20, 20, 25, 0.6); --glass-border: 1px solid rgba(255, 255, 255, 0.05);
-            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); --input-bg: rgba(15, 15, 20, 0.8);
-            --text-main: #f8fafc; --text-sub: #94a3b8;
-        }
+        :root { --font-head: 'Outfit', sans-serif; --font-body: 'Inter', sans-serif; --primary: #6366f1; --primary-rgb: 99, 102, 241; --secondary: #0ea5e9; --accent: #f43f5e; --bg-color: #050505; --glass-bg: rgba(20, 20, 25, 0.6); --glass-border: 1px solid rgba(255, 255, 255, 0.05); --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); --input-bg: rgba(15, 15, 20, 0.8); --text-main: #f8fafc; --text-sub: #94a3b8; }
         body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        /* --- AMBIENT BACKGROUND --- */
         .bg-mesh { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
         .blob { position: absolute; filter: blur(100px); opacity: 0.3; border-radius: 50%; animation: floatBlob 20s infinite alternate ease-in-out; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: rgba(99, 102, 241, 0.15); }
         .blob-2 { bottom: -20%; right: -10%; width: 600px; height: 600px; background: rgba(244, 63, 94, 0.1); }
         .blob-3 { top: 40%; left: 40%; width: 400px; height: 400px; background: rgba(14, 165, 233, 0.1); }
         @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+        /* --- UI UTILS --- */
+        .font-head { font-family: var(--font-head); }
         .text-gradient { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); border: var(--glass-border); border-radius: 16px; transition: all 0.3s ease; }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: 16px; transition: all 0.3s ease; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.4); border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.8); }
+        /* --- OVERLAYS & FORMS --- */
         #loginOverlay, #adminLoginOverlay { position: fixed; inset: 0; background: rgba(5,5,5,0.95); backdrop-filter: blur(15px); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: rgba(15,15,20,0.9); border: var(--glass-border); border-radius: 24px; padding: 40px; width: 100%; max-width: 400px; }
-        .auth-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 16px; color: white; outline: none; }
+        .auth-card { background: rgba(15,15,20,0.9); border: var(--glass-border); border-radius: 24px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        .auth-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 16px; color: white; outline: none; transition: 0.3s; }
+        .auth-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+        /* --- CHAT INTERFACE --- */
         .chat-container { height: calc(100vh - 100px); display: flex; overflow: hidden; margin-top: 80px; }
         .contact-list { width: 300px; border-right: var(--glass-border); display: flex; flex-direction: column; background: rgba(15,15,20,0.3); }
-        .contact-item { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); }
-        .contact-item.active { background: rgba(99, 102, 241, 0.15); border-left: 4px solid var(--primary); }
-        .unread-badge { background-color: var(--accent); color: white; font-size: 0.6rem; font-weight: bold; padding: 2px 6px; border-radius: 10px; display: none; }
-        .unread-badge.show { display: inline-block; }
+        .contact-item { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .contact-item:hover { background: rgba(255,255,255,0.05); } .contact-item.active { background: rgba(99, 102, 241, 0.15); border-left: 4px solid var(--primary); }
+        .unread-badge { background-color: var(--accent); color: white; font-size: 0.6rem; font-weight: bold; padding: 2px 6px; border-radius: 10px; display: none; } .unread-badge.show { display: inline-block; }
         .chat-area { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
         .chat-header { padding: 15px 20px; border-bottom: var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(15,15,20,0.5); }
         .chat-messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
         .chat-input-area { padding: 15px 20px; border-top: var(--glass-border); display: flex; align-items: center; gap: 10px; background: rgba(15,15,20,0.5); }
-        .msg-input { flex-grow: 1; background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; padding: 12px 20px; color: white; outline: none; }
-        .send-btn { background: var(--primary); border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; }
-        .msg-wrap { display: flex; max-width: 75%; flex-direction: column; }
-        .msg-wrap.mine { align-self: flex-end; align-items: flex-end; }
-        .msg-wrap.theirs { align-self: flex-start; align-items: flex-start; }
+        .msg-input { flex-grow: 1; background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; padding: 12px 20px; color: white; outline: none; transition: 0.3s; } .msg-input:focus { border-color: var(--primary); }
+        .send-btn, .enhance-btn { border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        .send-btn { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); } .send-btn:hover { transform: scale(1.05); background: #4f46e5; }
+        .enhance-btn { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #fbbf24; } .enhance-btn:hover { background: rgba(245, 158, 11, 0.2); transform: scale(1.05); } .enhance-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        /* --- BUBBLES --- */
+        .msg-wrap { display: flex; max-width: 75%; flex-direction: column; } .msg-wrap.mine { align-self: flex-end; align-items: flex-end; } .msg-wrap.theirs { align-self: flex-start; align-items: flex-start; }
         .bubble { padding: 10px 16px; border-radius: 18px; font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; }
         .msg-wrap.mine .bubble { background: linear-gradient(135deg, var(--primary), #818cf8); color: white; border-bottom-right-radius: 4px; }
         .msg-wrap.theirs .bubble { background: rgba(255,255,255,0.1); color: var(--text-main); border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
-        .side-panel { position: absolute; top: 70px; right: 20px; width: 300px; background: rgba(15,15,20,0.95); backdrop-filter: blur(20px); border: var(--glass-border); border-radius: 16px; padding: 15px; z-index: 100; display: none; }
+        .msg-wrap.ai-bot .bubble { background: linear-gradient(135deg, #0ea5e9, #38bdf8); color: white; border: none; } .msg-wrap.ai-bot .msg-info { color: #38bdf8; font-weight: bold; }
+        .msg-info { font-size: 0.65rem; color: var(--text-sub); margin-top: 4px; display: flex; gap: 6px; }
+        .typing-indicator { display: inline-flex; align-items: center; gap: 4px; padding: 10px 16px; background: rgba(255,255,255,0.05); border-radius: 18px; border-bottom-left-radius: 4px; }
+        .dot { width: 6px; height: 6px; background: var(--text-sub); border-radius: 50%; animation: blink 1.4s infinite both; } .dot:nth-child(1) { animation-delay: 0.2s; } .dot:nth-child(2) { animation-delay: 0.4s; } .dot:nth-child(3) { animation-delay: 0.6s; }
+        @keyframes blink { 0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+        /* --- SIDE PANELS --- */
+        .side-panel { position: absolute; top: 70px; right: 20px; width: 300px; background: rgba(15,15,20,0.95); backdrop-filter: blur(20px); border: var(--glass-border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); padding: 15px; z-index: 100; display: none; }
         .side-panel.active { display: block; animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .nav-wrapper { position: fixed; top: 15px; left: 0; width: 100%; z-index: 50; display: flex; justify-content: center; padding: 0 20px; }
-        .nav-pill { width: 100%; max-width: 1400px; height: 55px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-radius: 100px; background: var(--glass-bg); backdrop-filter: blur(30px); border: var(--glass-border); }
-        .avatar-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 0.9rem; overflow: hidden; }
+        .nav-pill { width: 100%; max-width: 1400px; height: 55px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-radius: 100px; background: var(--glass-bg); backdrop-filter: blur(30px); border: var(--glass-border); box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
+        .avatar-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 0.9rem; flex-shrink: 0; overflow: hidden; }
         .avatar-img { width: 100%; height: 100%; object-fit: cover; }
+        #loadingSpinner { display: none; margin-left: 10px; font-size: 0.8rem; color: var(--primary); }
     </style>
 </head>
 <body>
 
+    <!-- Ambient Background (Bichhanar design) -->
     <div class="bg-mesh"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
 
-    <!-- Login Overlay -->
+    <!-- LOGIN OVERLAY -->
     <div id="loginOverlay">
         <div class="auth-card text-center relative">
-            <button onclick="showAdminLogin()" class="absolute top-4 right-4 text-slate-500 hover:text-white transition"><i class="fas fa-user-shield"></i></button>
-            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white mb-4">
+            <button onclick="showAdminLogin()" class="absolute top-4 right-4 text-[var(--text-sub)] hover:text-white transition"><i class="fas fa-user-shield"></i></button>
+            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-indigo-500/30">
                 <i class="fas fa-bolt text-2xl"></i>
             </div>
-            <h2 class="font-bold text-2xl text-white mb-1">Comm Center</h2>
-            <p class="text-xs text-slate-500 mb-6">Enter prefix to access (e.g. pranto.rodrix)</p>
+            <h2 class="font-head fw-bold text-2xl text-white mb-1 tracking-tight">Comm Center</h2>
+            <p class="text-xs text-[var(--text-sub)] mb-6">Access er jonno apnar prefix din (e.g., pranto.rodrix)</p>
             <div class="relative flex items-center mb-4">
                 <input type="text" id="emailInput" class="auth-input pr-[140px]" placeholder="your.name" onkeypress="if(event.key === 'Enter') login()">
-                <span class="absolute right-4 text-xs text-slate-500 select-none">@leverngear.com</span>
+                <span class="absolute right-4 text-xs text-[var(--text-sub)] select-none">@leverngear.com</span>
             </div>
-            <p id="loginError" class="text-xs text-rose-500 hidden mb-4">Access Denied!</p>
-            <button onclick="login()" class="w-full bg-[#6366f1] text-white font-bold py-3 rounded-xl transition-all">Connect</button>
+            <p id="loginError" class="text-xs text-rose-500 hidden mb-4 font-semibold">Unauthorized Access Denied!</p>
+            <button onclick="login()" class="w-full bg-[#6366f1] hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-md active:scale-95">
+                Connect <i id="authSpinner" class="fas fa-spinner fa-spin hidden ml-2"></i>
+            </button>
         </div>
     </div>
 
-    <!-- Admin Login -->
+    <!-- ADMIN LOGIN OVERLAY (Hidden thakbe default) -->
     <div id="adminLoginOverlay" style="display:none;">
         <div class="auth-card text-center relative">
-            <button onclick="hideAdminLogin()" class="absolute top-4 left-4 text-slate-500 hover:text-white transition"><i class="fas fa-arrow-left"></i></button>
-            <h2 class="font-bold text-2xl text-white mb-1">System Admin</h2>
-            <input type="email" id="adminEmailInput" class="auth-input mb-3" placeholder="Admin Email">
+            <button onclick="hideAdminLogin()" class="absolute top-4 left-4 text-[var(--text-sub)] hover:text-white transition"><i class="fas fa-arrow-left"></i></button>
+            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-rose-500 to-orange-600 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-rose-500/30">
+                <i class="fas fa-lock text-2xl"></i>
+            </div>
+            <h2 class="font-head fw-bold text-2xl text-white mb-1 tracking-tight">System Admin</h2>
+            <p class="text-xs text-[var(--text-sub)] mb-6">Restricted Access. Credentials dorkar.</p>
+            <input type="email" id="adminEmailInput" class="auth-input mb-3" placeholder="Admin Email (pranto.rodrix@...)">
             <input type="password" id="adminPassInput" class="auth-input mb-4" placeholder="Password (1234)" onkeypress="if(event.key === 'Enter') adminLogin()">
-            <p id="adminLoginError" class="text-xs text-rose-500 hidden mb-4">Invalid Credentials!</p>
-            <button onclick="adminLogin()" class="w-full bg-rose-600 text-white font-bold py-3 rounded-xl transition-all">Authenticate</button>
+            <p id="adminLoginError" class="text-xs text-rose-500 hidden mb-4 font-semibold">Invalid Credentials!</p>
+            <button onclick="adminLogin()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl transition-all shadow-md active:scale-95">
+                Authenticate
+            </button>
         </div>
     </div>
 
-    <!-- Navbar -->
+    <!-- Navigation -->
     <nav class="nav-wrapper">
         <div class="nav-pill">
-            <div class="font-bold text-lg text-gradient flex items-center">
-                <i class="fas fa-network-wired mr-2"></i> Comm Center <i id="loadingSpinner" class="fas fa-circle-notch fa-spin ml-2 hidden"></i>
+            <div class="font-head font-bold text-lg text-gradient tracking-tight flex items-center">
+                <i class="fas fa-network-wired mr-2"></i> Comm Center <i id="loadingSpinner" class="fas fa-circle-notch fa-spin"></i>
             </div>
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2 cursor-pointer" onclick="toggleProfilePanel()">
                     <div id="navAvatar" class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white overflow-hidden"></div>
-                    <span id="navUserName" class="text-sm font-semibold text-slate-400 hidden sm:block"></span>
+                    <span id="navUserName" class="text-sm font-semibold text-[var(--text-sub)] hidden sm:block"></span>
                 </div>
-                <button onclick="logout()" class="bg-rose-500/10 text-rose-400 px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-rose-500/20">Exit</button>
+                <button onclick="logout()" class="bg-[rgba(244,63,94,0.1)] text-[#f43f5e] hover:bg-[#f43f5e] hover:text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-[rgba(244,63,94,0.2)]">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Exit
+                </button>
             </div>
         </div>
     </nav>
 
+    <!-- Main Chat Interface -->
     <main class="w-full max-w-[1400px] mx-auto px-4">
         <div class="glass-panel chat-container">
+            
+            <!-- Sidebar: Contacts -->
             <div class="contact-list" id="contactList">
-                <div class="p-4 border-b border-white/5 text-xs font-bold text-slate-500 uppercase flex justify-between items-center">
-                    <span>Networks</span>
-                    <button id="mainAdminBtn" onclick="toggleAdminPanel()" class="hidden text-slate-500 hover:text-white"><i class="fas fa-cogs"></i></button>
+                <div class="p-4 border-b border-[rgba(255,255,255,0.05)] text-xs font-bold text-[var(--text-sub)] uppercase tracking-widest flex justify-between items-center">
+                    <span><i class="fas fa-comments mr-1 text-[#6366f1]"></i> Networks</span>
+                    <button id="mainAdminBtn" onclick="toggleAdminPanel()" class="hidden text-[var(--text-sub)] hover:text-white transition"><i class="fas fa-cogs"></i></button>
                 </div>
-                <div id="contactsContainer" class="overflow-y-auto flex-grow"></div>
+                <div id="contactsContainer" class="overflow-y-auto custom-scroll flex-grow">
+                    <!-- JavaScript theke Data ashbe -->
+                </div>
             </div>
 
+            <!-- Chat Area -->
             <div class="chat-area">
+                <!-- Chat Header -->
                 <div class="chat-header">
                     <div class="flex items-center gap-3">
                         <div id="activeAvatar" class="avatar-circle bg-slate-700">--</div>
-                        <div><h4 id="activeName" class="font-bold text-white text-sm m-0">Select Network</h4><span id="activeStatus" class="text-[10px] text-slate-500">--</span></div>
+                        <div>
+                            <h4 id="activeName" class="font-bold text-white text-sm m-0">Network select korun</h4>
+                            <span id="activeStatus" class="text-[10px] text-[var(--text-sub)]">--</span>
+                        </div>
                     </div>
-                    <button id="groupSettingsBtn" onclick="toggleGroupPanel()" class="hidden text-slate-400 hover:text-white"><i class="fas fa-users-cog"></i></button>
+                    <button id="groupSettingsBtn" onclick="toggleGroupPanel()" class="hidden text-[var(--text-sub)] hover:text-white transition-all w-8 h-8 rounded-full bg-[rgba(255,255,255,0.05)] flex items-center justify-center">
+                        <i class="fas fa-users-cog"></i>
+                    </button>
                 </div>
 
+                <!-- Admin User Management Panel -->
                 <div id="adminPanel" class="side-panel">
-                    <h5 class="text-xs font-bold text-slate-500 uppercase mb-3 border-b border-white/10 pb-2 flex justify-between">User Management <button onclick="toggleAdminPanel()"><i class="fas fa-times"></i></button></h5>
-                    <div class="flex gap-2 mb-3"><input type="text" id="newEmailPrefix" class="auth-input text-xs" placeholder="new.user"><button onclick="addNewUser()" class="bg-indigo-500 text-white px-3 py-2 rounded-lg text-xs font-bold">Add</button></div>
-                    <div id="adminUsersList" class="space-y-2 max-h-[200px] overflow-y-auto"></div>
+                    <h5 class="text-xs font-bold text-[var(--text-sub)] uppercase tracking-widest mb-3 border-b border-[rgba(255,255,255,0.1)] pb-2 flex justify-between">
+                        <span>User Management</span>
+                        <button onclick="toggleAdminPanel()" class="hover:text-white"><i class="fas fa-times"></i></button>
+                    </h5>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="newEmailPrefix" class="auth-input text-xs py-1.5 px-2" placeholder="prefix (e.g. new.user)" onkeypress="if(event.key === 'Enter') addNewUser()">
+                        <button onclick="addNewUser()" class="bg-[#6366f1] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-500 transition">Add</button>
+                    </div>
+                    <div id="adminUsersList" class="space-y-2 mb-2 max-h-[200px] overflow-y-auto custom-scroll">
+                        <!-- Admin users list -->
+                    </div>
                 </div>
 
+                <!-- Group Settings Panel -->
                 <div id="groupPanel" class="side-panel">
-                    <h5 class="text-xs font-bold text-slate-500 uppercase mb-3 border-b border-white/10 pb-2 flex justify-between">Group Members <button onclick="toggleGroupPanel()"><i class="fas fa-times"></i></button></h5>
-                    <div id="groupMembersList" class="space-y-2 max-h-[200px] overflow-y-auto"></div>
+                    <h5 class="text-xs font-bold text-[var(--text-sub)] uppercase tracking-widest mb-3 border-b border-[rgba(255,255,255,0.1)] pb-2 flex justify-between">
+                        <span>Group Members</span>
+                        <button onclick="toggleGroupPanel()" class="hover:text-white"><i class="fas fa-times"></i></button>
+                    </h5>
+                    <div id="groupMembersList" class="space-y-2 mb-2 max-h-[200px] overflow-y-auto custom-scroll">
+                        <!-- Group members list -->
+                    </div>
                 </div>
-
+                
+                <!-- Profile Settings Panel -->
                 <div id="profilePanel" class="side-panel">
-                    <h5 class="text-xs font-bold text-slate-500 uppercase mb-3 border-b border-white/10 pb-2 flex justify-between">Settings <button onclick="toggleProfilePanel()"><i class="fas fa-times"></i></button></h5>
-                    <div class="flex flex-col items-center gap-3"><div id="profilePanelAvatar" class="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold overflow-hidden"></div><input type="file" id="avatarUpload" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)"><label for="avatarUpload" class="text-xs bg-white/10 px-3 py-2 rounded-lg cursor-pointer">Change Photo</label></div>
+                    <h5 class="text-xs font-bold text-[var(--text-sub)] uppercase tracking-widest mb-3 border-b border-[rgba(255,255,255,0.1)] pb-2 flex justify-between">
+                        <span>Profile Settings</span>
+                        <button onclick="toggleProfilePanel()" class="hover:text-white"><i class="fas fa-times"></i></button>
+                    </h5>
+                    <div class="flex flex-col items-center gap-3 mb-3">
+                        <div id="profilePanelAvatar" class="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center text-xl font-bold text-white overflow-hidden"></div>
+                        <input type="file" id="avatarUpload" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+                        <label for="avatarUpload" class="text-xs bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.2)] cursor-pointer px-3 py-1.5 rounded-lg transition">Change Picture</label>
+                    </div>
                 </div>
 
-                <div class="chat-messages" id="chatBox"></div>
+                <!-- Messages -->
+                <div class="chat-messages" id="chatBox">
+                    <div class="h-full flex flex-col items-center justify-center opacity-50">
+                        <i class="fas fa-satellite-dish text-4xl mb-3 text-[var(--text-sub)]"></i>
+                        <p class="text-sm font-medium">Network theke connect korar jonno select korun</p>
+                    </div>
+                </div>
 
+                <!-- Input -->
                 <div class="chat-input-area hidden" id="chatInputArea">
-                    <button onclick="enhanceMessage()" class="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center" title="AI Enhance"><i class="fas fa-magic"></i></button>
-                    <input type="text" id="msgInput" class="msg-input" placeholder="Transmit message..." onkeypress="handleEnter(event)">
+                    <button id="enhanceBtn" onclick="enhanceMessage()" class="enhance-btn" title="Enhance message with AI ✨">
+                        <i class="fas fa-magic"></i>
+                    </button>
+                    <input type="text" id="msgInput" class="msg-input" placeholder="Transmit a message..." onkeypress="handleEnter(event)">
                     <button onclick="sendMessage()" class="send-btn"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
+
         </div>
     </main>
 
+    <!-- App Logic (Firebase Modules) -->
     <script type="module">
+        // --- FIREBASE IMPORTS (SDK Version 11.6.1) ---
+        // SDK gulo import kora hochhe sothik source theke.
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, collection, addDoc, doc, setDoc, onSnapshot, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
-        const myFirebaseConfig = {
+        // --- FIREBASE SETUP (Apnar deya SDK Code) ---
+        // Ekhane apnar project er authentic keys add kora hoyeche.
+        const firebaseConfig = {
             apiKey: "AIzaSyBn__xwzTygfgz6xuQFxRnxpGpvKCZfpm4",
             authDomain: "workspacechat-2bffe.firebaseapp.com",
             projectId: "workspacechat-2bffe",
@@ -164,12 +237,48 @@
             appId: "1:1086571655842:web:ae663facc3bd6c1942ddfb",
             measurementId: "G-LCFKLPVRQ1"
         };
-
-        const app = initializeApp(myFirebaseConfig);
+        
+        // Initialize kora hocche
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = 'pranto-chat-pro-app';
+        
+        // App ID jeta Database er document structure e use hobe
+        const appId = typeof __app_id !== 'undefined' && __app_id ? __app_id : 'pranto-chat-pro-app';
 
+        // --- GEMINI API CONFIGURATION ---
+        // GitHub er jonno ekhane apnar Gemini API key boshiye nite hobe (jodi AI use koren)
+        const canvasApiKey = ""; 
+        const GITHUB_GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
+        const finalApiKey = canvasApiKey || GITHUB_GEMINI_API_KEY;
+
+        // --- FETCH WITH RETRY ---
+        // AI theke text generate korar jonno API call function
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            let delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    let res = await fetch(url, options);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return await res.json();
+                } catch (err) {
+                    if (i === maxRetries - 1) throw err;
+                    await new Promise(r => setTimeout(r, delays[i]));
+                }
+            }
+        }
+
+        async function callGeminiAPI(promptText, systemPrompt = "") {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${finalApiKey}`;
+            const payload = { contents: [{ parts: [{ text: promptText }] }] };
+            if (systemPrompt) payload.systemInstruction = { parts: [{ text: systemPrompt }] };
+            const data = await fetchWithRetry(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || "Error processing request.";
+        }
+
+        // --- DATA & CONFIG ---
+        // Base users (apni caile ekhane notun member add korte paren)
         const BASE_USERS = {
             'pranto.rodrix@leverngear.com': { name: 'Pranto Rodrix', role: 'admin', color: 'from-blue-500 to-indigo-600', short: 'PR' },
             'rakibul.sumon@leverngear.com': { name: 'Rakibul Sumon', role: 'user', color: 'from-emerald-500 to-teal-600', short: 'RS' },
@@ -178,162 +287,557 @@
         };
         
         let ALLOWED_USERS = { ...BASE_USERS };
-        let currentUser = null, activeChatId = null, activeChatType = null, allCloudMessages = [], groupMembers = [], unreadCounts = {};
+        let currentUser = null;
+        let fbUser = null;
+        let activeChatId = null; 
+        let activeChatType = null; 
+        let allCloudMessages = [];
+        let groupMembers = Object.keys(ALLOWED_USERS).filter(e => e !== 'gemini@workspace.ai');
+        let isWaitingForAI = false;
+        let unreadCounts = {};
 
-        window.login = () => {
-            const pre = document.getElementById('emailInput').value.trim().toLowerCase();
-            const email = `${pre}@leverngear.com`;
-            if (ALLOWED_USERS[email]) { localStorage.setItem('workspace_active_user', email); checkLocalAuth(); }
-            else document.getElementById('loginError').classList.remove('hidden');
-        };
+        // HTML theke onlick execute korar jonno functions gulo global object e register kora hoyeche
+        window.login = login;
+        window.logout = logout;
+        window.showAdminLogin = showAdminLogin;
+        window.hideAdminLogin = hideAdminLogin;
+        window.adminLogin = adminLogin;
+        window.openChat = openChat;
+        window.sendMessage = sendMessage;
+        window.enhanceMessage = enhanceMessage;
+        window.toggleAdminPanel = toggleAdminPanel;
+        window.toggleGroupPanel = toggleGroupPanel;
+        window.toggleProfilePanel = toggleProfilePanel;
+        window.toggleGroupMember = toggleGroupMember;
+        window.addNewUser = addNewUser;
+        window.handleEnter = handleEnter; 
+        window.handleAvatarUpload = handleAvatarUpload;
 
-        window.logout = () => { localStorage.removeItem('workspace_active_user'); location.reload(); };
-        window.showAdminLogin = () => document.getElementById('adminLoginOverlay').style.display = 'flex';
-        window.hideAdminLogin = () => document.getElementById('adminLoginOverlay').style.display = 'none';
-        window.adminLogin = () => { if(document.getElementById('adminEmailInput').value === 'pranto.rodrix@leverngear.com' && document.getElementById('adminPassInput').value === '1234') { localStorage.setItem('workspace_active_user', 'pranto.rodrix@leverngear.com'); checkLocalAuth(); hideAdminLogin(); } };
-        window.handleEnter = (e) => { if(e.key === 'Enter') sendMessage(); };
-        window.toggleAdminPanel = () => { document.getElementById('adminPanel').classList.toggle('active'); renderAdminPanel(); };
-        window.toggleGroupPanel = () => { document.getElementById('groupPanel').classList.toggle('active'); renderGroupPanel(); };
-        window.toggleProfilePanel = () => document.getElementById('profilePanel').classList.toggle('active');
-        
-        window.handleAvatarUpload = (e) => {
+        // --- HELPER FUNCTIONS ---
+        function getEmailFromPrefix(prefix) { return `${prefix.toLowerCase()}@leverngear.com`; }
+        function formatName(prefix) { return prefix.split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+        function generateUserShort(email) {
+            const parts = email.split('@')[0].split('.');
+            if(parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
+            return parts[0].substring(0,2).toUpperCase();
+        }
+        function getRandomColor() {
+            const colors = ['from-red-500 to-orange-500', 'from-pink-500 to-rose-500', 'from-green-500 to-emerald-500', 'from-yellow-500 to-amber-500'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // --- AVATAR LOGIC ---
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if(!file) return;
             const reader = new FileReader();
-            reader.onload = (ev) => { localStorage.setItem(`avatar_${currentUser.email}`, ev.target.result); updateAvatarsInUI(); };
-            reader.readAsDataURL(e.target.files[0]);
-        };
+            reader.onload = function(e) {
+                localStorage.setItem(`avatar_${currentUser.email}`, e.target.result);
+                updateAvatarsInUI();
+            };
+            reader.readAsDataURL(file);
+        }
 
-        async function checkLocalAuth() {
-            const saved = localStorage.getItem('workspace_active_user');
-            if (saved) { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('loadingSpinner').classList.remove('hidden'); await signInAnonymously(auth); }
+        function getUserAvatarHTML(email, userObj, extraClasses="") {
+            const localImg = localStorage.getItem(`avatar_${email}`);
+            if(localImg) return `<img src="${localImg}" class="avatar-img ${extraClasses}">`;
+            if(email === 'gemini@workspace.ai') return `<i class="fas fa-robot ${extraClasses}"></i>`;
+            return `<span class="${extraClasses}">${userObj.short}</span>`;
+        }
+
+        function updateAvatarsInUI() {
+            if(!currentUser) return;
+            const navAv = document.getElementById('navAvatar');
+            navAv.innerHTML = getUserAvatarHTML(currentUser.email, currentUser);
+            navAv.className = `w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white overflow-hidden bg-gradient-to-r ${currentUser.color}`;
+            
+            const profAv = document.getElementById('profilePanelAvatar');
+            profAv.innerHTML = getUserAvatarHTML(currentUser.email, currentUser);
+            profAv.className = `w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-white overflow-hidden bg-gradient-to-r ${currentUser.color}`;
+            
+            renderContacts();
+            if(activeChatId) openChat(activeChatId, activeChatType);
+        }
+
+        // --- AUTH LOGIC ---
+        function showAdminLogin() { document.getElementById('adminLoginOverlay').style.display = 'flex'; }
+        function hideAdminLogin() { document.getElementById('adminLoginOverlay').style.display = 'none'; }
+        
+        function adminLogin() {
+            const email = document.getElementById('adminEmailInput').value.trim();
+            const pass = document.getElementById('adminPassInput').value.trim();
+            const err = document.getElementById('adminLoginError');
+            
+            if(email === 'pranto.rodrix@leverngear.com' && pass === '1234') {
+                err.classList.add('hidden');
+                localStorage.setItem('workspace_active_user', email);
+                hideAdminLogin();
+                checkLocalAuth();
+            } else {
+                err.classList.remove('hidden');
+            }
+        }
+
+        function checkLocalAuth() {
+            const savedEmail = localStorage.getItem('workspace_active_user');
+            if (savedEmail && savedEmail !== 'gemini@workspace.ai') {
+                document.getElementById('loginOverlay').style.display = 'none';
+                initFirebaseAuth(); 
+            } else {
+                document.getElementById('loginOverlay').style.display = 'flex';
+            }
+        }
+
+        function login() {
+            const prefix = document.getElementById('emailInput').value.trim().toLowerCase();
+            const err = document.getElementById('loginError');
+            if(!prefix) return;
+            const email = getEmailFromPrefix(prefix);
+            
+            if (ALLOWED_USERS[email] && email !== 'gemini@workspace.ai') {
+                localStorage.setItem('workspace_active_user', email);
+                err.classList.add('hidden');
+                checkLocalAuth();
+            } else {
+                err.innerText = "Prefix not recognized in local cache.";
+                err.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('workspace_active_user');
+            if (window.location.pathname.endsWith('index.html')) {
+                location.reload();
+            } else {
+                window.location.href = "index.html"; 
+            }
+        }
+
+        function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
+
+        // --- FIREBASE INIT & SYNC ---
+        // User check korar por cloud theke auth complete hobe
+        async function initFirebaseAuth() {
+            document.getElementById('loadingSpinner').style.display = 'inline-block';
+            try {
+                // GitHub ba external host e token mismatch error fix korar jonno
+                await signInAnonymously(auth);
+            } catch(e) {
+                console.error("Auth Error:", e);
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert("Database connection failed. Please check your internet connection.");
+            }
         }
 
         onAuthStateChanged(auth, async (u) => {
+            fbUser = u;
             if (u) {
-                const saved = localStorage.getItem('workspace_active_user');
-                const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'usersList'));
-                if (docSnap.exists()) ALLOWED_USERS = { ...BASE_USERS, ...docSnap.data().users };
-                if(saved && ALLOWED_USERS[saved]) {
-                    currentUser = { email: saved, ...ALLOWED_USERS[saved] };
+                await syncUsersFromCloud();
+                const savedEmail = localStorage.getItem('workspace_active_user');
+                if(savedEmail && ALLOWED_USERS[savedEmail]) {
+                    currentUser = { email: savedEmail, ...ALLOWED_USERS[savedEmail] };
                     document.getElementById('navUserName').innerText = currentUser.name;
                     updateAvatarsInUI();
-                    if(currentUser.role === 'admin') document.getElementById('mainAdminBtn').classList.remove('hidden');
+                    
+                    if(currentUser.role === 'admin') {
+                        document.getElementById('mainAdminBtn').classList.remove('hidden');
+                    }
                     setupCloudListeners();
+                } else {
+                    localStorage.removeItem('workspace_active_user');
+                    document.getElementById('loginOverlay').style.display = 'flex';
+                    document.getElementById('loadingSpinner').style.display = 'none';
                 }
             }
         });
 
+        async function syncUsersFromCloud() {
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'usersList');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    ALLOWED_USERS = { ...BASE_USERS, ...docSnap.data().users };
+                } else {
+                    await setDoc(docRef, { users: BASE_USERS });
+                }
+            } catch(e) { console.error("Error syncing users", e); }
+        }
+
+        // --- CLOUD LISTENER DATA (Messages & Users Data) ---
         function setupCloudListeners() {
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), (snap) => {
-                allCloudMessages = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => a.timestamp - b.timestamp);
+            if(!fbUser) return;
+            
+            // Message gulo realtime fetch korar jonno listener
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), (snapshot) => {
+                let msgs = [];
+                snapshot.forEach(doc => msgs.push({ id: doc.id, ...doc.data() }));
+                allCloudMessages = msgs.sort((a, b) => a.timestamp - b.timestamp);
+                document.getElementById('loadingSpinner').style.display = 'none';
                 calculateUnread();
-                renderContacts();
-                if(activeChatId) renderMessages();
-                document.getElementById('loadingSpinner').classList.add('hidden');
-            });
-            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'groupSettings', 'members'), (snap) => {
-                groupMembers = snap.exists() ? snap.data().emails : Object.keys(ALLOWED_USERS).filter(e => e !== 'gemini@workspace.ai');
-                renderContacts();
-            });
-            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'usersList'), (snap) => {
-                if(snap.exists()) { ALLOWED_USERS = { ...BASE_USERS, ...snap.data().users }; renderContacts(); }
-            });
-        }
+                if (activeChatId) renderMessages();
+                renderContacts(); 
+            }, (err) => { console.error("Msg Sync Error", err); });
 
-        function getUserAvatarHTML(email, u) {
-            const img = localStorage.getItem(`avatar_${email}`);
-            return img ? `<img src="${img}" class="avatar-img">` : (email === 'gemini@workspace.ai' ? '<i class="fas fa-robot"></i>' : `<span>${u.short}</span>`);
-        }
-
-        function updateAvatarsInUI() {
-            const html = getUserAvatarHTML(currentUser.email, currentUser);
-            document.getElementById('navAvatar').innerHTML = html;
-            document.getElementById('navAvatar').className = `w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white overflow-hidden bg-gradient-to-r ${currentUser.color}`;
-            document.getElementById('profilePanelAvatar').innerHTML = html;
-            document.getElementById('profilePanelAvatar').className = `w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold bg-gradient-to-r ${currentUser.color}`;
+            // Group Members update monitor korche
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'groupSettings'), (snapshot) => {
+                snapshot.forEach(doc => {
+                    if (doc.id === 'members') {
+                        groupMembers = doc.data().emails || Object.keys(ALLOWED_USERS).filter(e => e !== 'gemini@workspace.ai');
+                        renderContacts();
+                        if(activeChatId === 'group' && !groupMembers.includes(currentUser.email)) {
+                            activeChatId = null;
+                            document.getElementById('chatBox').innerHTML = `<div class="h-full flex items-center justify-center opacity-50"><p>Connection Terminated.</p></div>`;
+                            document.getElementById('chatInputArea').classList.add('hidden');
+                            document.getElementById('groupSettingsBtn').classList.add('hidden');
+                            document.getElementById('activeName').innerText = "Network select korun";
+                        } else if (activeChatId === 'group') {
+                            document.getElementById('activeStatus').innerText = groupMembers.length + " Linked";
+                            renderGroupPanel();
+                        }
+                    }
+                });
+            });
+            
+            // Notun user add hole sync korbe
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'usersList'), (docSnap) => {
+                if(docSnap.exists()) {
+                    ALLOWED_USERS = { ...BASE_USERS, ...docSnap.data().users };
+                    renderContacts();
+                    if(document.getElementById('adminPanel').classList.contains('active')) renderAdminPanel();
+                }
+            });
+            
             renderContacts();
         }
 
+        // --- READ/UNREAD LOGIC ---
         function calculateUnread() {
             unreadCounts = {};
             const lastRead = JSON.parse(localStorage.getItem('workspace_last_read')) || {};
+
             allCloudMessages.forEach(m => {
-                if(m.sender === currentUser.email) return;
-                let cid = m.chatId === 'group' ? 'group' : m.sender;
-                if(m.chatId !== 'group' && !m.chatId.includes(currentUser.email)) return;
-                if(!lastRead[cid] || m.timestamp > lastRead[cid]) unreadCounts[cid] = (unreadCounts[cid] || 0) + 1;
+                if (m.sender === currentUser.email) return; 
+                let chatIdentifier = m.chatId === 'group' ? 'group' : m.sender;
+                if (m.chatId !== 'group' && !m.chatId.includes(currentUser.email)) return;
+
+                if (!lastRead[chatIdentifier] || m.timestamp > lastRead[chatIdentifier]) {
+                    unreadCounts[chatIdentifier] = (unreadCounts[chatIdentifier] || 0) + 1;
+                }
             });
         }
 
-        window.openChat = (id, type) => {
-            activeChatId = id; activeChatType = type;
-            const lr = JSON.parse(localStorage.getItem('workspace_last_read')) || {};
-            lr[id] = Date.now();
-            localStorage.setItem('workspace_last_read', JSON.stringify(lr));
-            const u = type === 'group' ? {name: 'Team Network', color: 'from-purple-500 to-pink-600'} : ALLOWED_USERS[id];
-            document.getElementById('activeAvatar').innerHTML = type === 'group' ? '<i class="fas fa-users"></i>' : getUserAvatarHTML(id, u);
-            document.getElementById('activeAvatar').className = `avatar-circle bg-gradient-to-r ${u.color}`;
-            document.getElementById('activeName').innerText = u.name;
-            document.getElementById('activeStatus').innerText = type === 'group' ? groupMembers.length + ' Linked' : 'Direct Link';
-            document.getElementById('chatInputArea').classList.remove('hidden');
-            document.getElementById('groupSettingsBtn').className = type === 'group' && groupMembers.includes(currentUser.email) ? 'block' : 'hidden';
-            calculateUnread(); renderContacts(); renderMessages();
-        };
+        function markAsRead(id) {
+            const lastRead = JSON.parse(localStorage.getItem('workspace_last_read')) || {};
+            lastRead[id] = Date.now();
+            localStorage.setItem('workspace_last_read', JSON.stringify(lastRead));
+            calculateUnread();
+            renderContacts();
+        }
 
-        window.sendMessage = async () => {
-            const inp = document.getElementById('msgInput');
-            const txt = inp.value.trim();
-            if(!txt || !activeChatId) return;
-            const key = activeChatType === 'group' ? 'group' : [currentUser.email, activeChatId].sort().join('|');
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), { chatId: key, sender: currentUser.email, text: txt, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), timestamp: Date.now() });
-            inp.value = '';
-        };
-
+        // --- UI RENDERING (Contacts & Chats) ---
         function renderContacts() {
             const container = document.getElementById('contactsContainer');
             container.innerHTML = '';
-            const gUr = unreadCounts['group'] || 0;
-            container.innerHTML += `<div class="contact-item ${activeChatId === 'group' ? 'active' : ''}" onclick="openChat('group', 'group')"><div class="flex items-center gap-3"><div class="avatar-circle bg-gradient-to-r from-purple-500 to-pink-600"><i class="fas fa-users"></i></div><div><div class="text-sm font-bold text-white">Team Network</div><div class="text-[10px] text-slate-500">${groupMembers.includes(currentUser.email) ? 'Linked' : 'Restricted'}</div></div></div><div class="unread-badge ${gUr > 0 && activeChatId !== 'group' ? 'show' : ''}">${gUr}</div></div>`;
+
+            const isGroupMember = groupMembers.includes(currentUser.email);
+            const grpClass = activeChatId === 'group' ? 'active' : '';
+            const grpUnread = unreadCounts['group'] || 0;
+            
+            container.innerHTML += `
+                <div class="contact-item ${grpClass}" onclick="openChat('group', 'group')">
+                    <div class="flex items-center gap-3">
+                        <div class="avatar-circle bg-gradient-to-r from-purple-500 to-pink-600"><i class="fas fa-users"></i></div>
+                        <div class="flex-grow">
+                            <div class="text-sm font-bold text-white">Team Network</div>
+                            <div class="text-[10px] text-[var(--text-sub)]">${isGroupMember ? 'Active' : 'Restricted'}</div>
+                        </div>
+                    </div>
+                    <div class="unread-badge ${grpUnread > 0 && activeChatId !== 'group' ? 'show' : ''}">${grpUnread}</div>
+                </div>
+            `;
+
             Object.keys(ALLOWED_USERS).forEach(email => {
-                if(email === currentUser.email) return;
-                const u = ALLOWED_USERS[email], ur = unreadCounts[email] || 0;
-                container.innerHTML += `<div class="contact-item ${activeChatId === email ? 'active' : ''}" onclick="openChat('${email}', 'personal')"><div class="flex items-center gap-3"><div class="avatar-circle bg-gradient-to-r ${u.color}">${getUserAvatarHTML(email, u)}</div><div><div class="text-sm font-bold text-white">${u.name}</div><div class="text-[10px] text-slate-500 capitalize">${u.role}</div></div></div><div class="unread-badge ${ur > 0 && activeChatId !== email ? 'show' : ''}">${ur}</div></div>`;
+                if (email === currentUser.email) return; 
+                const user = ALLOWED_USERS[email];
+                const isActive = activeChatId === email ? 'active' : '';
+                const isAI = email === 'gemini@workspace.ai';
+                const unread = unreadCounts[email] || 0;
+                let avHtml = getUserAvatarHTML(email, user);
+                
+                container.innerHTML += `
+                    <div class="contact-item ${isActive}" onclick="openChat('${email}', 'personal')">
+                        <div class="flex items-center gap-3">
+                            <div class="avatar-circle bg-gradient-to-r ${user.color}">${avHtml}</div>
+                            <div class="flex-grow">
+                                <div class="text-sm font-bold text-white ${isAI ? 'text-cyan-400' : ''}">${user.name}</div>
+                                <div class="text-[10px] text-[var(--text-sub)] capitalize">${user.role}</div>
+                            </div>
+                        </div>
+                        <div class="unread-badge ${unread > 0 && activeChatId !== email ? 'show' : ''}">${unread}</div>
+                    </div>
+                `;
             });
+        }
+
+        function openChat(id, type) {
+            activeChatId = id;
+            activeChatType = type;
+            markAsRead(id);
+
+            // Chat change korle panels gulo hide kore dibe
+            document.getElementById('adminPanel').classList.remove('active');
+            document.getElementById('groupPanel').classList.remove('active');
+            document.getElementById('profilePanel').classList.remove('active');
+
+            const avatarEl = document.getElementById('activeAvatar');
+            const nameEl = document.getElementById('activeName');
+            const statusEl = document.getElementById('activeStatus');
+            const inputArea = document.getElementById('chatInputArea');
+            const grpSetBtn = document.getElementById('groupSettingsBtn');
+
+            if (type === 'group') {
+                avatarEl.className = "avatar-circle bg-gradient-to-r from-purple-500 to-pink-600";
+                avatarEl.innerHTML = '<i class="fas fa-users"></i>';
+                nameEl.innerText = "Team Network";
+                statusEl.innerText = groupMembers.length + " Linked";
+                
+                if(groupMembers.includes(currentUser.email)) {
+                    inputArea.classList.remove('hidden');
+                    grpSetBtn.classList.remove('hidden');
+                } else {
+                    inputArea.classList.add('hidden');
+                    grpSetBtn.classList.add('hidden');
+                }
+            } else {
+                const u = ALLOWED_USERS[id];
+                avatarEl.className = `avatar-circle bg-gradient-to-r ${u.color}`;
+                avatarEl.innerHTML = getUserAvatarHTML(id, u);
+                nameEl.innerText = u.name;
+                statusEl.innerText = id === 'gemini@workspace.ai' ? "Powered by Gemini LLM" : "Direct Link";
+                inputArea.classList.remove('hidden');
+                grpSetBtn.classList.add('hidden');
+            }
+
+            renderContacts(); 
+            renderMessages();
+            document.getElementById('msgInput').focus();
+        }
+
+        function getChatKey() {
+            if(activeChatType === 'group') return 'group';
+            return [currentUser.email, activeChatId].sort().join('|');
         }
 
         function renderMessages() {
             const chatBox = document.getElementById('chatBox');
-            if(activeChatType === 'group' && !groupMembers.includes(currentUser.email)) { chatBox.innerHTML = '<p class="m-auto opacity-50">Restricted.</p>'; return; }
-            const key = activeChatType === 'group' ? 'group' : [currentUser.email, activeChatId].sort().join('|');
-            const msgs = allCloudMessages.filter(m => m.chatId === key);
-            chatBox.innerHTML = msgs.map(m => `<div class="msg-wrap ${m.sender === currentUser.email ? 'mine' : 'theirs'}">${m.sender !== currentUser.email ? `<span class="text-[9px] font-bold text-slate-500 mb-1">${ALLOWED_USERS[m.sender]?.name || 'User'}</span>` : ''}<div class="bubble">${m.text}</div><div class="msg-info"><span>${m.time}</span></div></div>`).join('');
-            chatBox.scrollTop = chatBox.scrollHeight;
+            if(activeChatType === 'group' && !groupMembers.includes(currentUser.email)) {
+                chatBox.innerHTML = `<div class="h-full flex items-center justify-center opacity-50 text-sm"><p>Connection Restricted.</p></div>`;
+                return;
+            }
+            const currentKey = getChatKey();
+            const msgs = allCloudMessages.filter(m => m.chatId === currentKey);
+
+            if(msgs.length === 0 && !isWaitingForAI) {
+                chatBox.innerHTML = `<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="fas fa-satellite-dish text-3xl mb-2"></i><p class="text-xs">Kono signal nei. Transmission shuru korun.</p></div>`;
+                return;
+            }
+
+            let html = '';
+            msgs.forEach(m => {
+                const isMine = m.sender === currentUser.email;
+                const isAI = m.sender === 'gemini@workspace.ai';
+                const senderName = isMine ? 'You' : ALLOWED_USERS[m.sender]?.name.split(' ')[0] || 'Unknown';
+                const wrapClass = isMine ? 'mine' : (isAI ? 'theirs ai-bot' : 'theirs');
+                
+                html += `
+                    <div class="msg-wrap ${wrapClass}">
+                        ${(activeChatType === 'group' || isAI) && !isMine ? `<span class="text-[9px] font-bold ${isAI ? 'text-cyan-400' : 'text-[var(--text-sub)]'} mb-1 pl-1">${senderName}</span>` : ''}
+                        <div class="bubble">${m.text.replace(/\n/g, '<br>')}</div>
+                        <div class="msg-info"><span>${m.time}</span></div>
+                    </div>
+                `;
+            });
+            
+            if(isWaitingForAI && activeChatId === 'gemini@workspace.ai') {
+                 html += `<div class="msg-wrap theirs ai-bot"><span class="text-[9px] font-bold text-cyan-400 mb-1 pl-1">Gemini AI ✨</span><div class="typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+            }
+            chatBox.innerHTML = html;
+            chatBox.scrollTop = chatBox.scrollHeight; 
+            if (activeChatId) markAsRead(activeChatId);
         }
 
-        window.addNewUser = async () => {
-            const pre = document.getElementById('newEmailPrefix').value.trim().toLowerCase();
-            const email = `${pre}@leverngear.com`;
-            const updated = { ...ALLOWED_USERS, [email]: { name: pre.replace('.',' '), role: 'user', color: 'from-slate-500 to-slate-700', short: pre.slice(0,2).toUpperCase() } };
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'usersList'), { users: updated });
-            document.getElementById('newEmailPrefix').value = '';
-        };
+        // --- GEMINI AI & SENDING MESSAGES ---
+        async function enhanceMessage() {
+            const inp = document.getElementById('msgInput');
+            const btn = document.getElementById('enhanceBtn');
+            const originalText = inp.value.trim();
+            if(!originalText) return;
 
-        window.toggleGroupMember = async (email, add) => {
-            let n = add ? [...groupMembers, email] : groupMembers.filter(e => e !== email);
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groupSettings', 'members'), { emails: n });
-        };
+            inp.disabled = true; btn.disabled = true;
+            const tempVal = inp.value; inp.value = "Enhancing with AI ✨...";
+
+            try {
+                const systemPrompt = "You are a professional communication assistant. Rewrite the user's text to make it sound highly professional, clear, concise, and polite. Return ONLY the rewritten text.";
+                const response = await callGeminiAPI(originalText, systemPrompt);
+                inp.value = response.trim();
+            } catch (error) {
+                inp.value = tempVal; 
+            } finally {
+                inp.disabled = false; btn.disabled = false; inp.focus();
+            }
+        }
+
+        async function sendMessage() {
+            const inp = document.getElementById('msgInput');
+            const text = inp.value.trim();
+            if(!text || !activeChatId || !fbUser) return;
+
+            const currentKey = getChatKey();
+            const msgData = { chatId: currentKey, sender: currentUser.email, text: text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), timestamp: Date.now() };
+
+            inp.value = '';
+            // Data Cloud e pathano hocche
+            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), msgData); } catch(e) {}
+
+            // Jodi AI er sathe kotha hoy, tahole automatic bot theke reply ashbe
+            if (activeChatId === 'gemini@workspace.ai') {
+                isWaitingForAI = true;
+                renderMessages();
+                try {
+                    const historyMsgs = allCloudMessages.filter(m => m.chatId === currentKey).slice(-10);
+                    let promptContext = "Chat History:\n";
+                    historyMsgs.forEach(m => { promptContext += `${m.sender === currentUser.email ? "User" : "AI"}: ${m.text}\n`; });
+                    promptContext += `User: ${text}\n\nRespond to the User's last message as a helpful, intelligent, and friendly AI assistant inside a corporate workspace app.`;
+
+                    const aiResponse = await callGeminiAPI(promptContext);
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), { chatId: currentKey, sender: 'gemini@workspace.ai', text: aiResponse.trim(), time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), timestamp: Date.now() });
+                } catch (error) {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), { chatId: currentKey, sender: 'gemini@workspace.ai', text: "Error connecting to AI core.", time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), timestamp: Date.now() });
+                } finally {
+                    isWaitingForAI = false;
+                    renderMessages();
+                }
+            }
+        }
+
+        // --- PANELS CONFIGURATION (Admin, Group, Profile) ---
+        function toggleAdminPanel() {
+            document.getElementById('groupPanel').classList.remove('active');
+            document.getElementById('profilePanel').classList.remove('active');
+            const panel = document.getElementById('adminPanel');
+            panel.classList.toggle('active');
+            if(panel.classList.contains('active')) renderAdminPanel();
+        }
+        
+        function toggleGroupPanel() {
+            document.getElementById('adminPanel').classList.remove('active');
+            document.getElementById('profilePanel').classList.remove('active');
+            const panel = document.getElementById('groupPanel');
+            panel.classList.toggle('active');
+            if(panel.classList.contains('active')) renderGroupPanel();
+        }
+
+        function toggleProfilePanel() {
+            document.getElementById('adminPanel').classList.remove('active');
+            document.getElementById('groupPanel').classList.remove('active');
+            const panel = document.getElementById('profilePanel');
+            panel.classList.toggle('active');
+        }
 
         function renderAdminPanel() {
-            document.getElementById('adminUsersList').innerHTML = Object.keys(ALLOWED_USERS).filter(e => e !== 'gemini@workspace.ai').map(email => `<div class="flex items-center gap-2 bg-white/5 p-2 rounded"><div class="text-[10px] font-bold text-white">${ALLOWED_USERS[email].name}</div></div>`).join('');
+            const list = document.getElementById('adminUsersList');
+            list.innerHTML = '';
+            
+            Object.keys(ALLOWED_USERS).forEach(email => {
+                if (email === 'gemini@workspace.ai') return; 
+                const u = ALLOWED_USERS[email];
+                
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-[rgba(255,255,255,0.02)] p-2 rounded border border-[rgba(255,255,255,0.05)]">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full bg-gradient-to-r ${u.color} text-[8px] font-bold flex items-center justify-center text-white">${u.short}</div>
+                            <div>
+                                <div class="text-[10px] font-bold text-white leading-none">${u.name}</div>
+                                <div class="text-[8px] text-[var(--text-sub)]">${email}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function addNewUser() {
+            const prefixInput = document.getElementById('newEmailPrefix');
+            const prefix = prefixInput.value.trim().toLowerCase();
+            if(!prefix) return;
+            
+            const email = getEmailFromPrefix(prefix);
+            if(ALLOWED_USERS[email]) {
+                alert("User already exists!"); return;
+            }
+
+            const newUser = {
+                name: formatName(prefix),
+                role: 'user',
+                color: getRandomColor(),
+                short: generateUserShort(email)
+            };
+
+            const updatedUsers = { ...ALLOWED_USERS, [email]: newUser };
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'usersList'), { users: updatedUsers }, {merge: true});
+                prefixInput.value = '';
+            } catch(e) { console.error("Failed to add user", e); }
         }
 
         function renderGroupPanel() {
-            document.getElementById('groupMembersList').innerHTML = Object.keys(ALLOWED_USERS).filter(e => e !== 'gemini@workspace.ai').map(email => {
-                const inG = groupMembers.includes(email);
-                return `<div class="flex justify-between items-center bg-white/5 p-2 rounded"><div class="text-[10px] text-white">${ALLOWED_USERS[email].name}</div>${currentUser.role === 'admin' && email !== currentUser.email ? `<button onclick="toggleGroupMember('${email}', ${!inG})" class="text-[8px] ${inG ? 'text-rose-400' : 'text-emerald-400'}">${inG ? 'Kick' : 'Add'}</button>` : ''}</div>`;
-            }).join('');
+            const list = document.getElementById('groupMembersList');
+            list.innerHTML = '';
+            const isAdmin = currentUser.role === 'admin';
+            
+            Object.keys(ALLOWED_USERS).forEach(email => {
+                if (email === 'gemini@workspace.ai') return; 
+                const u = ALLOWED_USERS[email];
+                const inGroup = groupMembers.includes(email);
+                const isMe = email === currentUser.email;
+                
+                let actionBtn = '';
+                if (isAdmin && !isMe) {
+                    if (inGroup) actionBtn = `<button onclick="toggleGroupMember('${email}', false)" class="text-[10px] bg-rose-500/20 text-rose-400 px-2 py-1 rounded hover:bg-rose-500 hover:text-white transition">Kick</button>`;
+                    else actionBtn = `<button onclick="toggleGroupMember('${email}', true)" class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded hover:bg-emerald-500 hover:text-white transition">Add</button>`;
+                } else if (inGroup) {
+                    actionBtn = `<span class="text-[9px] text-[var(--text-sub)] italic">Linked</span>`;
+                } else {
+                    actionBtn = `<span class="text-[9px] text-[var(--text-sub)] italic">Unlinked</span>`;
+                }
+
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-[rgba(255,255,255,0.02)] p-2 rounded border border-[rgba(255,255,255,0.05)] opacity-${inGroup ? '100' : '40'}">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full bg-gradient-to-r ${u.color} text-[8px] font-bold flex items-center justify-center text-white">${u.short}</div>
+                            <div>
+                                <div class="text-[11px] font-bold text-white leading-none">${u.name} ${isMe ? '(You)' : ''}</div>
+                                <div class="text-[8px] text-[var(--text-sub)] capitalize mt-1">${u.role}</div>
+                            </div>
+                        </div>
+                        ${actionBtn}
+                    </div>
+                `;
+            });
         }
 
+        async function toggleGroupMember(email, add) {
+            if(!fbUser) return;
+            let newMembers = [...groupMembers];
+            if(!add) newMembers = newMembers.filter(e => e !== email);
+            else if(!newMembers.includes(email)) newMembers.push(email);
+            
+            try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groupSettings', 'members'), { emails: newMembers }); } catch(e) {}
+        }
+
+        // Program er initial check call hocche ekhane
         checkLocalAuth();
+
     </script>
 </body>
 </html>
