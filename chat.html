@@ -45,13 +45,15 @@
         /* --- CHAT INTERFACE --- */
         .chat-container { height: calc(100vh - 100px); display: flex; overflow: hidden; margin-top: 80px; }
         .contact-list { width: 300px; border-right: var(--glass-border); display: flex; flex-direction: column; background: rgba(15,15,20,0.3); }
-        .contact-item { padding: 15px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .contact-item { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid rgba(255,255,255,0.02); }
         .contact-item:hover { background: rgba(255,255,255,0.05); }
         .contact-item.active { background: rgba(99, 102, 241, 0.15); border-left: 4px solid var(--primary); }
+        .unread-badge { background-color: var(--accent); color: white; font-size: 0.6rem; font-weight: bold; padding: 2px 6px; border-radius: 10px; display: none; }
+        .unread-badge.show { display: inline-block; }
         
         .chat-area { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
         .chat-header { padding: 15px 20px; border-bottom: var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(15,15,20,0.5); }
-        .chat-messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .chat-messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
         .chat-input-area { padding: 15px 20px; border-top: var(--glass-border); display: flex; align-items: center; gap: 10px; background: rgba(15,15,20,0.5); }
         .msg-input { flex-grow: 1; background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; padding: 12px 20px; color: white; outline: none; transition: 0.3s; }
         .msg-input:focus { border-color: var(--primary); }
@@ -195,7 +197,7 @@
                         <button onclick="toggleAdminPanel()" class="hover:text-white"><i class="fas fa-times"></i></button>
                     </h5>
                     <div class="flex gap-2 mb-3">
-                        <input type="text" id="newEmailPrefix" class="auth-input text-xs py-1.5 px-2" placeholder="prefix (e.g. new.user)">
+                        <input type="text" id="newEmailPrefix" class="auth-input text-xs py-1.5 px-2" placeholder="prefix (e.g. new.user)" onkeypress="if(event.key === 'Enter') addNewUser()">
                         <button onclick="addNewUser()" class="bg-[#6366f1] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-500 transition">Add</button>
                     </div>
                     <div id="adminUsersList" class="space-y-2 mb-2 max-h-[200px] overflow-y-auto custom-scroll">
@@ -302,6 +304,7 @@
         let allCloudMessages = [];
         let groupMembers = Object.keys(ALLOWED_USERS).filter(e => e !== 'gemini@workspace.ai');
         let isWaitingForAI = false;
+        let unreadCounts = {}; // Keep track of unread messages
 
         // Make functions globally available
         window.login = login;
@@ -317,7 +320,7 @@
         window.toggleProfilePanel = toggleProfilePanel;
         window.toggleGroupMember = toggleGroupMember;
         window.addNewUser = addNewUser;
-        window.handleEnter = handleEnter;
+        window.handleEnter = handleEnter; // FIXED: assigned globally
         window.handleAvatarUpload = handleAvatarUpload;
 
         // --- HELPER FUNCTIONS ---
@@ -394,12 +397,9 @@
 
         function checkLocalAuth() {
             const savedEmail = localStorage.getItem('workspace_active_user');
-            
-            // Need to load allowed users from cloud first if possible, but local auth is synchronous.
-            // For smooth UX, assume savedEmail is valid if it exists, cloud will verify.
             if (savedEmail && savedEmail !== 'gemini@workspace.ai') {
                 document.getElementById('loginOverlay').style.display = 'none';
-                initFirebaseAuth(savedEmail); // Pass savedEmail to setup
+                initFirebaseAuth(savedEmail); 
             } else {
                 document.getElementById('loginOverlay').style.display = 'flex';
             }
@@ -424,7 +424,7 @@
 
         function logout() {
             localStorage.removeItem('workspace_active_user');
-            window.location.href = "index.html"; // Redirect to index.html
+            window.location.href = "index.html"; 
         }
 
         function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
@@ -460,7 +460,6 @@
                     
                     setupCloudListeners();
                 } else {
-                    // Invalid saved email after cloud sync
                     localStorage.removeItem('workspace_active_user');
                     document.getElementById('loginOverlay').style.display = 'flex';
                     document.getElementById('loadingSpinner').style.display = 'none';
@@ -476,7 +475,6 @@
                     const cloudUsers = docSnap.data().users || {};
                     ALLOWED_USERS = { ...BASE_USERS, ...cloudUsers };
                 } else {
-                    // Initialize cloud users with base users if it doesn't exist
                     await setDoc(docRef, { users: BASE_USERS });
                 }
             } catch(e) {
@@ -493,7 +491,12 @@
                 snapshot.forEach(doc => msgs.push({ id: doc.id, ...doc.data() }));
                 allCloudMessages = msgs.sort((a, b) => a.timestamp - b.timestamp);
                 document.getElementById('loadingSpinner').style.display = 'none';
+                
+                // Read/Unread logic setup
+                calculateUnread();
+
                 if (activeChatId) renderMessages();
+                renderContacts(); // Re-render to show unread badges
             }, (err) => { console.error("Msg Sync Error", err); });
 
             // Listen for Group Settings
@@ -528,6 +531,33 @@
             renderContacts();
         }
 
+        // --- READ/UNREAD LOGIC ---
+        function calculateUnread() {
+            unreadCounts = {};
+            const lastRead = JSON.parse(localStorage.getItem('workspace_last_read')) || {};
+
+            allCloudMessages.forEach(m => {
+                if (m.sender === currentUser.email) return; // Ignore my own msgs
+                
+                let chatIdentifier = m.chatId === 'group' ? 'group' : m.sender;
+                
+                // If it's a personal chat, make sure the message was meant for me
+                if (m.chatId !== 'group' && !m.chatId.includes(currentUser.email)) return;
+
+                if (!lastRead[chatIdentifier] || m.timestamp > lastRead[chatIdentifier]) {
+                    unreadCounts[chatIdentifier] = (unreadCounts[chatIdentifier] || 0) + 1;
+                }
+            });
+        }
+
+        function markAsRead(id) {
+            const lastRead = JSON.parse(localStorage.getItem('workspace_last_read')) || {};
+            lastRead[id] = Date.now();
+            localStorage.setItem('workspace_last_read', JSON.stringify(lastRead));
+            calculateUnread();
+            renderContacts();
+        }
+
         // --- UI RENDERING ---
         function renderContacts() {
             const container = document.getElementById('contactsContainer');
@@ -536,13 +566,18 @@
             // 1. Group
             const isGroupMember = groupMembers.includes(currentUser.email);
             const grpClass = activeChatId === 'group' ? 'active' : '';
+            const grpUnread = unreadCounts['group'] || 0;
+            
             container.innerHTML += `
                 <div class="contact-item ${grpClass}" onclick="openChat('group', 'group')">
-                    <div class="avatar-circle bg-gradient-to-r from-purple-500 to-pink-600"><i class="fas fa-users"></i></div>
-                    <div class="flex-grow">
-                        <div class="text-sm font-bold text-white">Team Network</div>
-                        <div class="text-[10px] text-[var(--text-sub)]">${isGroupMember ? 'Active' : 'Restricted'}</div>
+                    <div class="flex items-center gap-3">
+                        <div class="avatar-circle bg-gradient-to-r from-purple-500 to-pink-600"><i class="fas fa-users"></i></div>
+                        <div class="flex-grow">
+                            <div class="text-sm font-bold text-white">Team Network</div>
+                            <div class="text-[10px] text-[var(--text-sub)]">${isGroupMember ? 'Active' : 'Restricted'}</div>
+                        </div>
                     </div>
+                    <div class="unread-badge ${grpUnread > 0 && activeChatId !== 'group' ? 'show' : ''}">${grpUnread}</div>
                 </div>
             `;
 
@@ -552,16 +587,20 @@
                 const user = ALLOWED_USERS[email];
                 const isActive = activeChatId === email ? 'active' : '';
                 const isAI = email === 'gemini@workspace.ai';
+                const unread = unreadCounts[email] || 0;
                 
                 let avHtml = getUserAvatarHTML(email, user);
                 
                 container.innerHTML += `
                     <div class="contact-item ${isActive}" onclick="openChat('${email}', 'personal')">
-                        <div class="avatar-circle bg-gradient-to-r ${user.color}">${avHtml}</div>
-                        <div class="flex-grow">
-                            <div class="text-sm font-bold text-white ${isAI ? 'text-cyan-400' : ''}">${user.name}</div>
-                            <div class="text-[10px] text-[var(--text-sub)] capitalize">${user.role}</div>
+                        <div class="flex items-center gap-3">
+                            <div class="avatar-circle bg-gradient-to-r ${user.color}">${avHtml}</div>
+                            <div class="flex-grow">
+                                <div class="text-sm font-bold text-white ${isAI ? 'text-cyan-400' : ''}">${user.name}</div>
+                                <div class="text-[10px] text-[var(--text-sub)] capitalize">${user.role}</div>
+                            </div>
                         </div>
+                        <div class="unread-badge ${unread > 0 && activeChatId !== email ? 'show' : ''}">${unread}</div>
                     </div>
                 `;
             });
@@ -570,6 +609,8 @@
         function openChat(id, type) {
             activeChatId = id;
             activeChatType = type;
+            markAsRead(id); // Mark read upon opening
+
             document.getElementById('adminPanel').classList.remove('active');
             document.getElementById('groupPanel').classList.remove('active');
             document.getElementById('profilePanel').classList.remove('active');
@@ -648,6 +689,9 @@
             }
             chatBox.innerHTML = html;
             chatBox.scrollTop = chatBox.scrollHeight; 
+            
+            // Re-mark read when new message arrives in active chat
+            if (activeChatId) markAsRead(activeChatId);
         }
 
         // --- GEMINI & MESSAGING ---
@@ -772,7 +816,6 @@
             try {
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'usersList'), { users: updatedUsers }, {merge: true});
                 prefixInput.value = '';
-                // The onSnapshot listener will update ALLOWED_USERS and re-render
             } catch(e) {
                 console.error("Failed to add user", e);
             }
