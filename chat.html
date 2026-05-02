@@ -256,15 +256,31 @@
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, collection, addDoc, doc, setDoc, onSnapshot, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // Firebase Setup
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        // --- FIREBASE SETUP (FOR GITHUB) ---
+        // GitHub e deploy korar jonno nicher myFirebaseConfig object e apnar Firebase Console er credentials bosiye din
+        const myFirebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // Use environment config if available (for Canvas), otherwise use myFirebaseConfig (for GitHub)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' && Object.keys(__firebase_config).length > 0 ? JSON.parse(__firebase_config) : myFirebaseConfig;
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-workspace-app';
+        const appId = typeof __app_id !== 'undefined' && __app_id ? __app_id : 'pranto-chat-pro-app';
 
         // --- GEMINI API CONFIGURATION ---
-        const apiKey = ""; 
+        const canvasApiKey = ""; // Do not change this (Canvas auto-injects here)
+        // GitHub er jonno nicher variable e apnar Gemini API key boshiye din
+        const GITHUB_GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
+        
+        const finalApiKey = canvasApiKey || GITHUB_GEMINI_API_KEY;
+
         async function fetchWithRetry(url, options, maxRetries = 5) {
             let delays = [1000, 2000, 4000, 8000, 16000];
             for (let i = 0; i < maxRetries; i++) {
@@ -280,7 +296,7 @@
         }
 
         async function callGeminiAPI(promptText, systemPrompt = "") {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${finalApiKey}`;
             const payload = { contents: [{ parts: [{ text: promptText }] }] };
             if (systemPrompt) payload.systemInstruction = { parts: [{ text: systemPrompt }] };
             const data = await fetchWithRetry(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -288,7 +304,6 @@
         }
 
         // --- DATA & CONFIG ---
-        // Base users. Added users will be merged with this.
         const BASE_USERS = {
             'pranto.rodrix@leverngear.com': { name: 'Pranto Rodrix', role: 'admin', color: 'from-blue-500 to-indigo-600', short: 'PR' },
             'rakibul.sumon@leverngear.com': { name: 'Rakibul Sumon', role: 'user', color: 'from-emerald-500 to-teal-600', short: 'RS' },
@@ -304,9 +319,9 @@
         let allCloudMessages = [];
         let groupMembers = Object.keys(ALLOWED_USERS).filter(e => e !== 'gemini@workspace.ai');
         let isWaitingForAI = false;
-        let unreadCounts = {}; // Keep track of unread messages
+        let unreadCounts = {};
 
-        // Make functions globally available
+        // Expose functions globally for HTML event handlers
         window.login = login;
         window.logout = logout;
         window.showAdminLogin = showAdminLogin;
@@ -325,7 +340,7 @@
 
         // --- HELPER FUNCTIONS ---
         function getEmailFromPrefix(prefix) { return `${prefix.toLowerCase()}@leverngear.com`; }
-        function getPrefixFromEmail(email) { return email.split('@')[0]; }
+        function formatName(prefix) { return prefix.split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
         function generateUserShort(email) {
             const parts = email.split('@')[0].split('.');
             if(parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
@@ -335,9 +350,6 @@
             const colors = ['from-red-500 to-orange-500', 'from-pink-500 to-rose-500', 'from-green-500 to-emerald-500', 'from-yellow-500 to-amber-500'];
             return colors[Math.floor(Math.random() * colors.length)];
         }
-        function formatName(prefix) {
-            return prefix.split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-        }
 
         // --- AVATAR LOGIC ---
         function handleAvatarUpload(event) {
@@ -345,9 +357,7 @@
             if(!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
-                const base64Image = e.target.result;
-                // Save to local storage for this user
-                localStorage.setItem(`avatar_${currentUser.email}`, base64Image);
+                localStorage.setItem(`avatar_${currentUser.email}`, e.target.result);
                 updateAvatarsInUI();
             };
             reader.readAsDataURL(file);
@@ -355,9 +365,7 @@
 
         function getUserAvatarHTML(email, userObj, extraClasses="") {
             const localImg = localStorage.getItem(`avatar_${email}`);
-            if(localImg) {
-                return `<img src="${localImg}" class="avatar-img ${extraClasses}">`;
-            }
+            if(localImg) return `<img src="${localImg}" class="avatar-img ${extraClasses}">`;
             if(email === 'gemini@workspace.ai') return `<i class="fas fa-robot ${extraClasses}"></i>`;
             return `<span class="${extraClasses}">${userObj.short}</span>`;
         }
@@ -373,7 +381,7 @@
             profAv.className = `w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-white overflow-hidden bg-gradient-to-r ${currentUser.color}`;
             
             renderContacts();
-            if(activeChatId) openChat(activeChatId, activeChatType); // Refresh header
+            if(activeChatId) openChat(activeChatId, activeChatType);
         }
 
         // --- AUTH LOGIC ---
@@ -399,7 +407,7 @@
             const savedEmail = localStorage.getItem('workspace_active_user');
             if (savedEmail && savedEmail !== 'gemini@workspace.ai') {
                 document.getElementById('loginOverlay').style.display = 'none';
-                initFirebaseAuth(savedEmail); 
+                initFirebaseAuth(); 
             } else {
                 document.getElementById('loginOverlay').style.display = 'flex';
             }
@@ -411,7 +419,6 @@
             if(!prefix) return;
             const email = getEmailFromPrefix(prefix);
             
-            // Check local/base first, cloud will validate later
             if (ALLOWED_USERS[email] && email !== 'gemini@workspace.ai') {
                 localStorage.setItem('workspace_active_user', email);
                 err.classList.add('hidden');
@@ -424,13 +431,13 @@
 
         function logout() {
             localStorage.removeItem('workspace_active_user');
-            location.reload(); 
+            window.location.href = "index.html"; 
         }
 
         function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
 
         // --- FIREBASE INIT & SYNC ---
-        async function initFirebaseAuth(savedEmail) {
+        async function initFirebaseAuth() {
             document.getElementById('loadingSpinner').style.display = 'inline-block';
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -441,6 +448,7 @@
             } catch(e) {
                 console.error("Auth Error:", e);
                 document.getElementById('loadingSpinner').style.display = 'none';
+                alert("Database connection failed. Check config or internet.");
             }
         }
 
@@ -472,8 +480,7 @@
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'usersList');
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    const cloudUsers = docSnap.data().users || {};
-                    ALLOWED_USERS = { ...BASE_USERS, ...cloudUsers };
+                    ALLOWED_USERS = { ...BASE_USERS, ...docSnap.data().users };
                 } else {
                     await setDoc(docRef, { users: BASE_USERS });
                 }
@@ -491,12 +498,9 @@
                 snapshot.forEach(doc => msgs.push({ id: doc.id, ...doc.data() }));
                 allCloudMessages = msgs.sort((a, b) => a.timestamp - b.timestamp);
                 document.getElementById('loadingSpinner').style.display = 'none';
-                
-                // Read/Unread logic setup
                 calculateUnread();
-
                 if (activeChatId) renderMessages();
-                renderContacts(); // Re-render to show unread badges
+                renderContacts(); 
             }, (err) => { console.error("Msg Sync Error", err); });
 
             // Listen for Group Settings
@@ -517,7 +521,7 @@
                         }
                     }
                 });
-            }, (err) => { console.error("Group Sync Error", err); });
+            });
             
             // Listen for User Additions
             onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'usersList'), (docSnap) => {
@@ -537,11 +541,8 @@
             const lastRead = JSON.parse(localStorage.getItem('workspace_last_read')) || {};
 
             allCloudMessages.forEach(m => {
-                if (m.sender === currentUser.email) return; // Ignore my own msgs
-                
+                if (m.sender === currentUser.email) return; 
                 let chatIdentifier = m.chatId === 'group' ? 'group' : m.sender;
-                
-                // If it's a personal chat, make sure the message was meant for me
                 if (m.chatId !== 'group' && !m.chatId.includes(currentUser.email)) return;
 
                 if (!lastRead[chatIdentifier] || m.timestamp > lastRead[chatIdentifier]) {
@@ -563,7 +564,6 @@
             const container = document.getElementById('contactsContainer');
             container.innerHTML = '';
 
-            // 1. Group
             const isGroupMember = groupMembers.includes(currentUser.email);
             const grpClass = activeChatId === 'group' ? 'active' : '';
             const grpUnread = unreadCounts['group'] || 0;
@@ -581,7 +581,6 @@
                 </div>
             `;
 
-            // 2. Personal
             Object.keys(ALLOWED_USERS).forEach(email => {
                 if (email === currentUser.email) return; 
                 const user = ALLOWED_USERS[email];
@@ -609,7 +608,7 @@
         function openChat(id, type) {
             activeChatId = id;
             activeChatType = type;
-            markAsRead(id); // Mark read upon opening
+            markAsRead(id);
 
             document.getElementById('adminPanel').classList.remove('active');
             document.getElementById('groupPanel').classList.remove('active');
@@ -689,8 +688,6 @@
             }
             chatBox.innerHTML = html;
             chatBox.scrollTop = chatBox.scrollHeight; 
-            
-            // Re-mark read when new message arrives in active chat
             if (activeChatId) markAsRead(activeChatId);
         }
 
@@ -705,7 +702,7 @@
             const tempVal = inp.value; inp.value = "Enhancing with AI ✨...";
 
             try {
-                const systemPrompt = "You are a professional communication assistant. Rewrite the user's text to make it sound highly professional, clear, concise, and polite. Return ONLY the rewritten text, without any conversational filler.";
+                const systemPrompt = "You are a professional communication assistant. Rewrite the user's text to make it sound highly professional, clear, concise, and polite. Return ONLY the rewritten text.";
                 const response = await callGeminiAPI(originalText, systemPrompt);
                 inp.value = response.trim();
             } catch (error) {
@@ -770,7 +767,6 @@
             panel.classList.toggle('active');
         }
 
-        // ADMIN PANEL: Manage allowed users
         function renderAdminPanel() {
             const list = document.getElementById('adminUsersList');
             list.innerHTML = '';
@@ -778,7 +774,6 @@
             Object.keys(ALLOWED_USERS).forEach(email => {
                 if (email === 'gemini@workspace.ai') return; 
                 const u = ALLOWED_USERS[email];
-                const isBase = Object.keys(BASE_USERS).includes(email);
                 
                 list.innerHTML += `
                     <div class="flex justify-between items-center bg-[rgba(255,255,255,0.02)] p-2 rounded border border-[rgba(255,255,255,0.05)]">
@@ -821,7 +816,6 @@
             }
         }
 
-        // GROUP PANEL: Manage group members
         function renderGroupPanel() {
             const list = document.getElementById('groupMembersList');
             list.innerHTML = '';
@@ -868,6 +862,10 @@
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groupSettings', 'members'), { emails: newMembers });
             } catch(e) {}
         }
+
+        // Init Flow
+        checkLocalAuth();
+
     </script>
 </body>
 </html>
