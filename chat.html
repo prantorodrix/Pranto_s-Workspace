@@ -320,7 +320,7 @@
         window.toggleProfilePanel = toggleProfilePanel;
         window.toggleGroupMember = toggleGroupMember;
         window.addNewUser = addNewUser;
-        window.handleEnter = handleEnter; // FIXED: assigned globally
+        window.handleEnter = handleEnter; 
         window.handleAvatarUpload = handleAvatarUpload;
 
         // --- HELPER FUNCTIONS ---
@@ -424,7 +424,7 @@
 
         function logout() {
             localStorage.removeItem('workspace_active_user');
-            window.location.href = "index.html"; 
+            location.reload(); 
         }
 
         function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
