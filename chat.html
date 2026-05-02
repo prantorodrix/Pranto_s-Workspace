@@ -304,6 +304,7 @@
         }
 
         // --- DATA & CONFIG ---
+        // Base users. Added users will be merged with this.
         const BASE_USERS = {
             'pranto.rodrix@leverngear.com': { name: 'Pranto Rodrix', role: 'admin', color: 'from-blue-500 to-indigo-600', short: 'PR' },
             'rakibul.sumon@leverngear.com': { name: 'Rakibul Sumon', role: 'user', color: 'from-emerald-500 to-teal-600', short: 'RS' },
@@ -431,7 +432,12 @@
 
         function logout() {
             localStorage.removeItem('workspace_active_user');
-            window.location.href = "index.html"; 
+            // Navigate to index.html OR just reload if it is index.html already
+            if (window.location.pathname.endsWith('index.html')) {
+                location.reload();
+            } else {
+                window.location.href = "index.html"; 
+            }
         }
 
         function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
@@ -448,7 +454,6 @@
             } catch(e) {
                 console.error("Auth Error:", e);
                 document.getElementById('loadingSpinner').style.display = 'none';
-                alert("Database connection failed. Check config or internet.");
             }
         }
 
