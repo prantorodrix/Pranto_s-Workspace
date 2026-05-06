@@ -148,6 +148,7 @@
                 <div class="col-lg-2 order-lg-1">
                     <div class="glass-card p-2 h-100 d-flex flex-column">
                         <span class="section-label text-primary ps-2">Updated EOB</span>
+                        <input type="text" id="manualTicketInput" class="form-control mb-2 fw-bold text-info" placeholder="Manual Ticket No">
                         <textarea id="eobUpdatedInput" class="form-control no-scrollbar flex-grow-1" placeholder="Paste Full EOB Text here..."></textarea>
                     </div>
                 </div>
@@ -193,12 +194,35 @@
         document.addEventListener('DOMContentLoaded', () => { initTheme(); initSidebar(); initPersistent(); });
         
         const els = {
-            process: document.getElementById('processBtn'), clear: document.getElementById('clearBtn'), eobIn: document.getElementById('eobUpdatedInput'),
+            process: document.getElementById('processBtn'), clear: document.getElementById('clearBtn'), eobIn: document.getElementById('eobUpdatedInput'), manualTkt: document.getElementById('manualTicketInput'),
             results: document.getElementById('idr-results-container'), eobBar: document.getElementById('eob-display-bar'), eobContent: document.getElementById('eob-content'),
             eobGrid: document.getElementById('eob-details-grid'), resCount: document.getElementById('res-count'), errorDiv: document.getElementById('sidebar-errors'),
             idr24: [1,2,3,4].map(i => document.getElementById(`idrTextInput${i}`)), idr22: [1,2,3,4].map(i => document.getElementById(`idr2022TextInput${i}`)), idr26: [1,2,3,4].map(i => document.getElementById(`idr2026TextInput${i}`))
         };
         let globalData = { eob: null, idrRows: [] };
+
+        // Manual ticket typing live update (No full re-render, saves user dropdown changes)
+        els.manualTkt.addEventListener('input', () => { 
+            const manVal = els.manualTkt.value.trim();
+            const currentTkt = manVal.toUpperCase() || (globalData.eob ? globalData.eob.tkt.toUpperCase() : null);
+            
+            const eobDisp = document.querySelector('.eob-ticket-disp');
+            if (eobDisp) { eobDisp.innerText = manVal || (globalData.eob ? globalData.eob.tkt : 'N/A'); } 
+            else if (!globalData.eob && manVal) { renderEOB(); } // Render EOB bar if missing
+
+            if (globalData.idrRows.length > 0) {
+                document.querySelectorAll('.idr-card').forEach((card, i) => {
+                    const r = globalData.idrRows[i];
+                    const tktEl = card.querySelector('.ticket-val');
+                    if (tktEl) {
+                        tktEl.classList.remove('bg-match', 'bg-mismatch');
+                        // Case insensitive match checking
+                        if (currentTkt && r.ticket.toUpperCase() !== currentTkt) { tktEl.classList.add('bg-mismatch'); } 
+                        else { tktEl.classList.add('bg-match'); }
+                    }
+                });
+            }
+        });
 
         const fmtMoney = (n) => isNaN(n) ? '$0.00' : '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         const parseMoney = (s) => parseFloat((s||'').replace(/[$,\s]/g, '')) || 0;
@@ -248,16 +272,21 @@
         });
 
         function renderEOB() {
-            if(!globalData.eob) { els.eobBar.classList.remove('visible'); els.eobGrid.innerHTML = `<div class="text-center text-muted small opacity-50">Waiting for extraction...</div>`; return; }
-            const e = globalData.eob, sep = `<span class="opacity-25 mx-2">|</span>`;
-            els.eobContent.innerHTML = `<span class="text-info eob-ticket-disp">${e.tkt}</span>${sep}<span>${e.clm}</span>${sep}<span class="text-warning">Bill: ${fmtMoney(e.billed)}</span>${sep}<span class="text-success">Paid: ${fmtMoney(e.paid)}</span>${sep}<span class="text-danger">PT: ${fmtMoney(e.ptResp)}</span>${sep}<span id="bar-addl" class="fw-bold">Addl: ${fmtMoney(e.addl)}</span><span class="ms-auto small fw-normal opacity-50 text-truncate" style="max-width:150px">${e.prov}</span>`;
+            const manTkt = els.manualTkt.value.trim();
+            if(!globalData.eob && !manTkt) { els.eobBar.classList.remove('visible'); els.eobGrid.innerHTML = `<div class="text-center text-muted small opacity-50">Waiting for extraction...</div>`; return; }
+            
+            const e = globalData.eob || { tkt: manTkt, clm: 'N/A', billed: 0, paid: 0, ptResp: 0, addl: 0, prov: 'N/A' };
+            const sep = `<span class="opacity-25 mx-2">|</span>`;
+            const dispTkt = manTkt || e.tkt; // Manual ticket explicitly overriding EOB display
+            
+            els.eobContent.innerHTML = `<span class="text-info eob-ticket-disp">${dispTkt}</span>${sep}<span>${e.clm}</span>${sep}<span class="text-warning">Bill: ${fmtMoney(e.billed)}</span>${sep}<span class="text-success">Paid: ${fmtMoney(e.paid)}</span>${sep}<span class="text-danger">PT: ${fmtMoney(e.ptResp)}</span>${sep}<span id="bar-addl" class="fw-bold">Addl: ${fmtMoney(e.addl)}</span><span class="ms-auto small fw-normal opacity-50 text-truncate" style="max-width:150px">${e.prov}</span>`;
             els.eobBar.classList.add('visible');
             els.eobGrid.innerHTML = `<div class="eob-table-row"><span>Billed</span> <span>${fmtMoney(e.billed)}</span></div><div class="eob-table-row"><span>Paid</span> <span>${fmtMoney(e.paid)}</span></div><div class="eob-table-row text-info mb-2"><span>Addl</span> <span>${fmtMoney(e.addl)}</span></div><div class="eob-table-row border-top border-secondary pt-2 text-warning"><span>Adj w/ PT</span> <span>${fmtMoney(e.billed - e.paid - e.ptResp)}</span></div><div class="eob-table-row text-danger"><span>Adj w/o PT</span> <span>${fmtMoney(e.billed - e.paid)}</span></div>`;
         }
 
         function renderSidebar() {
             els.results.innerHTML = ''; els.resCount.innerText = globalData.idrRows.length;
-            const eobTkt = globalData.eob ? globalData.eob.tkt : null;
+            const eobTkt = els.manualTkt.value.trim().toUpperCase() || (globalData.eob ? globalData.eob.tkt.toUpperCase() : null);
 
             globalData.idrRows.forEach((r, i) => {
                 const card = document.createElement('div'); card.className = 'idr-card glass-card shadow-sm mb-3';
@@ -266,7 +295,8 @@
                 const typeBadge = r.idrType ? `<span class="badge bg-warning text-dark me-1" style="font-size:0.65rem; border-radius: 0 0 6px 0;">${r.idrType}</span>` : '';
                 
                 let tktClass = 'bg-match';
-                if(eobTkt && r.ticket !== eobTkt) { tktClass = 'bg-mismatch'; }
+                // Strict uppercase compare
+                if(eobTkt && r.ticket.toUpperCase() !== eobTkt) { tktClass = 'bg-mismatch'; }
 
                 let singleBatchHtml = '';
                 if(r.idrType === 'Single-Batch') {
@@ -347,14 +377,16 @@
             let allTkts = [];
             const rows = [];
             
-            // --- Validations ---
-            if(!globalData.eob) {
-                errors.push("⚠️ EOB DETAILS MISSING: PLEASE EXTRACT EOB DATA FIRST.");
+            // --- Validations logic adjusted for Manual Ticket Input ---
+            if(!globalData.eob && !els.manualTkt.value.trim()) {
+                errors.push("⚠️ EOB DETAILS OR TICKET MISSING: PLEASE EXTRACT EOB DATA OR ENTER MANUAL TICKET NUMBER FIRST.");
             } else {
-                const eobTkt = globalData.eob.tkt;
+                // Strict tracking of the final ticket ensuring manual is prioritised and uppercase.
+                const eobTkt = els.manualTkt.value.trim().toUpperCase() || (globalData.eob ? globalData.eob.tkt.toUpperCase() : 'N/A');
+                
                 document.querySelectorAll('.idr-card').forEach((card, i) => {
                     const org = globalData.idrRows[i];
-                    allTkts.push(org.ticket);
+                    allTkts.push(org.ticket.trim().toUpperCase()); // Store uppercase for safe comparing
                     const wl = card.querySelector('.wl-in').value.toLowerCase();
                     const ref = card.querySelector('.ref-in').value.toLowerCase();
                     
@@ -387,7 +419,10 @@
                     errors.push("⚠️ TICKET MISMATCH: MULTIPLE DIFFERENT TICKET NUMBERS FOUND IN IDR ROWS.");
                 } else if(uniqueTkts.length === 1 && uniqueTkts[0] !== eobTkt) {
                     errors.push(`⚠️ TICKET MISMATCH: EOB TICKET (${eobTkt}) DOES NOT MATCH IDR TICKET (${uniqueTkts[0]}).`);
-                    document.querySelectorAll('.ticket-val').forEach(el => el.classList.add('bg-mismatch'));
+                    document.querySelectorAll('.ticket-val').forEach(el => {
+                        el.classList.remove('bg-match'); 
+                        el.classList.add('bg-mismatch');
+                    });
                 }
             }
 
