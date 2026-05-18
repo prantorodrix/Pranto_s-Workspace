@@ -91,7 +91,7 @@
     </nav>
 
     <!-- --- Main Content Container --- -->
-    <div class="max-w-7xl mx-auto px-4 md:px-8 mt-6">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 mt-6 animate-fade-in">
         
         <!-- Upload & Control Box Section -->
         <div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-100/60 p-8 mb-8 transition-all duration-300 hover:shadow-2xl">
@@ -178,6 +178,26 @@
                 </table>
             </div>
         </div>
+
+        <!-- --- Premium Footer Section --- -->
+        <footer class="mt-16 border-t border-slate-200/60 pt-8 pb-12 text-center">
+            <div class="flex flex-col items-center gap-4">
+                <div class="flex items-center gap-2 text-indigo-600 font-semibold text-sm uppercase tracking-wider">
+                    <i class="fa-solid fa-scale-balanced text-lg"></i>
+                    <span>Federal IDR Final Payment Determination</span>
+                </div>
+                <p class="text-xs md:text-sm text-slate-500 max-w-3xl leading-relaxed">
+                    This workspace processes Independent Dispute Resolution (IDR) final payment determination documents under the No Surprises Act. It automatically scans medical provider and plan submissions, extracts claim numbers, CPT codes, approved out-of-network rates, and identifies the prevailing status.
+                </p>
+                <div class="h-px w-24 bg-slate-200 my-2"></div>
+                <p class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                    <span>Made with <i class="fa-solid fa-heart text-rose-500 animate-pulse"></i> by</span>
+                    <span class="font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Pranto's Workspace</span>
+                    <span>© 2026</span>
+                </p>
+            </div>
+        </footer>
+
     </div>
 
     <!-- --- Toast Notifications System --- -->
@@ -346,7 +366,7 @@
 
                 // --- 2. MULTI-TIER SMART VALIDATOR (GLOBAL LIST) ---
                 // Federal mandated structures follow exactly 14-character unique alphanumeric claims (starts with 60)
-                let claimRegex = /\b(60[A-Z0-9]{12})\b/gi;
+                let claimRegex = /\b(60[A-Z0-9]{11,15})\b/gi;
                 let allClaims = [];
                 let cMatch;
                 while ((cMatch = claimRegex.exec(text)) !== null) {
@@ -365,75 +385,64 @@
                 }
                 allCpts = [...new Set(allCpts)];
 
-                // --- 3. HIGH ACCURACY SENTENCE-BASED GLOBAL EXTRACTOR ---
+                // --- 3. ROBUST TEMPLATE-BASED SEGMENTATION FOR TRUE DETERMINATIONS ---
                 let determinations = [];
-                
-                // HHS system uses an official rigid template sentence for final legal determinations.
-                // We run a global regular expression match directly on the normalized text stream.
-                let strictSentencePattern = /determined\s+that\s+(?:the\s+)?(?:out-of-network\s+)?payment\s+amount\s+of\s*(?:\\\$|\$)?\s*([\d,.]+)\s+offered\s+by\s+(.*?)\s+is\s+(?:the\s+)?appropriate\s+(?:out-of-network\s+)?rate\s+for\s+(?:the\s+)?(?:item\s+or\s+service|service|code)\s*([A-Z0-9]{4,5})\s+on\s+(?:this\s+claim|claim\s+number|claim)\s*([A-Z0-9]{10,18})/gi;
+                let textLower = text.toLowerCase();
+                let splitKeyword = "after considering all permissible information";
 
-                let match;
-                while ((match = strictSentencePattern.exec(text)) !== null) {
-                    let amt = "$" + match[1].trim();
-                    let winner = match[2].trim();
-                    let cpt = match[3].trim();
-                    let claimNo = match[4].trim();
-
-                    // Map elements without arbitrary duplicate matching filters to ensure we catch every distinct page occurrence
-                    determinations.push({
-                        amount: amt,
-                        winner: winner,
-                        cpt: cpt,
-                        claim: claimNo
-                    });
-                }
-
-                // --- 4. BACKWARD FALLBACK SYSTEM (IF TEMPLATE FAILED) ---
-                if (determinations.length === 0) {
-                    let splitKeyword = "after considering all permissible information";
-                    if (text.toLowerCase().includes(splitKeyword)) {
-                        let chunks = text.split(new RegExp(splitKeyword, "i"));
+                if (textLower.includes(splitKeyword)) {
+                    // Split the document by the HHS mandated boiler-plate pattern for official determinations
+                    let chunks = text.split(new RegExp(splitKeyword, "i"));
+                    
+                    // Each chunk (excluding index 0 which contains introductory info) corresponds to exactly one TRUE determination
+                    for (let c = 1; c < chunks.length; c++) {
+                        let chunk = chunks[c].substring(0, 600); // 600 characters is enough to capture the determination details sentence
                         
-                        for (let c = 1; c < chunks.length; c++) {
-                            let chunk = chunks[c].substring(0, 600);
-                            
-                            let amountMatch = chunk.match(/\$\s*([\d,]+\.\d{2})/) || chunk.match(/(?:payment\s+amount\s+of|amount\s+of)\s*(?:\\\$|\$)?\s*([\d,]+\.\d{2})/i) || chunk.match(/\b([\d,]+\.\d{2})\b/);
-                            let amt = amountMatch ? "$" + amountMatch[1].trim() : "-";
+                        // Amount Match (Find the selected rate)
+                        let amountMatch = chunk.match(/\$\s*([\d,]+\.\d{2})/) || chunk.match(/(?:payment\s+amount\s+of|amount\s+of)\s*(?:\\\$|\$)?\s*([\d,]+\.\d{2})/i) || chunk.match(/\b([\d,]+\.\d{2})\b/);
+                        let amt = amountMatch ? "$" + amountMatch[1].trim() : "-";
 
-                            let winnerMatch = chunk.match(/offered\s+by\s+([^,.]+?)\s+(?:is\s+the|is\s+appropriate|is\s+selected)/i);
-                            let winner = winnerMatch ? winnerMatch[1].trim() : "";
+                        // Winner Match
+                        let winnerMatch = chunk.match(/offered\s+by\s+([^,.]+?)\s+(?:is\s+the|is\s+appropriate|is\s+selected)/i);
+                        let winner = winnerMatch ? winnerMatch[1].trim() : "";
 
-                            let chunkClaimMatch = chunk.match(/\b(60[A-Z0-9]{11,15})\b/i);
-                            let claimNo = "-";
-                            if (chunkClaimMatch) {
-                                claimNo = chunkClaimMatch[1].toUpperCase();
-                            } else if (allClaims[c - 1]) {
-                                claimNo = allClaims[c - 1];
-                            } else if (allClaims.length > 0) {
-                                claimNo = allClaims[0];
+                        // Claim No Match inside this isolated chunk
+                        let chunkClaimMatch = chunk.match(/\b(60[A-Z0-9]{11,15})\b/i);
+                        let claimNo = "-";
+                        if (chunkClaimMatch) {
+                            claimNo = chunkClaimMatch[1].toUpperCase();
+                        } else if (allClaims[c - 1]) {
+                            claimNo = allClaims[c - 1];
+                        } else if (allClaims.length > 0) {
+                            claimNo = allClaims[0];
+                        }
+
+                        // CPT Match inside this isolated chunk
+                        let chunkCptMatch = chunk.match(/(?:service|code|cpt|item)[\s\S]{0,150}?\b(\d{5})\b/i) || chunk.match(/\b(\d{5})\b/);
+                        let cpt = "-";
+                        if (chunkCptMatch) {
+                            cpt = chunkCptMatch[1];
+                        } else if (allCpts[c - 1]) {
+                            cpt = allCpts[c - 1];
+                        } else if (allCpts.length > 0) {
+                            cpt = allCpts[0];
+                        }
+
+                        if (amt !== "-" || claimNo !== "-") {
+                            let uniqueKey = amt + "_" + claimNo;
+                            if (!determinations.some(d => (d.amount + "_" + d.claim) === uniqueKey)) {
+                                determinations.push({
+                                    amount: amt,
+                                    winner: winner,
+                                    cpt: cpt,
+                                    claim: claimNo
+                                });
                             }
-
-                            let chunkCptMatch = chunk.match(/(?:service|code|cpt|item)[\s\S]{0,150}?\b(\d{5})\b/i) || chunk.match(/\b(\d{5})\b/);
-                            let cpt = "-";
-                            if (chunkCptMatch) {
-                                cpt = chunkCptMatch[1];
-                            } else if (allCpts[c - 1]) {
-                                cpt = allCpts[c - 1];
-                            } else if (allCpts.length > 0) {
-                                cpt = allCpts[0];
-                            }
-
-                            determinations.push({
-                                amount: amt,
-                                winner: winner,
-                                cpt: cpt,
-                                claim: claimNo
-                            });
                         }
                     }
                 }
 
-                // Final flat fall-back
+                // Global Fallback if chunk sequential mapping is absolutely missing or if split was not found
                 if (determinations.length === 0) {
                     let amtM = text.match(/\$\s*([\d,]+\.\d{2})/g) || [];
                     let maxCount = Math.max(amtM.length, allClaims.length);
@@ -447,19 +456,42 @@
                     }
                 }
 
-                // --- 5. WIN / LOSE SYSTEM (BCBS DETECTION) ---
-                let status = "Win";
-                let prevailingMatch = text.match(/(?:determined|determines)\s+that\s+(.*?)\s+is\s+the\s+prevailing\s+party/i);
-                let prevailing = prevailingMatch ? prevailingMatch[1].trim() : "";
+                // --- 4. WIN / LOSE SYSTEM (BCBS DETECTION) ---
+                let status = "Win"; // Default to Win (Since our providers Midland/Killeen are the Initiating Party)
+                let textUpper = text.toUpperCase();
 
-                let isBcbsWinner = determinations.some(d => d.winner.toUpperCase().includes("BCBS") || d.winner.toUpperCase().includes("BLUE CROSS") || d.winner.toUpperCase().includes("TX"));
-                let isOverallBcbs = prevailing.toUpperCase().includes("BCBS") || prevailing.toUpperCase().includes("BLUE CROSS") || prevailing.toUpperCase().includes("TX");
+                // 1. Check if BCBS's offer is mentioned as the appropriate or selected rate in the text
+                let isBcbsAppropriate = textUpper.includes("OFFERED BY BCBS") || 
+                                        textUpper.includes("OFFERED BY BLUE CROSS") || 
+                                        textUpper.includes("BCBS OF TX'S OFFER BEST REPRESENTS") ||
+                                        textUpper.includes("BCBS'S OFFER BEST REPRESENTS") ||
+                                        textUpper.includes("BLUE CROSS'S OFFER BEST REPRESENTS");
 
-                if (isBcbsWinner || isOverallBcbs) {
+                // 2. Check if BCBS of TX is explicitly mentioned as the prevailing party in the text
+                let isBcbsPrevailing = textUpper.includes("BCBS OF TX IS THE PREVAILING PARTY") || 
+                                       textUpper.includes("BCBS IS THE PREVAILING PARTY") || 
+                                       textUpper.includes("BLUE CROSS IS THE PREVAILING PARTY");
+
+                // 3. Check if Non-Initiating Party (NIP) prevailed
+                let isNipPrevailed = textUpper.includes("NON-INITIATING PARTY HAS PREVAILED") || 
+                                     textUpper.includes("NON-INITIATING PARTY IS THE PREVAILING") || 
+                                     textUpper.includes("NIP HAS PREVAILED") || 
+                                     textUpper.includes("NIP IS THE PREVAILING");
+
+                // 4. Check if any parsed determination winner points to BCBS/Blue Cross
+                let isBcbsWinnerInDets = determinations.some(d => 
+                    d.winner && (
+                        d.winner.toUpperCase().includes("BCBS") || 
+                        d.winner.toUpperCase().includes("BLUE CROSS") || 
+                        d.winner.toUpperCase().includes("TX")
+                    )
+                );
+
+                if (isBcbsAppropriate || isBcbsPrevailing || isNipPrevailed || isBcbsWinnerInDets) {
                     status = "Lose";
                 }
 
-                // --- 6. RENDER DATA TO DOCUMENT TABLE ---
+                // --- 5. RENDER DATA TO DOCUMENT TABLE ---
                 let statusClass = status === "Win" ? "win-text" : "lose-text";
                 
                 if (determinations.length > 0) {
