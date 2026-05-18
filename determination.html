@@ -150,6 +150,53 @@
             </div>
         </div>
 
+        <!-- --- Premium Stats Summary Cards Dashboard --- -->
+        <div id="summaryCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 hidden fade-in">
+            <!-- Total Disputes Card -->
+            <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Disputes</p>
+                    <h3 id="statTotalDisputes" class="text-3xl font-bold text-slate-900 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+            </div>
+            
+            <!-- Total Determinations Card -->
+            <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Determinations</p>
+                    <h3 id="statTotalDets" class="text-3xl font-bold text-slate-900 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+            </div>
+            
+            <!-- Wins Card -->
+            <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Wins</p>
+                    <h3 id="statTotalWins" class="text-3xl font-bold text-emerald-600 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+            
+            <!-- Losses Card -->
+            <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Losses</p>
+                    <h3 id="statTotalLosses" class="text-3xl font-bold text-rose-600 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+            </div>
+        </div>
+
         <!-- --- Table Container Section --- -->
         <div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-100/60 overflow-hidden hidden transition-all duration-300" id="tableContainer">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
@@ -240,6 +287,7 @@
             document.getElementById('tableContainer').classList.add('hidden');
             document.getElementById('progressContainer').classList.add('hidden');
             document.getElementById('copyBtn').classList.add('hidden');
+            document.getElementById('summaryCardsContainer').classList.add('hidden');
             extractedResults = [];
             showToast("Workspace completely reset!");
         }
@@ -286,11 +334,13 @@
             const processBtn = document.getElementById('processBtn');
             const copyBtn = document.getElementById('copyBtn');
             const tableContainer = document.getElementById('tableContainer');
+            const summaryCardsContainer = document.getElementById('summaryCardsContainer');
 
             // Workspace table reset kora hocche
             tableBody.innerHTML = "";
             tableContainer.classList.add('hidden');
             copyBtn.classList.add('hidden');
+            summaryCardsContainer.classList.add('hidden');
             progressContainer.classList.remove('hidden');
             processBtn.disabled = true;
 
@@ -351,10 +401,13 @@
             const copyBtn = document.getElementById('copyBtn');
             const processBtn = document.getElementById('processBtn');
             const totalCountBadge = document.getElementById('totalCountBadge');
+            const summaryCardsContainer = document.getElementById('summaryCardsContainer');
 
             tableBody.innerHTML = "";
             let disputeSerial = 0;
             let totalRowsCount = 0;
+            let totalWinsCount = 0;
+            let totalLossesCount = 0;
 
             extractedResults.forEach((item) => {
                 let text = item.text;
@@ -365,8 +418,8 @@
                 let idr = idrMatch ? idrMatch[1] : "Unknown";
 
                 // --- 2. MULTI-TIER SMART VALIDATOR (GLOBAL LIST) ---
-                // Federal mandated structures follow exactly 14-character unique alphanumeric claims (starts with 60)
-                let claimRegex = /\b(60[A-Z0-9]{11,15})\b/gi;
+                // Scan globally first to gather all valid 13-17 char alphanumeric claim numbers starting with '60'
+                let claimRegex = /\b(60[A-Z0-9]{11,16})\b/gi;
                 let allClaims = [];
                 let cMatch;
                 while ((cMatch = claimRegex.exec(text)) !== null) {
@@ -407,7 +460,7 @@
                         let winner = winnerMatch ? winnerMatch[1].trim() : "";
 
                         // Claim No Match inside this isolated chunk
-                        let chunkClaimMatch = chunk.match(/\b(60[A-Z0-9]{11,15})\b/i);
+                        let chunkClaimMatch = chunk.match(/\b(60[A-Z0-9]{11,16})\b/i);
                         let claimNo = "-";
                         if (chunkClaimMatch) {
                             claimNo = chunkClaimMatch[1].toUpperCase();
@@ -429,13 +482,15 @@
                         }
 
                         if (amt !== "-" || claimNo !== "-") {
-                            let uniqueKey = amt + "_" + claimNo;
-                            if (!determinations.some(d => (d.amount + "_" + d.claim) === uniqueKey)) {
+                            // Unified chunk-index key mapping to strictly preserve all distinct sequential determinations (e.g. 7 determinations)
+                            let uniqueKey = amt + "_" + claimNo + "_" + cpt + "_" + c;
+                            if (!determinations.some(d => (d.amount + "_" + d.claim + "_" + d.cpt + "_" + d.chunkIndex) === uniqueKey)) {
                                 determinations.push({
                                     amount: amt,
                                     winner: winner,
                                     cpt: cpt,
-                                    claim: claimNo
+                                    claim: claimNo,
+                                    chunkIndex: c
                                 });
                             }
                         }
@@ -451,7 +506,8 @@
                             amount: amtM[k] ? amtM[k].trim() : "-",
                             winner: "",
                             cpt: allCpts[k] || (allCpts[0] || "-"),
-                            claim: allClaims[k] || "-"
+                            claim: allClaims[k] || "-",
+                            chunkIndex: k + 1
                         });
                     }
                 }
@@ -470,13 +526,15 @@
                 // 2. Check if BCBS of TX is explicitly mentioned as the prevailing party in the text
                 let isBcbsPrevailing = textUpper.includes("BCBS OF TX IS THE PREVAILING PARTY") || 
                                        textUpper.includes("BCBS IS THE PREVAILING PARTY") || 
-                                       textUpper.includes("BLUE CROSS IS THE PREVAILING PARTY");
+                                       textUpper.includes("BLUE CROSS IS THE PREVAILING PARTY") ||
+                                       textUpper.includes("BCBS OF TX IS RESPONSIBLE FOR PAYING");
 
                 // 3. Check if Non-Initiating Party (NIP) prevailed
                 let isNipPrevailed = textUpper.includes("NON-INITIATING PARTY HAS PREVAILED") || 
                                      textUpper.includes("NON-INITIATING PARTY IS THE PREVAILING") || 
                                      textUpper.includes("NIP HAS PREVAILED") || 
-                                     textUpper.includes("NIP IS THE PREVAILING");
+                                     textUpper.includes("NIP IS THE PREVAILING") ||
+                                     textUpper.includes("NON-PREVAILING PARTY IS THE INITIATING PARTY");
 
                 // 4. Check if any parsed determination winner points to BCBS/Blue Cross
                 let isBcbsWinnerInDets = determinations.some(d => 
@@ -489,6 +547,9 @@
 
                 if (isBcbsAppropriate || isBcbsPrevailing || isNipPrevailed || isBcbsWinnerInDets) {
                     status = "Lose";
+                    totalLossesCount++;
+                } else {
+                    totalWinsCount++;
                 }
 
                 // --- 5. RENDER DATA TO DOCUMENT TABLE ---
@@ -525,9 +586,16 @@
                 }
             });
 
+            // Update Premium Dashboard summary numbers
+            document.getElementById('statTotalDisputes').innerText = disputeSerial;
+            document.getElementById('statTotalDets').innerText = totalRowsCount;
+            document.getElementById('statTotalWins').innerText = totalWinsCount;
+            document.getElementById('statTotalLosses').innerText = totalLossesCount;
+
             // Status Badge text reload
             totalCountBadge.innerText = `${totalRowsCount} Record(s) Loaded`;
             tableContainer.classList.remove('hidden');
+            summaryCardsContainer.classList.remove('hidden');
             copyBtn.classList.remove('hidden');
             processBtn.disabled = false;
             showToast("Dataset loaded and formatted successfully!");
