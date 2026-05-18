@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- Stylesheet Section (Design Token abong layout styling) --- */
+        /* --- Stylesheet Section --- */
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
         
         body {
@@ -70,7 +70,6 @@
 
     <!-- --- Top Premium Navigation Bar --- -->
     <nav class="fixed top-4 left-4 right-4 z-50 max-w-7xl mx-auto px-6 py-3 rounded-full glass-nav shadow-md flex items-center justify-between">
-        <!-- Logo Left -->
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200">
                 <i class="fa-solid fa-briefcase text-lg"></i>
@@ -78,14 +77,12 @@
             <span class="font-bold text-lg bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent">Pranto's Workspace</span>
         </div>
 
-        <!-- Middle Menu Button -->
         <div class="flex items-center gap-1">
-            <a href="index.html" class="px-6 py-2 rounded-full text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-all duration-200 flex items-center gap-2">
+            <a href="#" class="px-6 py-2 rounded-full text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-all duration-200 flex items-center gap-2">
                 <i class="fa-solid fa-house"></i> Home
             </a>
         </div>
 
-        <!-- Right Side status tracker -->
         <div class="hidden md:flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Workspace Active</span>
@@ -154,7 +151,6 @@
 
         <!-- --- Premium Stats Summary Cards Dashboard --- -->
         <div id="summaryCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 hidden fade-in">
-            <!-- Total Disputes Card -->
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between">
                 <div>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Disputes</p>
@@ -165,7 +161,6 @@
                 </div>
             </div>
             
-            <!-- Total Determinations Card -->
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between">
                 <div>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Dets</p>
@@ -176,7 +171,6 @@
                 </div>
             </div>
             
-            <!-- Wins Card -->
             <div class="bg-white rounded-2xl border border-emerald-100 p-6 shadow-lg shadow-emerald-100/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between relative overflow-hidden">
                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-50 rounded-full z-0"></div>
                 <div class="z-10 relative">
@@ -188,7 +182,6 @@
                 </div>
             </div>
             
-            <!-- Losses Card -->
             <div class="bg-white rounded-2xl border border-rose-100 p-6 shadow-lg shadow-rose-100/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between relative overflow-hidden">
                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-rose-50 rounded-full z-0"></div>
                 <div class="z-10 relative">
@@ -238,7 +231,7 @@
                     <span>Federal IDR Final Payment Determination</span>
                 </div>
                 <p class="text-xs md:text-sm text-slate-500 max-w-3xl leading-relaxed font-medium">
-                    This workspace processes Independent Dispute Resolution (IDR) final payment determination documents under the No Surprises Act. It automatically scans medical provider and plan submissions, extracts claim numbers, CPT codes, approved out-of-network rates, and identifies the prevailing status.
+                    This workspace processes Independent Dispute Resolution (IDR) final payment determination documents under the No Surprises Act. It automatically scans medical provider and plan submissions, extracts claim numbers, CPT codes, approved out-of-network rates, and identifies the prevailing party.
                 </p>
                 <div class="h-1 w-16 bg-slate-200 rounded-full my-2"></div>
                 <p class="text-sm text-slate-500 font-semibold flex items-center gap-1.5">
@@ -255,12 +248,9 @@
     <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-slate-900/50 opacity-0 transition-all duration-300 translate-y-4 z-50 flex items-center gap-3 font-bold border border-slate-700"></div>
 
     <script>
-        // PDF.js global setup
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
         let extractedResults = []; 
 
-        // Update selected file count in UI
         function updateFileCount() {
             const input = document.getElementById('pdfFiles');
             const fileCountText = document.getElementById('fileCountText');
@@ -271,7 +261,6 @@
             }
         }
 
-        // Custom toast notification trigger logic
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
             toast.innerHTML = isError ? `<i class="fa-solid fa-circle-exclamation text-rose-500 text-lg"></i> ${msg}` : `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i> ${msg}`;
@@ -283,7 +272,6 @@
             }, 3500);
         }
 
-        // Clean all fields/records
         function clearAllData() {
             document.getElementById('pdfFiles').value = "";
             document.getElementById('fileCountText').innerText = "Support multiple files (Up to 100+ files)";
@@ -296,7 +284,6 @@
             showToast("Workspace completely reset!");
         }
 
-        // Read text from uploaded PDF safely
         function extractTextFromPDF(file) {
             return new Promise((resolve, reject) => {
                 if (!file) return resolve("");
@@ -319,7 +306,6 @@
             });
         }
 
-        // Extraction process start trigger
         async function processPDFs() {
             const fileInput = document.getElementById('pdfFiles');
             const filesArray = Array.from(fileInput.files);
@@ -339,7 +325,6 @@
             const tableContainer = document.getElementById('tableContainer');
             const summaryCardsContainer = document.getElementById('summaryCardsContainer');
 
-            // Workspace table reset
             tableBody.innerHTML = "";
             tableContainer.classList.add('hidden');
             copyBtn.classList.add('hidden');
@@ -350,10 +335,9 @@
             extractedResults = [];
             let totalFiles = filesArray.length;
 
-            // Sequential reading loop with safety guards
             for (let i = 0; i < totalFiles; i++) {
                 let file = filesArray[i];
-                if (!file || !file.name) continue; // Safe read property check
+                if (!file || !file.name) continue; 
                 
                 let text = await extractTextFromPDF(file);
                 if(text && text.trim().length > 50) {
@@ -361,9 +345,8 @@
                 }
             }
 
-            // Processing UI timeline speed setting (5 seconds)
             let currentPercent = 0;
-            let duration = 5000; 
+            let duration = 3000; 
             let intervalTime = 50; 
             let steps = duration / intervalTime;
             let increment = 100 / steps;
@@ -380,7 +363,7 @@
                 } else if (currentPercent < 50) {
                     progressStatus.innerHTML = `<i class="fa-solid fa-bolt animate-bounce text-indigo-500"></i> Analyzing CPT codes & Claims...`;
                 } else if (currentPercent < 75) {
-                    progressStatus.innerHTML = `<i class="fa-solid fa-bezier-curve text-pink-500"></i> Evaluating prevailing parties & offers...`;
+                    progressStatus.innerHTML = `<i class="fa-solid fa-bezier-curve text-pink-500"></i> Evaluating prevailing parties...`;
                 } else if (currentPercent < 100) {
                     progressStatus.innerHTML = `<i class="fa-solid fa-rectangle-list text-teal-500"></i> Formatting Excel ready rows...`;
                 } else {
@@ -394,7 +377,43 @@
             }, intervalTime);
         }
 
-        // Extracted variables table UI-te load korar mapping function
+        // Helper function for reliable block extraction
+        function extractDataFromBlock(textBlock) {
+            let amtStr = "Check PDF";
+            let cptStr = "Check PDF";
+            let claimStr = "Check PDF";
+
+            // 1. Amount Scanner
+            let amtMatch = textBlock.match(/(?:payment amount of|out-of-network rate|rate of)[\s\S]{1,60}?\$\s*([\d,]+\.\d{2})/i) || textBlock.match(/\$\s*([\d,]+\.\d{2})/);
+            if (amtMatch) amtStr = "$" + amtMatch[1];
+
+            // 2. CPT Scanner (Strict validation: Must start with 4 digits + 1 alphanumeric to avoid words like 'from', 'that')
+            let cptMatch = textBlock.match(/(?:item|service|code|cpt)(?:\s+or\s+service)?\s*[:\-]?\s*([0-9]{4}[A-Za-z0-9])/i);
+            if (!cptMatch) {
+                // Generic fallback for any common 5 digit CPT (e.g., 99284)
+                cptMatch = textBlock.match(/\b(9928\d|9929\d|9921\d|9922\d|\d{5})\b/);
+            }
+            if (cptMatch) {
+                cptStr = cptMatch[1] || cptMatch[0];
+            }
+
+            // 3. Claim Scanner (Strict validation: Must contain at least ONE digit, preventing purely alphabetical words)
+            let cMatch = textBlock.match(/claim(?:\s+number|\s+no|\s+#)?\s*[:\-]?\s*([A-Za-z0-9\-_]{6,30})/i);
+            
+            // Check if captured claim has a number (\d) and is NOT a 9-10 digit TIN/NPI
+            if (cMatch && /\d/.test(cMatch[1]) && !/^\d{9,10}$/.test(cMatch[1])) {
+                claimStr = cMatch[1];
+            } else {
+                // Ultimate Fallback: search for a 8+ character string that contains BOTH letters and numbers (Alpha-Numeric)
+                let altClaim = textBlock.match(/\b(?![0-9]{9,10}\b)(?=[A-Za-z0-9\-_]*[A-Za-z])(?=[A-Za-z0-9\-_]*[0-9])[A-Za-z0-9\-_]{8,30}\b/);
+                if (altClaim) {
+                    claimStr = altClaim[0];
+                }
+            }
+
+            return { amount: amtStr, cpt: cptStr, claim: claimStr };
+        }
+
         function renderTableData() {
             const tableBody = document.getElementById('tableBody');
             const tableContainer = document.getElementById('tableContainer');
@@ -411,158 +430,86 @@
 
             extractedResults.forEach((item) => {
                 let text = item.text || "";
-                // Normalize text completely to avoid regex backslash mismatches and multiple spaces
-                let cleanText = text.replace(/\\/g, '').replace(/\s+/g, ' ');
-                let cleanTextUpper = cleanText.toUpperCase();
+                let cleanText = text.replace(/\\/g, '').replace(/\s+/g, ' '); 
                 disputeSerial++;
 
                 // --- 1. Dispute ID Logic ---
                 let idrMatch = cleanText.match(/(DISP-\d+)/i);
                 let idr = idrMatch ? idrMatch[1] : "Unknown";
 
-                // --- 2. MULTI-TIER SMART VALIDATOR FOR FALLBACKS ---
-                // Scan globally for valid claim numbers starting with 5 or 6 (length 11-17)
-                let claimRegex = /\b([56][0-9][A-Z0-9]{9,16})\b/gi;
-                let allClaims = [];
-                let cMatch;
-                while ((cMatch = claimRegex.exec(cleanText)) !== null) {
-                    if (/\d/.test(cMatch[1])) {
-                        allClaims.push(cMatch[1].toUpperCase());
-                    }
-                }
-                allClaims = [...new Set(allClaims)]; 
-
-                // Distinct unique CPT codes scanner (usually 5 digits)
-                let cptRegex = /\b(99\d{3}|96\d{3}|74\d{3}|87\d{3}|70\d{3}|[789]\d{4}|\d{5})\b/g;
-                let allCpts = [];
-                let cptM;
-                while ((cptM = cptRegex.exec(cleanText)) !== null) {
-                    allCpts.push(cptM[1]);
-                }
-                allCpts = [...new Set(allCpts)];
-
-                // --- 3. CONTEXT AWARE DOLLAR-SCANNER FOR TRUE DETERMINATIONS ---
-                let determinations = [];
-                let dollarRegex = /\$\s*([\d,]+\.\d{2})/g;
-                let dMatch;
-                
-                while ((dMatch = dollarRegex.exec(cleanText)) !== null) {
-                    let amt = "$" + dMatch[1];
-                    let index = dMatch.index;
-                    // Grab 200 characters before and after the dollar sign
-                    let context = cleanText.substring(Math.max(0, index - 250), Math.min(cleanText.length, index + 350));
-                    let contextUpper = context.toUpperCase();
-                    
-                    // We check if this dollar amount is mentioned as the Final Decision
-                    let isFinal = /(APPROPRIATE|SELECTED|BEST REPRESENTS|DETERMINED THAT|DETERMINES THAT|PREVAILING|AWARDED)/.test(contextUpper);
-                    let isJustOfferList = /SUBMITTED AN OFFER OF\s*\$[\d,]+\.\d{2}/.test(contextUpper) && !/(APPROPRIATE|BEST REPRESENTS)/.test(contextUpper);
-
-                    if (isFinal && !isJustOfferList) {
-                        // Winner logic: check who offered this specific amount
-                        let winner = "";
-                        let offeredByMatch = contextUpper.match(/OFFERED\s+BY\s+(.*?)(?:\s+IS|\s+BEST|\s+APPROPRIATE|\.)/);
-                        if (offeredByMatch) {
-                            winner = offeredByMatch[1];
-                        } else {
-                            if (contextUpper.includes("BCBS") || contextUpper.includes("BLUE CROSS")) winner = "BCBS";
-                        }
-                        
-                        // Claim logic: find claim in this specific context block
-                        let contextClaimMatch = contextUpper.match(/\b([56][0-9][A-Z0-9]{9,16})\b/);
-                        let claimNo = contextClaimMatch ? contextClaimMatch[1] : "-";
-                        
-                        // CPT logic: find CPT in this specific context block
-                        let contextCptMatch = contextUpper.match(/\b(99\d{3}|96\d{3}|74\d{3}|87\d{3}|70\d{3}|[789]\d{4}|\d{5})\b/);
-                        let cpt = contextCptMatch ? contextCptMatch[1] : "-";
-
-                        // Prevent duplicate extractions of the exact same determination
-                        let uniqueKey = amt + "_" + claimNo;
-                        if (!determinations.some(d => d.key === uniqueKey)) {
-                            determinations.push({ amount: amt, claim: claimNo, cpt: cpt, winner: winner, key: uniqueKey });
-                        }
-                    }
-                }
-
-                // Fill missing claims/cpts safely via global index if they weren't in the 250 char chunk context
-                determinations.forEach((det, i) => {
-                    if (det.claim === "-" && allClaims[i]) det.claim = allClaims[i];
-                    if (det.cpt === "-" && allCpts[i]) det.cpt = allCpts[i];
-                });
-
-                // Global Fallback if Context Scanner mapping failed completely
-                if (determinations.length === 0) {
-                    let amtM = cleanText.match(/\$\s*([\d,]+\.\d{2})/g) || [];
-                    let maxCount = Math.max(amtM.length, allClaims.length);
-                    for (let k = 0; k < maxCount; k++) {
-                        determinations.push({
-                            amount: amtM[k] ? amtM[k].trim() : "-",
-                            winner: "",
-                            cpt: allCpts[k] || (allCpts[0] || "-"),
-                            claim: allClaims[k] || "-"
-                        });
-                    }
-                }
-
-                // --- 4. EXTREMELY CLEAN WIN / LOSE CLASSIFICATION (SMART SENTENCE EVALUATOR) ---
-                let status = "Win"; // Default to Win
+                // --- 2. Accurate Win/Lose Logic ---
                 let isLose = false;
-                let isWin = false;
-
-                // 1. Sentence-by-sentence evaluation
-                let sentences = cleanText.split(/[.!?\n]+/);
+                let upperText = cleanText.toUpperCase();
+                
+                let sentences = upperText.split(/(?<=[.!?])\s+/);
+                
                 for (let s of sentences) {
-                    let sUpper = s.toUpperCase();
-                    
-                    // Does the sentence discuss the prevailing party?
-                    if (sUpper.includes("PREVAILING") || sUpper.includes("PREVAILED")) {
-                        if (sUpper.includes("NON-PREVAILING")) {
-                            if (sUpper.includes("BCBS") || sUpper.includes("BLUE CROSS") || sUpper.includes("BLUE SHIELD")) {
-                                isWin = true; // BCBS lost
-                            } else if (sUpper.includes("LLC") || sUpper.includes("CENTER") || sUpper.includes("EMERGENCY")) {
-                                isLose = true; // Provider lost
-                            }
-                        } else {
-                            if (sUpper.includes("BCBS") || sUpper.includes("BLUE CROSS") || sUpper.includes("BLUE SHIELD") || sUpper.includes("TX")) {
-                                isLose = true; // BCBS won
-                            } else if (sUpper.includes("LLC") || sUpper.includes("CENTER") || sUpper.includes("EMERGENCY")) {
-                                isWin = true; // Provider won
+                    if (s.includes("IS THE PREVAILING") || s.includes("PREVAILED")) {
+                        
+                        if (s.includes("NOT THE PREVAILING") || s.includes("NON-PREVAILING")) continue;
+
+                        let hasIns = /BCBS|BLUE CROSS|BLUE SHIELD|AETNA|CIGNA|UNITED|UHC|HUMANA|MOLINA|OSCAR|AMBETTER/.test(s);
+                        let hasProv = / LLC| GROUP| CENTER| ER | PHYSICIAN| CLINIC| HOSPITAL/.test(s);
+
+                        if (hasIns) {
+                            if (hasProv) {
+                                let match = s.match(/DETERMINED(?: THAT)?\s+(.*?)\s+(?:IS THE PREVAILING|PREVAILED)/);
+                                if (match && /BCBS|BLUE CROSS|BLUE SHIELD|AETNA|CIGNA/.test(match[1])) {
+                                    isLose = true;
+                                } else if (!match) {
+                                    isLose = true;
+                                }
+                            } else {
+                                isLose = true; 
                             }
                         }
                     }
                     
-                    // Alternative legal declaration check (e.g. "BCBS of TX's offer best represents")
-                    if (sUpper.includes("BCBS") && sUpper.includes("BEST REPRESENTS")) {
-                        isLose = true; 
+                    if (s.includes("FAVOR IS FOR THE NON-INITIATING")) {
+                        isLose = true;
                     }
                 }
 
-                // 2. Determinations Winner Evaluation (Double Safety)
-                let bcbsWinsInDets = determinations.some(d => d.winner && (d.winner.toUpperCase().includes("BCBS") || d.winner.toUpperCase().includes("BLUE CROSS")));
-                if (bcbsWinsInDets) isLose = true;
-
-                // Consolidate final result
+                let status = isLose ? "Lose" : "Win";
                 if (isLose) {
-                    status = "Lose";
                     totalLossesCount++;
                 } else {
-                    status = "Win"; // Always default to Win if not explicitly proven Lose
                     totalWinsCount++;
                 }
 
-                // --- 5. RENDER DATA TO DOCUMENT TABLE ---
+                // --- 3. Exact Determinations Extractor ---
+                let determinations = [];
+                
+                let hasMultiDets = /Determination\s*1/i.test(cleanText) && /Determination\s*2/i.test(cleanText);
+
+                if (hasMultiDets) {
+                    let blocks = cleanText.split(/(?=Determination\s*\d+)/i);
+                    blocks.forEach(block => {
+                        if(!/Determination\s*\d+/i.test(block)) return;
+                        determinations.push(extractDataFromBlock(block));
+                    });
+                } else {
+                    determinations.push(extractDataFromBlock(cleanText));
+                }
+
+                // --- 4. Render Table UI ---
                 let statusClass = status === "Win" ? "win-text" : "lose-text";
+                let totalDetsForThisDispute = determinations.length;
                 
                 if (determinations.length > 0) {
                     determinations.forEach((det, index) => {
                         totalRowsCount++;
                         let isFirst = (index === 0);
+                        
+                        let detLabel = (totalDetsForThisDispute > 1) ? `Det ${index + 1}` : "-";
+
                         let row = document.createElement('tr');
                         row.className = "fade-in";
                         row.innerHTML = `
                             <td class="font-bold text-center text-slate-500">${isFirst ? disputeSerial : ""}</td>
                             <td class="font-bold text-slate-800">${isFirst ? idr : ""}</td>
                             <td class="${isFirst ? statusClass : ""}">${isFirst ? status : ""}</td>
-                            <td class="text-slate-500 font-semibold">Det ${index + 1}</td>
+                            <td class="text-slate-500 font-semibold">${detLabel}</td>
                             <td class="font-mono text-indigo-900 font-bold">${det.claim}</td>
                             <td class="font-bold text-slate-700">${det.cpt}</td>
                             <td class="font-extrabold text-slate-900">${det.amount}</td>
@@ -598,7 +545,6 @@
             showToast("Dataset loaded and formatted successfully!");
         }
 
-        // Clip-board data copy feature
         function copyTableToClipboard() {
             const table = document.getElementById("resultTable");
             const range = document.createRange();
