@@ -98,29 +98,33 @@
                 <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-file-invoice-dollar text-indigo-500"></i> IDR PDF Auto Data Extractor
                 </h2>
-                <p class="text-slate-500 mt-2 font-medium">Ek sathe onnek gulo PDF upload korun (Unlimited). Upload korar sathe sathei auto-process shuru hoye jabe.</p>
+                <p class="text-slate-500 mt-2 font-medium">Upload multiple PDFs simultaneously to extract IDR final payment determinations. You can keep adding files to the queue.</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 
-                <!-- Upload Drop Zone -->
-                <div class="lg:col-span-2">
-                    <input type="file" id="pdfFiles" multiple accept=".pdf" class="hidden" onchange="handleAutoUpload()">
+                <!-- Input Zone: PDF Drop & Email Paste -->
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <!-- Upload Drop Zone -->
+                    <input type="file" id="pdfFiles" multiple accept=".pdf" class="hidden" onchange="handleManualUpload(event)">
                     <label for="pdfFiles" class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-indigo-50/60 hover:border-indigo-400 transition-all duration-300 group">
                         <div class="flex flex-col items-center justify-center transition-transform group-hover:-translate-y-1">
                             <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-3 shadow-sm">
                                 <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
                             </div>
                             <p class="text-sm text-slate-600 font-medium"><span class="font-bold text-indigo-600">Click to upload</span> or drag and drop PDFs</p>
-                            <p class="text-xs text-rose-500 mt-1.5 font-bold" id="fileCountText">Support unlimited PDFs at a time (e.g., 100+)</p>
+                            <p class="text-xs text-emerald-600 mt-1.5 font-bold" id="fileCountText">Unlimited files supported (Appends to queue)</p>
                         </div>
                     </label>
+
+                    <!-- Email Paste Zone -->
+                    <textarea id="emailText" placeholder="Paste determination emails here to auto-match dates (e.g., Sun, May 17...). Dates will be linked to the extracted disputes." class="w-full h-24 p-4 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:border-indigo-300 focus:bg-white focus:border-indigo-500 outline-none transition-all resize-none text-sm text-slate-700 placeholder-slate-400"></textarea>
                 </div>
 
                 <!-- Interactive Buttons Panel -->
                 <div class="flex flex-col gap-3 justify-center">
                     <button onclick="processPDFs()" id="processBtn" class="bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed" disabled>
-                        <i class="fa-solid fa-robot"></i> Waiting for PDFs...
+                        <i class="fa-solid fa-robot"></i> Select PDFs First...
                     </button>
                     
                     <div class="grid grid-cols-2 gap-3">
@@ -217,8 +221,9 @@
                 <table id="resultTable" class="rounded-xl overflow-hidden border border-slate-200">
                     <thead>
                         <tr>
-                            <th class="text-center w-16">Sl No</th>
                             <th>Dispute No</th>
+                            <th>Dispute Group</th>
+                            <th class="w-32 text-center">Det. Date</th>
                             <th>Status</th>
                             <th>Det #</th>
                             <th>Claim No</th>
@@ -257,22 +262,32 @@
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        
+        let allSelectedFiles = []; // Global array to append files
         let extractedResults = []; 
 
         const insKeywords = ["BCBS", "BLUE CROSS", "BLUE SHIELD", "AETNA", "CIGNA", "UNITED", "UHC", "HUMANA", "MOLINA", "OSCAR", "AMBETTER", "HEALTH PLAN"];
         const provKeywords = ["LLC", "GROUP", "CENTER", " ER ", "PHYSICIAN", "CLINIC", "HOSPITAL", " PA ", "PLLC", "ASSOCIATES", "EMERGENCY"];
 
-        function handleAutoUpload() {
-            const input = document.getElementById('pdfFiles');
+        function handleManualUpload(event) {
+            const input = event.target;
             const fileCountText = document.getElementById('fileCountText');
+            const processBtn = document.getElementById('processBtn');
             
             if(input.files.length > 0) {
-                let count = input.files.length;
-                fileCountText.innerHTML = `<span class="text-indigo-600 font-extrabold">${count}</span> file(s) auto-processing...`;
-                processPDFs();
-            } else {
-                fileCountText.innerText = "Support unlimited PDFs at a time (e.g., 100+)";
+                let newFiles = Array.from(input.files);
+                allSelectedFiles = allSelectedFiles.concat(newFiles); // Append new files to the list
+                
+                fileCountText.innerHTML = `<span class="text-indigo-600 font-extrabold">${allSelectedFiles.length}</span> file(s) queued. Add more or click Extract.`;
+                
+                // Enable button since files are present
+                processBtn.disabled = false;
+                processBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data`;
+                processBtn.className = "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all duration-200 flex items-center justify-center gap-2 text-base";
             }
+            
+            // Clear input value so same files can be re-selected if user browses same directory
+            input.value = ""; 
         }
 
         function showToast(msg, isError = false) {
@@ -287,8 +302,12 @@
         }
 
         function clearAllData() {
+            allSelectedFiles = [];
+            extractedResults = [];
+            
             document.getElementById('pdfFiles').value = "";
-            document.getElementById('fileCountText').innerText = "Support unlimited PDFs at a time (e.g., 100+)";
+            document.getElementById('emailText').value = "";
+            document.getElementById('fileCountText').innerText = "Unlimited files supported (Appends to queue)";
             document.getElementById('tableBody').innerHTML = "";
             document.getElementById('tableContainer').classList.add('hidden');
             document.getElementById('progressContainer').classList.add('hidden');
@@ -296,12 +315,61 @@
             document.getElementById('summaryCardsContainer').classList.add('hidden');
             
             let processBtn = document.getElementById('processBtn');
-            processBtn.innerHTML = `<i class="fa-solid fa-robot"></i> Waiting for PDFs...`;
+            processBtn.innerHTML = `<i class="fa-solid fa-robot"></i> Select PDFs First...`;
             processBtn.className = "bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
             processBtn.disabled = true;
 
-            extractedResults = [];
             showToast("Workspace completely reset!");
+        }
+
+        // Email Parsing Engine
+        function parseEmailDates() {
+            const text = document.getElementById('emailText').value;
+            const dateMap = {};
+            if (!text) return dateMap;
+
+            // Regex to find dates like "May 17", "May 17, 2024", "January 5"
+            const dateRegex = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s+(\d{4}))?\b/gi;
+            const dispRegex = /DISP-\d+/gi;
+            
+            let dates = [];
+            let match;
+            while ((match = dateRegex.exec(text)) !== null) {
+                dates.push({
+                    index: match.index,
+                    month: match[1].substring(0, 3).toLowerCase(),
+                    day: match[2],
+                    year: match[3] || new Date().getFullYear(),
+                    raw: match[0]
+                });
+            }
+            
+            const monthMap = {
+                "jan":"01", "feb":"02", "mar":"03", "apr":"04", "may":"05", "jun":"06",
+                "jul":"07", "aug":"08", "sep":"09", "oct":"10", "nov":"11", "dec":"12"
+            };
+
+            while ((match = dispRegex.exec(text)) !== null) {
+                let disp = match[0].toUpperCase();
+                let dispIndex = match.index;
+                
+                // Find the closest date physically appearing before this DISP number in the text
+                let closestDate = null;
+                for (let i = dates.length - 1; i >= 0; i--) {
+                    if (dates[i].index < dispIndex) {
+                        closestDate = dates[i];
+                        break;
+                    }
+                }
+                
+                if (closestDate) {
+                    let dd = closestDate.day.padStart(2, '0');
+                    let mm = monthMap[closestDate.month];
+                    let yyyy = closestDate.year;
+                    dateMap[disp] = `${mm}/${dd}/${yyyy}`;
+                }
+            }
+            return dateMap;
         }
 
         function extractTextFromPDF(file) {
@@ -327,10 +395,10 @@
         }
 
         async function processPDFs() {
-            const fileInput = document.getElementById('pdfFiles');
-            let filesArray = Array.from(fileInput.files);
-            
-            if (filesArray.length === 0) return;
+            if (allSelectedFiles.length === 0) {
+                showToast("Please add PDF files to extract first.", true);
+                return;
+            }
 
             const tableBody = document.getElementById('tableBody');
             const progressContainer = document.getElementById('progressContainer');
@@ -342,21 +410,23 @@
             const tableContainer = document.getElementById('tableContainer');
             const summaryCardsContainer = document.getElementById('summaryCardsContainer');
 
+            // UI Setup for Processing State
             tableBody.innerHTML = "";
             tableContainer.classList.add('hidden');
             copyBtn.classList.add('hidden');
             summaryCardsContainer.classList.add('hidden');
             progressContainer.classList.remove('hidden');
             
+            // Transform button to processing state
             processBtn.disabled = true;
             processBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Processing Extractor...`;
             processBtn.className = "bg-slate-200 text-indigo-600 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
 
             extractedResults = [];
-            let totalFiles = filesArray.length;
+            let totalFiles = allSelectedFiles.length;
 
             for (let i = 0; i < totalFiles; i++) {
-                let file = filesArray[i];
+                let file = allSelectedFiles[i];
                 if (!file || !file.name) continue; 
                 
                 let text = await extractTextFromPDF(file);
@@ -366,7 +436,7 @@
             }
 
             let currentPercent = 0;
-            let duration = Math.max(3000, totalFiles * 150); 
+            let duration = Math.max(2000, totalFiles * 150); 
             let intervalTime = 50; 
             let steps = duration / intervalTime;
             let increment = 100 / steps;
@@ -407,11 +477,9 @@
             return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
         }
 
-        // Feature: Extract submitted offers from text to compare against final amount (The Failsafe Verify Engine)
         function getSubmittedOffers(textBlock) {
             let provOffers = [];
             let insOffers = [];
-            // Catch variations like "submitted an offer of", "offer of $", "offered $", etc.
             let offerRegex = /(.{1,80}?)\s+(?:SUBMITTED AN OFFER OF|SUBMITTED AN OFFER FOR|OFFER OF|OFFERED)\s*\$\s*([\d,]+\.\d{2})/gi;
             
             for (let m of textBlock.matchAll(offerRegex)) {
@@ -454,7 +522,7 @@
                 cptStr = cptMatch[1] || cptMatch[0];
             }
 
-            // 3. Claim Scanner (STRICT: Removes "DISP-XXXXX" to prevent false claim match)
+            // 3. Claim Scanner 
             let safeTextForClaim = textBlock.replace(/DISP-\d+/gi, '');
             let cRegex = /claim(?:\s+number|\s+no|\s+#)?\s*[:\-]?\s*([A-Za-z0-9\-_]{6,30})/gi;
             let cMatches = [...safeTextForClaim.matchAll(cRegex)];
@@ -473,7 +541,7 @@
                 }
             }
 
-            // 4. Verification Engine: Cross-Check the Final Amount against Submitted Offers (Ultimate Source of Truth)
+            // 4. Verification Engine
             let localOffers = getSubmittedOffers(textBlock);
             let pOffers = localOffers.provOffers.length > 0 ? localOffers.provOffers : globalOffers.provOffers;
             let iOffers = localOffers.insOffers.length > 0 ? localOffers.insOffers : globalOffers.insOffers;
@@ -483,13 +551,13 @@
                 let matchesIns = iOffers.includes(finalAmtNum);
 
                 if (matchesProv && !matchesIns) {
-                    blockStatus = "Win"; // The final amount perfectly matches the provider's submitted offer!
+                    blockStatus = "Win"; 
                 } else if (matchesIns && !matchesProv) {
-                    blockStatus = "Lose"; // The final amount perfectly matches the insurance's submitted offer!
+                    blockStatus = "Lose"; 
                 }
             }
 
-            // 5. Fallback: Block Text Scanner (If Amount match couldn't determine status)
+            // 5. Fallback Status
             if (!blockStatus) {
                 let upperBlock = textBlock.toUpperCase();
                 let offeredByMatch = upperBlock.match(/(?:OFFERED|SUBMITTED) BY\s+(.{1,80}?)\s+(?:IS THE APPROPRIATE|BEST REPRESENTS|BEST REFLECTS)/);
@@ -538,20 +606,23 @@
             let totalWinAmount = 0; 
             let totalLossAmount = 0; 
 
+            // Initialize email date map
+            let dispDateMap = parseEmailDates();
+
             extractedResults.forEach((item) => {
                 let text = item.text || "";
                 let cleanText = text.replace(/\\/g, '').replace(/\s+/g, ' '); 
                 let upperText = cleanText.toUpperCase();
                 disputeSerial++;
 
-                // 1. Dispute ID
+                // 1. Dispute ID Logic
                 let idrMatch = cleanText.match(/(DISP-\d+)/i);
                 let idr = idrMatch ? idrMatch[1] : "Unknown";
 
-                // 2. Extract Global Submitted Offers to use for robust matching
-                let globalOffers = getSubmittedOffers(upperText);
+                // Map Date from Email
+                let extractedDate = dispDateMap[idr];
 
-                // 3. Fallback Sentence-based Global Status
+                // 2. Global Status Fallback Logic
                 let globalIsLose = false;
                 let isExplicitWin = false;
                 
@@ -589,7 +660,8 @@
                 }
                 let globalFallbackStatusText = globalIsLose ? "Lose" : "Win";
 
-                // 4. Exact Determinations Extractor
+                // 3. Exact Determinations Extractor
+                let globalOffers = getSubmittedOffers(upperText);
                 let determinations = [];
                 let hasMultiDets = /Determination\s*1/i.test(cleanText) && /Determination\s*2/i.test(cleanText);
 
@@ -603,7 +675,7 @@
                     determinations.push(extractDataFromBlock(cleanText, globalOffers));
                 }
 
-                // 5. Resolve Majority and Tie Status based on mathematically verified individual determinations
+                // 4. Resolve Majority and Tie Status
                 let localWins = 0;
                 let localLoses = 0;
 
@@ -620,11 +692,10 @@
                     else if (localLoses > localWins) finalStatus = "Lose";
                     else if (localWins === localLoses) finalStatus = "Tie";
                 } else if (determinations.length === 1) {
-                    // For single determination, the mathematically verified status becomes the final status!
                     finalStatus = determinations[0].status; 
                 }
 
-                // 6. Global Counters & Amounts Update
+                // Global Counters & Amounts Update
                 if (finalStatus === "Win") {
                     totalWinsCount++;
                     determinations.forEach(det => {
@@ -637,11 +708,15 @@
                     });
                 }
 
-                // 7. Render Table UI
+                // 5. Render Table UI
                 let statusClass = "text-slate-800 font-bold";
                 if (finalStatus === "Win") statusClass = "win-text";
                 else if (finalStatus === "Lose") statusClass = "lose-text";
                 else if (finalStatus === "Tie") statusClass = "text-amber-500 font-bold";
+
+                // Render Det Date Column
+                let dateVal = extractedDate ? extractedDate : "Not Found";
+                let dateClass = extractedDate ? "font-bold text-slate-800 text-center" : "bg-rose-50/60 text-rose-500 text-[11px] font-bold text-center uppercase tracking-wide";
 
                 let totalDetsForThisDispute = determinations.length;
                 
@@ -653,14 +728,15 @@
                         let detLabel = "-";
                         if (totalDetsForThisDispute > 1) {
                             let detColor = det.status === 'Win' ? 'text-emerald-600' : 'text-rose-600';
-                            detLabel = `Det ${index + 1} <span class="text-xs font-bold ${detColor}">(${det.status})</span>`;
+                            detLabel = `Det ${index + 1} <span class="text-[10px] font-bold ${detColor} ml-1">(${det.status})</span>`;
                         }
 
                         let row = document.createElement('tr');
                         row.className = "fade-in";
                         row.innerHTML = `
-                            <td class="font-bold text-center text-slate-500">${isFirst ? disputeSerial : ""}</td>
                             <td class="font-bold text-slate-800">${isFirst ? idr : ""}</td>
+                            <td class="font-bold text-indigo-700 bg-indigo-50/30">${idr}</td>
+                            <td class="${isFirst ? dateClass : ""}">${isFirst ? dateVal : ""}</td>
                             <td class="${isFirst ? statusClass : ""}">${isFirst ? finalStatus : ""}</td>
                             <td class="text-slate-500 font-semibold">${detLabel}</td>
                             <td class="font-mono text-indigo-900 font-bold">${det.claim}</td>
@@ -674,8 +750,9 @@
                     let row = document.createElement('tr');
                     row.className = "fade-in";
                     row.innerHTML = `
-                        <td class="font-bold text-center text-slate-500">${disputeSerial}</td>
                         <td class="font-bold text-slate-800">${idr}</td>
+                        <td class="font-bold text-indigo-700 bg-indigo-50/30">${idr}</td>
+                        <td class="${dateClass}">${dateVal}</td>
                         <td class="${statusClass}">${finalStatus}</td>
                         <td colspan="4" class="text-center text-rose-500 font-bold bg-rose-50/50">Manual check required</td>
                     `;
@@ -691,9 +768,10 @@
             document.getElementById('statTotalWinAmount').innerText = formatNumberToCurrency(totalWinAmount);
             document.getElementById('statTotalLossAmount').innerText = formatNumberToCurrency(totalLossAmount);
 
-            // Restore button back to normal
-            processBtn.innerHTML = `<i class="fa-solid fa-check-double"></i> Extracted`;
-            processBtn.className = "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-200 transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-default";
+            // Restore button 
+            processBtn.disabled = false;
+            processBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data`;
+            processBtn.className = "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-200 transition-all duration-200 flex items-center justify-center gap-2 text-base";
 
             // Status Badge text reload
             totalCountBadge.innerText = `${totalRowsCount} Record(s) Loaded`;
