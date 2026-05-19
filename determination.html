@@ -98,29 +98,29 @@
                 <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-file-invoice-dollar text-indigo-500"></i> IDR PDF Auto Data Extractor
                 </h2>
-                <p class="text-slate-500 mt-2 font-medium">Ek sathe onnek gulo PDF upload korun. Data extract hobar por Copy kore Excel e paste korun.</p>
+                <p class="text-slate-500 mt-2 font-medium">Ek sathe onnek gulo PDF upload korun (Unlimited). Upload korar sathe sathei auto-process shuru hoye jabe.</p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
                 
-                <!-- Upload Drop Zone -->
+                <!-- Upload Drop Zone (Auto Trigger added here) -->
                 <div class="lg:col-span-2">
-                    <input type="file" id="pdfFiles" multiple accept=".pdf" class="hidden" onchange="updateFileCount()">
+                    <input type="file" id="pdfFiles" multiple accept=".pdf" class="hidden" onchange="handleAutoUpload()">
                     <label for="pdfFiles" class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-indigo-50/60 hover:border-indigo-400 transition-all duration-300 group">
                         <div class="flex flex-col items-center justify-center transition-transform group-hover:-translate-y-1">
                             <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-3 shadow-sm">
                                 <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
                             </div>
                             <p class="text-sm text-slate-600 font-medium"><span class="font-bold text-indigo-600">Click to upload</span> or drag and drop PDFs</p>
-                            <p class="text-xs text-slate-400 mt-1.5 font-medium" id="fileCountText">Support multiple files (Up to 100+ files)</p>
+                            <p class="text-xs text-rose-500 mt-1.5 font-bold" id="fileCountText">Support unlimited PDFs at a time (e.g., 100+)</p>
                         </div>
                     </label>
                 </div>
 
                 <!-- Interactive Buttons Panel -->
                 <div class="flex flex-col gap-3 justify-center">
-                    <button onclick="processPDFs()" id="processBtn" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all duration-200 flex items-center justify-center gap-2 text-base">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data
+                    <button onclick="processPDFs()" id="processBtn" class="bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed" disabled>
+                        <i class="fa-solid fa-robot"></i> Waiting for PDFs...
                     </button>
                     
                     <div class="grid grid-cols-2 gap-3">
@@ -251,13 +251,22 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
         let extractedResults = []; 
 
-        function updateFileCount() {
+        // Regex patterns for identification
+        const insRegex = /\bBCBS\b|\bBLUE CROSS\b|\bBLUE SHIELD\b|\bAETNA\b|\bCIGNA\b|\bUNITED\b|\bUHC\b|\bHUMANA\b|\bMOLINA\b|\bOSCAR\b|\bAMBETTER\b/;
+        const provRegex = /\bLLC\b|\bGROUP\b|\bCENTER\b|\bER\b|\bPHYSICIAN\b|\bCLINIC\b|\bHOSPITAL\b/;
+
+        function handleAutoUpload() {
             const input = document.getElementById('pdfFiles');
             const fileCountText = document.getElementById('fileCountText');
+            
             if(input.files.length > 0) {
-                fileCountText.innerHTML = `<span class="text-indigo-600 font-extrabold">${input.files.length}</span> file(s) selected`;
+                let count = input.files.length;
+                fileCountText.innerHTML = `<span class="text-indigo-600 font-extrabold">${count}</span> file(s) auto-processing...`;
+                
+                // Immediately start processing when files are selected
+                processPDFs();
             } else {
-                fileCountText.innerText = "Support multiple files (Up to 100+ files)";
+                fileCountText.innerText = "Support unlimited PDFs at a time (e.g., 100+)";
             }
         }
 
@@ -274,12 +283,19 @@
 
         function clearAllData() {
             document.getElementById('pdfFiles').value = "";
-            document.getElementById('fileCountText').innerText = "Support multiple files (Up to 100+ files)";
+            document.getElementById('fileCountText').innerText = "Support unlimited PDFs at a time (e.g., 100+)";
             document.getElementById('tableBody').innerHTML = "";
             document.getElementById('tableContainer').classList.add('hidden');
             document.getElementById('progressContainer').classList.add('hidden');
             document.getElementById('copyBtn').classList.add('hidden');
             document.getElementById('summaryCardsContainer').classList.add('hidden');
+            
+            // Reset main button
+            let processBtn = document.getElementById('processBtn');
+            processBtn.innerHTML = `<i class="fa-solid fa-robot"></i> Waiting for PDFs...`;
+            processBtn.className = "bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
+            processBtn.disabled = true;
+
             extractedResults = [];
             showToast("Workspace completely reset!");
         }
@@ -308,10 +324,9 @@
 
         async function processPDFs() {
             const fileInput = document.getElementById('pdfFiles');
-            const filesArray = Array.from(fileInput.files);
+            let filesArray = Array.from(fileInput.files);
             
             if (filesArray.length === 0) {
-                showToast("Doya kore agey PDF file select korun!", true);
                 return;
             }
 
@@ -325,12 +340,17 @@
             const tableContainer = document.getElementById('tableContainer');
             const summaryCardsContainer = document.getElementById('summaryCardsContainer');
 
+            // UI Setup for Processing State
             tableBody.innerHTML = "";
             tableContainer.classList.add('hidden');
             copyBtn.classList.add('hidden');
             summaryCardsContainer.classList.add('hidden');
             progressContainer.classList.remove('hidden');
+            
+            // Transform button to processing state
             processBtn.disabled = true;
+            processBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Processing Extractor...`;
+            processBtn.className = "bg-slate-200 text-indigo-600 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
 
             extractedResults = [];
             let totalFiles = filesArray.length;
@@ -346,7 +366,8 @@
             }
 
             let currentPercent = 0;
-            let duration = 3000; 
+            // Scale the fake progress bar duration based on the number of files so it doesn't jump too fast for 100+ files
+            let duration = Math.max(3000, totalFiles * 150); 
             let intervalTime = 50; 
             let steps = duration / intervalTime;
             let increment = 100 / steps;
@@ -377,41 +398,67 @@
             }, intervalTime);
         }
 
-        // Helper function for reliable block extraction
+        // Helper function for reliable block extraction with exact constraints & status parsing
         function extractDataFromBlock(textBlock) {
             let amtStr = "Check PDF";
             let cptStr = "Check PDF";
             let claimStr = "Check PDF";
+            let blockStatus = null; 
 
             // 1. Amount Scanner
             let amtMatch = textBlock.match(/(?:payment amount of|out-of-network rate|rate of)[\s\S]{1,60}?\$\s*([\d,]+\.\d{2})/i) || textBlock.match(/\$\s*([\d,]+\.\d{2})/);
             if (amtMatch) amtStr = "$" + amtMatch[1];
 
-            // 2. CPT Scanner (Strict validation: Must start with 4 digits + 1 alphanumeric to avoid words like 'from', 'that')
+            // 2. CPT Scanner
             let cptMatch = textBlock.match(/(?:item|service|code|cpt)(?:\s+or\s+service)?\s*[:\-]?\s*([0-9]{4}[A-Za-z0-9])/i);
             if (!cptMatch) {
-                // Generic fallback for any common 5 digit CPT (e.g., 99284)
                 cptMatch = textBlock.match(/\b(9928\d|9929\d|9921\d|9922\d|\d{5})\b/);
             }
             if (cptMatch) {
                 cptStr = cptMatch[1] || cptMatch[0];
             }
 
-            // 3. Claim Scanner (Strict validation: Must contain at least ONE digit, preventing purely alphabetical words)
+            // 3. Claim Scanner
             let cMatch = textBlock.match(/claim(?:\s+number|\s+no|\s+#)?\s*[:\-]?\s*([A-Za-z0-9\-_]{6,30})/i);
-            
-            // Check if captured claim has a number (\d) and is NOT a 9-10 digit TIN/NPI
             if (cMatch && /\d/.test(cMatch[1]) && !/^\d{9,10}$/.test(cMatch[1])) {
                 claimStr = cMatch[1];
             } else {
-                // Ultimate Fallback: search for a 8+ character string that contains BOTH letters and numbers (Alpha-Numeric)
                 let altClaim = textBlock.match(/\b(?![0-9]{9,10}\b)(?=[A-Za-z0-9\-_]*[A-Za-z])(?=[A-Za-z0-9\-_]*[0-9])[A-Za-z0-9\-_]{8,30}\b/);
                 if (altClaim) {
                     claimStr = altClaim[0];
                 }
             }
 
-            return { amount: amtStr, cpt: cptStr, claim: claimStr };
+            // 4. Block Status Scanner with MASHED NAME handling
+            let upperBlock = textBlock.toUpperCase();
+            let offeredByMatch = upperBlock.match(/(?:OFFERED|SUBMITTED) BY\s+([^.!?]{1,100}?)\s+IS THE APPROPRIATE/);
+            
+            if (offeredByMatch) {
+                let winner = offeredByMatch[1];
+                let insIdx = winner.search(insRegex);
+                let provIdx = winner.search(provRegex);
+
+                if (insIdx !== -1 && provIdx !== -1) {
+                    // Mashed name (e.g. ODESSA EMERGENCY CENTER LLC BCBS OF TX)
+                    blockStatus = (provIdx < insIdx) ? "Win" : "Lose"; 
+                } else if (insIdx !== -1) {
+                    blockStatus = "Lose";
+                } else if (provIdx !== -1) {
+                    blockStatus = "Win";
+                } else {
+                    blockStatus = null;
+                }
+            } 
+            
+            if (blockStatus === null) {
+                if (upperBlock.includes("NON-INITIATING PARTY'S OFFER BEST REPRESENTS") || upperBlock.includes("FAVOR IS FOR THE NON-INITIATING")) {
+                    blockStatus = "Lose";
+                } else if (upperBlock.includes("INITIATING PARTY'S OFFER BEST REPRESENTS") || upperBlock.includes("FAVOR IS FOR THE INITIATING") || upperBlock.includes("INITIATING PARTY PREVAILED")) {
+                    blockStatus = "Win";
+                }
+            }
+
+            return { amount: amtStr, cpt: cptStr, claim: claimStr, status: blockStatus };
         }
 
         function renderTableData() {
@@ -437,49 +484,63 @@
                 let idrMatch = cleanText.match(/(DISP-\d+)/i);
                 let idr = idrMatch ? idrMatch[1] : "Unknown";
 
-                // --- 2. Accurate Win/Lose Logic ---
-                let isLose = false;
+                // --- 2. Calculate Global Status Logic (with Mashed Name handling) ---
+                let globalIsLose = false;
+                let isExplicitWin = false;
                 let upperText = cleanText.toUpperCase();
-                
                 let sentences = upperText.split(/(?<=[.!?])\s+/);
                 
                 for (let s of sentences) {
                     if (s.includes("IS THE PREVAILING") || s.includes("PREVAILED")) {
-                        
                         if (s.includes("NOT THE PREVAILING") || s.includes("NON-PREVAILING")) continue;
 
-                        let hasIns = /BCBS|BLUE CROSS|BLUE SHIELD|AETNA|CIGNA|UNITED|UHC|HUMANA|MOLINA|OSCAR|AMBETTER/.test(s);
-                        let hasProv = / LLC| GROUP| CENTER| ER | PHYSICIAN| CLINIC| HOSPITAL/.test(s);
+                        let match = s.match(/DETERMINED(?: THAT)?\s+(.*?)\s+(?:IS THE PREVAILING|PREVAILED)/);
+                        
+                        if (match) {
+                            let winnerName = match[1];
+                            let insIdx = winnerName.search(insRegex);
+                            let provIdx = winnerName.search(provRegex);
 
-                        if (hasIns) {
-                            if (hasProv) {
-                                let match = s.match(/DETERMINED(?: THAT)?\s+(.*?)\s+(?:IS THE PREVAILING|PREVAILED)/);
-                                if (match && /BCBS|BLUE CROSS|BLUE SHIELD|AETNA|CIGNA/.test(match[1])) {
-                                    isLose = true;
-                                } else if (!match) {
-                                    isLose = true;
+                            if (insIdx !== -1 && provIdx !== -1) {
+                                // MASHED NAME ISSUE (e.g. ODESSA EMERGENCY CENTER LLC BCBS OF TX)
+                                // If the provider name comes first, it's a WIN. Otherwise LOSE.
+                                if (provIdx < insIdx) {
+                                    isExplicitWin = true;
+                                } else {
+                                    globalIsLose = true;
                                 }
-                            } else {
-                                isLose = true; 
+                            } else if (insIdx !== -1) {
+                                globalIsLose = true;
+                            } else if (provIdx !== -1) {
+                                isExplicitWin = true;
                             }
+                        } else {
+                            // Fallback if match fails but words exist
+                            let hasIns = insRegex.test(s);
+                            let hasProv = provRegex.test(s);
+                            
+                            if (hasIns && !hasProv) globalIsLose = true;
+                            else if (hasProv && !hasIns) isExplicitWin = true;
                         }
                     }
-                    
-                    if (s.includes("FAVOR IS FOR THE NON-INITIATING")) {
-                        isLose = true;
+                }
+
+                if (!isExplicitWin && !globalIsLose) {
+                    for (let s of sentences) {
+                        if (s.includes("FAVOR IS FOR THE NON-INITIATING")) {
+                            globalIsLose = true;
+                            break;
+                        } else if (s.includes("INITIATING PARTY PREVAILED")) {
+                            isExplicitWin = true;
+                            break;
+                        }
                     }
                 }
 
-                let status = isLose ? "Lose" : "Win";
-                if (isLose) {
-                    totalLossesCount++;
-                } else {
-                    totalWinsCount++;
-                }
+                let globalStatus = globalIsLose ? "Lose" : "Win";
 
                 // --- 3. Exact Determinations Extractor ---
                 let determinations = [];
-                
                 let hasMultiDets = /Determination\s*1/i.test(cleanText) && /Determination\s*2/i.test(cleanText);
 
                 if (hasMultiDets) {
@@ -492,8 +553,47 @@
                     determinations.push(extractDataFromBlock(cleanText));
                 }
 
-                // --- 4. Render Table UI ---
-                let statusClass = status === "Win" ? "win-text" : "lose-text";
+                // --- 4. Resolve Majority and Tie Status ---
+                let localWins = 0;
+                let localLoses = 0;
+
+                determinations.forEach(det => {
+                    if (det.status === null) {
+                        det.status = globalStatus; // Fallback to global if block status is vague
+                    }
+                    if (det.status === "Win") localWins++;
+                    else localLoses++;
+                });
+
+                let finalStatus = globalStatus; // Default to global
+                
+                // Apply majority / tie logic only for multi determinations
+                if (determinations.length > 1) {
+                    if (localWins > localLoses) {
+                        finalStatus = "Win";
+                    } else if (localLoses > localWins) {
+                        finalStatus = "Lose";
+                    } else if (localWins === localLoses) {
+                        finalStatus = "Tie";
+                    }
+                } else if (determinations.length === 1) {
+                    finalStatus = globalStatus;
+                    determinations[0].status = globalStatus; // Sync single det to global status
+                }
+
+                // Global Counters Update (Tie doesn't add to win/lose)
+                if (finalStatus === "Win") {
+                    totalWinsCount++;
+                } else if (finalStatus === "Lose") {
+                    totalLossesCount++;
+                }
+
+                // --- 5. Render Table UI ---
+                let statusClass = "text-slate-800 font-bold";
+                if (finalStatus === "Win") statusClass = "win-text";
+                else if (finalStatus === "Lose") statusClass = "lose-text";
+                else if (finalStatus === "Tie") statusClass = "text-amber-500 font-bold";
+
                 let totalDetsForThisDispute = determinations.length;
                 
                 if (determinations.length > 0) {
@@ -501,14 +601,19 @@
                         totalRowsCount++;
                         let isFirst = (index === 0);
                         
-                        let detLabel = (totalDetsForThisDispute > 1) ? `Det ${index + 1}` : "-";
+                        // Det column styling based on individual win/lose
+                        let detLabel = "-";
+                        if (totalDetsForThisDispute > 1) {
+                            let detColor = det.status === 'Win' ? 'text-emerald-600' : 'text-rose-600';
+                            detLabel = `Det ${index + 1} <span class="text-xs font-bold ${detColor}">(${det.status})</span>`;
+                        }
 
                         let row = document.createElement('tr');
                         row.className = "fade-in";
                         row.innerHTML = `
                             <td class="font-bold text-center text-slate-500">${isFirst ? disputeSerial : ""}</td>
                             <td class="font-bold text-slate-800">${isFirst ? idr : ""}</td>
-                            <td class="${isFirst ? statusClass : ""}">${isFirst ? status : ""}</td>
+                            <td class="${isFirst ? statusClass : ""}">${isFirst ? finalStatus : ""}</td>
                             <td class="text-slate-500 font-semibold">${detLabel}</td>
                             <td class="font-mono text-indigo-900 font-bold">${det.claim}</td>
                             <td class="font-bold text-slate-700">${det.cpt}</td>
@@ -523,7 +628,7 @@
                     row.innerHTML = `
                         <td class="font-bold text-center text-slate-500">${disputeSerial}</td>
                         <td class="font-bold text-slate-800">${idr}</td>
-                        <td class="${statusClass}">${status}</td>
+                        <td class="${statusClass}">${finalStatus}</td>
                         <td colspan="4" class="text-center text-rose-500 font-bold bg-rose-50/50">Manual check required</td>
                     `;
                     tableBody.appendChild(row);
@@ -536,12 +641,15 @@
             document.getElementById('statTotalWins').innerText = totalWinsCount;
             document.getElementById('statTotalLosses').innerText = totalLossesCount;
 
+            // Restore button back to normal
+            processBtn.innerHTML = `<i class="fa-solid fa-check-double"></i> Extracted`;
+            processBtn.className = "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-200 transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-default";
+
             // Status Badge text reload
             totalCountBadge.innerText = `${totalRowsCount} Record(s) Loaded`;
             tableContainer.classList.remove('hidden');
             summaryCardsContainer.classList.remove('hidden');
             copyBtn.classList.remove('hidden');
-            processBtn.disabled = false;
             showToast("Dataset loaded and formatted successfully!");
         }
 
