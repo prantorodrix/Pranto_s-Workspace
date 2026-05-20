@@ -429,9 +429,9 @@
             
             // Dictionary Format Sorting (Ascending A-Z based on Dispute ID)
             extractedResults.sort((a, b) => {
-                let mA = a.text.match(/DISP-\d+/i), mB = b.text.match(/DISP-\d+/i);
-                let idrA = mA ? mA[1].toUpperCase() : "ZZZZZZ";
-                let idrB = mB ? mB[1].toUpperCase() : "ZZZZZZ";
+                let mA = a.text.match(/(DISP-\d+)/i), mB = b.text.match(/(DISP-\d+)/i);
+                let idrA = mA && mA[1] ? mA[1].toUpperCase() : "ZZZZZZ";
+                let idrB = mB && mB[1] ? mB[1].toUpperCase() : "ZZZZZZ";
                 return idrA.localeCompare(idrB, undefined, {numeric: true, sensitivity: 'base'});
             });
 
