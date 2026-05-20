@@ -4,818 +4,670 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pranto's Workspace - IDR Extractor</title>
-    <!-- Tailwind CSS with CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF.js Library for PDF parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <!-- FontAwesome for Premium Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        /* --- Stylesheet Section --- */
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body{font-family:'Plus Jakarta Sans',sans-serif;scroll-behavior:smooth;background-color:#f8fafc;}
+        .glass-nav{background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(226,232,240,0.8);transition:all 0.3s;}
         
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            scroll-behavior: smooth;
-            background-color: #f8fafc;
+        .table-wrapper { max-height: 75vh; overflow: auto; scroll-behavior: smooth; background: #fff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); border-radius: 0.75rem;}
+        table{border-collapse:separate;border-spacing:0;width:100%;white-space:nowrap;}
+        th,td{border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;padding:12px 14px;text-align:left;font-size:13.5px;outline:none;transition:background-color 0.15s;}
+        
+        thead th {
+            position: sticky; top: 0; z-index: 30; background-color: #f1f5f9;
+            font-weight: 700; color: #475569; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; border-top: 1px solid #e2e8f0; white-space: normal; line-height: 1.4; vertical-align: middle;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-
-        /* Glassmorphism Navigation Sticky Bar */
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Excel-like Table Formatting */
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            background-color: #ffffff;
-        }
-        th, td {
-            border: 1px solid #e2e8f0;
-            padding: 12px 16px;
-            text-align: left;
-            font-size: 13.5px;
-        }
-        th {
-            background-color: #f1f5f9;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.05em;
-        }
-        tr:hover {
-            background-color: #f8fafc;
-        }
-        .win-text { color: #059669; font-weight: 700; }
-        .lose-text { color: #dc2626; font-weight: 700; }
-
-        /* Smooth fade-in animation for table rows */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
+        th:first-child,td:first-child{border-left:1px solid #e2e8f0;}
+        tr{background-color:#ffffff;transition:background-color 0.2s;}
+        tr:hover{background-color:#f8fafc;}
+        
+        td:focus{box-shadow:inset 0 0 0 2px #10b981;outline:none;z-index:25;position:relative;}
+        td[contenteditable="true"]{cursor:text;transition:all 0.2s;}
+        td[contenteditable="true"]:focus{background-color:#fefce8;box-shadow:inset 0 0 0 2px #10b981;}
+        
+        /* Empty Reason Red Highlight */
+        .empty-reason { background-color: #fee2e2 !important; box-shadow: inset 0 0 0 1.5px #ef4444 !important; }
+        
+        /* Sticky Column Widths & Backgrounds */
+        .sticky-col{position:sticky;z-index:20;background-color:#ffffff;} 
+        thead th.sticky-col{z-index:40;background-color:#f1f5f9;} 
+        thead th.sticky-col.bg-indigo-50{background-color:#eef2ff !important;}
+        
+        tr:hover .sticky-col { background-color: #f8fafc; }
+        tr.match-success{background-color:#ecfdf5 !important;} tr.match-success .sticky-col {background-color:#ecfdf5 !important;}
+        tr.match-success:hover{background-color:#d1fae5 !important;} tr.match-success:hover .sticky-col {background-color:#d1fae5 !important;}
+        tr.match-fail{background-color:#fff1f2 !important;} tr.match-fail .sticky-col {background-color:#fff1f2 !important;}
+        tr.match-fail:hover{background-color:#ffe4e6 !important;} tr.match-fail:hover .sticky-col {background-color:#ffe4e6 !important;}
+        
+        .col-1{left:0; width:130px; min-width:130px; max-width:130px; white-space:normal; word-wrap:break-word;}
+        .col-2{left:130px; width:130px; min-width:130px; max-width:130px; white-space:normal; word-wrap:break-word;}
+        .col-3{left:260px; width:120px; min-width:120px; max-width:120px; white-space:normal; word-wrap:break-word;}
+        .col-4{left:380px; width:130px; min-width:130px; max-width:130px; white-space:normal; word-wrap:break-word; box-shadow:4px 0 8px -2px rgba(0,0,0,0.15); transition: left 0.3s;}
+        
+        /* Compact View Mode Classes */
+        body.hide-mode .hidable { display: none !important; }
+        body.hide-mode .col-4 { left: 130px; } /* Adjust ticket col when internal cols are hidden */
+        
+        .win-text{color:#059669;font-weight:700;} .lose-text{color:#dc2626;font-weight:700;}
+        .copied-anim{background-color:#a7f3d0 !important;color:#064e3b !important;font-weight:800;transition:all 0.2s ease;}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(15px);}to{opacity:1;transform:translateY(0);}}
+        .fade-in{animation:fadeIn 0.5s ease-out forwards;}
     </style>
 </head>
 <body class="min-h-screen pt-28 pb-12 text-slate-800">
-
-    <!-- --- Top Premium Navigation Bar --- -->
     <nav class="fixed top-4 left-4 right-4 z-50 max-w-7xl mx-auto px-6 py-3 rounded-full glass-nav shadow-md flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200">
-                <i class="fa-solid fa-briefcase text-lg"></i>
-            </div>
-            <span class="font-bold text-lg bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent">Pranto's Workspace</span>
-        </div>
-
-        <div class="flex items-center gap-1">
-            <a href="#" class="px-6 py-2 rounded-full text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-all duration-200 flex items-center gap-2">
-                <i class="fa-solid fa-house"></i> Home
-            </a>
-        </div>
-
-        <div class="hidden md:flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Workspace Active</span>
-        </div>
+        <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200"><i class="fa-solid fa-briefcase text-lg"></i></div><span class="font-bold text-lg bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent">Pranto's Workspace</span></div>
+        <div class="flex items-center gap-1"><a href="#" class="px-6 py-2 rounded-full text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-all duration-200 flex items-center gap-2"><i class="fa-solid fa-house"></i> Home</a></div>
+        <div class="hidden md:flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Workspace Active</span></div>
     </nav>
 
-    <!-- --- Main Content Container --- -->
-    <div class="max-w-7xl mx-auto px-4 md:px-8 mt-6">
-        
-        <!-- Upload & Control Box Section -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 p-8 mb-8 transition-all duration-300 hover:shadow-2xl">
-            <div class="mb-8">
-                <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-file-invoice-dollar text-indigo-500"></i> IDR PDF Auto Data Extractor
-                </h2>
-                <p class="text-slate-500 mt-2 font-medium">Upload multiple PDFs simultaneously to extract IDR final payment determinations. You can keep adding files to the queue.</p>
-            </div>
-
+    <div class="max-w-[95%] mx-auto px-4 mt-6">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 p-8 mb-8">
+            <div class="mb-8"><h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar text-indigo-500"></i> IDR PDF Auto Data Extractor</h2><p class="text-slate-500 mt-2 font-medium">Upload multiple PDFs to extract IDR final payment determinations.</p></div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-                
-                <!-- Input Zone: PDF Drop & Email Paste -->
                 <div class="lg:col-span-2 flex flex-col gap-4">
-                    <!-- Upload Drop Zone -->
                     <input type="file" id="pdfFiles" multiple accept=".pdf" class="hidden" onchange="handleManualUpload(event)">
-                    <label for="pdfFiles" class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-indigo-50/60 hover:border-indigo-400 transition-all duration-300 group">
-                        <div class="flex flex-col items-center justify-center transition-transform group-hover:-translate-y-1">
-                            <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-3 shadow-sm">
-                                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
-                            </div>
-                            <p class="text-sm text-slate-600 font-medium"><span class="font-bold text-indigo-600">Click to upload</span> or drag and drop PDFs</p>
-                            <p class="text-xs text-emerald-600 mt-1.5 font-bold" id="fileCountText">Unlimited files supported (Appends to queue)</p>
-                        </div>
-                    </label>
-
-                    <!-- Email Paste Zone -->
-                    <textarea id="emailText" placeholder="Paste determination emails here to auto-match dates (e.g., Sun, May 17...). Dates will be linked to the extracted disputes." class="w-full h-24 p-4 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:border-indigo-300 focus:bg-white focus:border-indigo-500 outline-none transition-all resize-none text-sm text-slate-700 placeholder-slate-400"></textarea>
-                </div>
-
-                <!-- Interactive Buttons Panel -->
-                <div class="flex flex-col gap-3 justify-center">
-                    <button onclick="processPDFs()" id="processBtn" class="bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed" disabled>
-                        <i class="fa-solid fa-robot"></i> Select PDFs First...
-                    </button>
+                    <label for="pdfFiles" class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-indigo-50/60 hover:border-indigo-400 transition-all duration-300 group"><div class="flex flex-col items-center justify-center transition-transform group-hover:-translate-y-1"><div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-3 shadow-sm"><i class="fa-solid fa-cloud-arrow-up text-xl"></i></div><p class="text-sm text-slate-600 font-medium"><span class="font-bold text-indigo-600">Click to upload</span> or drag and drop PDFs</p><p class="text-xs text-emerald-600 mt-1.5 font-bold" id="fileCountText">Unlimited files supported</p></div></label>
+                    <textarea id="emailText" placeholder="Paste determination emails here to auto-match dates..." class="w-full h-24 p-4 rounded-2xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none text-sm text-slate-700"></textarea>
                     
+                    <div class="flex justify-between mt-[-10px] mb-2">
+                        <button onclick="document.getElementById('sheetInputContainer').classList.toggle('hidden')" class="text-[11px] text-teal-600 font-bold hover:text-teal-800 transition-colors flex items-center gap-1"><i class="fa-solid fa-link"></i> Master Sheet Link</button>
+                    </div>
+                    <div id="sheetInputContainer" class="hidden"><input type="text" id="googleSheetUrl" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vSnIe4C4_UxR8iPoTSAFy0Nr9DQIatx_SUJkB9jPW2xDbE85zeFnuPWtikrE6J8ZOhAAQT9_EaQ1mLY/pub?gid=2036811380&single=true&output=csv" placeholder="Paste Google Sheet Public CSV URL" class="w-full p-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 focus:bg-white outline-none text-sm font-medium text-slate-700"></div>
+                    
+                    <div class="flex items-center justify-between p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl mt-1 shadow-sm">
+                        <div class="flex items-center gap-3 w-full">
+                            <span class="text-[11px] font-extrabold text-indigo-800 uppercase tracking-wide"><i class="fa-solid fa-pen-nib"></i> Note Setup:</span>
+                            <input type="text" id="notePrefix" value="IDR" class="w-20 p-2 rounded-lg border border-slate-300 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500" title="Prefix">
+                            <input type="text" id="noteName" value="SHORNA R" class="w-40 p-2 rounded-lg border border-slate-300 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500" title="Name">
+                            <button onclick="generateNotes()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 ml-auto transition-colors shadow-sm"><i class="fa-solid fa-arrows-rotate"></i> Generate Notes</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-3 justify-center">
+                    <button onclick="processPDFs()" id="processBtn" class="bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-not-allowed" disabled><i class="fa-solid fa-robot"></i> Select PDFs First...</button>
+                    <button onclick="matchGoogleSheet()" id="matchBtn" class="bg-slate-100 border-2 border-slate-200 text-slate-400 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-not-allowed" disabled><i class="fa-solid fa-bolt"></i> Match Sheet Data</button>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="copyTableToClipboard()" id="copyBtn" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all duration-200 hidden flex items-center justify-center gap-1.5 text-sm">
-                            <i class="fa-solid fa-copy"></i> Copy Excel
-                        </button>
-                        
-                        <button onclick="clearAllData()" id="clearBtn" class="border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 font-bold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 text-sm">
-                            <i class="fa-solid fa-trash-can"></i> Clear All
-                        </button>
+                        <button onclick="copyTableToClipboard()" id="copyBtn" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 px-4 rounded-xl hidden flex items-center justify-center gap-1.5 text-sm shadow-md"><i class="fa-solid fa-copy"></i> Copy Output</button>
+                        <button onclick="clearAllData()" id="clearBtn" class="border-2 border-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-1.5 text-sm"><i class="fa-solid fa-trash-can"></i> Clear All</button>
                     </div>
                 </div>
             </div>
-
-            <!-- --- Animated Progress Bar Section --- -->
-            <div id="progressContainer" class="hidden mt-8 pt-6 border-t border-slate-100">
-                <div class="flex justify-between items-center mb-3">
-                    <span class="text-sm font-bold text-slate-700 flex items-center gap-2" id="progressStatus">
-                        <i class="fa-solid fa-circle-notch animate-spin text-indigo-600"></i> Reading PDF metadata...
-                    </span>
-                    <span class="text-sm font-bold text-indigo-600" id="progressPercentage">0%</span>
-                </div>
-                <div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-200">
-                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 h-2.5 rounded-full transition-all duration-100" style="width: 0%"></div>
-                </div>
-            </div>
+            <div id="progressContainer" class="hidden mt-8 pt-6 border-t border-slate-100"><div class="flex justify-between items-center mb-3"><span class="text-sm font-bold text-slate-700 flex items-center gap-2" id="progressStatus"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600"></i> Reading PDF metadata...</span><span class="text-sm font-bold text-indigo-600" id="progressPercentage">0%</span></div><div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-200"><div id="progressBar" class="bg-gradient-to-r from-blue-500 to-emerald-500 h-2.5 rounded-full" style="width:0%"></div></div></div>
         </div>
 
-        <!-- --- Premium Stats Summary Cards Dashboard --- -->
         <div id="summaryCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 hidden fade-in">
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Disputes</p>
-                    <h3 id="statTotalDisputes" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-                </div>
-                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl shadow-inner">
-                    <i class="fa-solid fa-folder-open"></i>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Dets</p>
-                    <h3 id="statTotalDets" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-                </div>
-                <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl shadow-inner">
-                    <i class="fa-solid fa-file-invoice"></i>
-                </div>
-            </div>
-            
-            <!-- Wins Card with Total Amount Badge -->
-            <div class="bg-white rounded-2xl border border-emerald-100 p-6 shadow-lg shadow-emerald-100/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-50 rounded-full z-0"></div>
-                <div class="z-10 relative">
-                    <p class="text-xs font-bold text-emerald-600/80 uppercase tracking-wider">Total Wins</p>
-                    <div class="mt-1">
-                        <h3 id="statTotalWins" class="text-3xl font-extrabold text-emerald-600 leading-none">0</h3>
-                        <span id="statTotalWinAmount" class="inline-block mt-1.5 text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md shadow-sm border border-emerald-200/50">$0.00</span>
-                    </div>
-                </div>
-                <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl shadow-inner z-10 relative">
-                    <i class="fa-solid fa-trophy"></i>
-                </div>
-            </div>
-            
-            <!-- Losses Card with Total Amount Badge -->
-            <div class="bg-white rounded-2xl border border-rose-100 p-6 shadow-lg shadow-rose-100/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 w-16 h-16 bg-rose-50 rounded-full z-0"></div>
-                <div class="z-10 relative">
-                    <p class="text-xs font-bold text-rose-600/80 uppercase tracking-wider">Total Losses</p>
-                    <div class="mt-1">
-                        <h3 id="statTotalLosses" class="text-3xl font-extrabold text-rose-600 leading-none">0</h3>
-                        <span id="statTotalLossAmount" class="inline-block mt-1.5 text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md shadow-sm border border-rose-200/50">$0.00</span>
-                    </div>
-                </div>
-                <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl shadow-inner z-10 relative">
-                    <i class="fa-solid fa-circle-xmark"></i>
-                </div>
-            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg shadow-slate-200/50 flex justify-between"><div><p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Disputes</p><h3 id="statTotalDisputes" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3></div><div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-folder-open"></i></div></div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg shadow-slate-200/50 flex justify-between"><div><p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Dets</p><h3 id="statTotalDets" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3></div><div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-file-invoice"></i></div></div>
+            <div class="bg-white rounded-2xl border border-emerald-100 p-6 shadow-lg shadow-emerald-100/50 flex justify-between"><div><p class="text-xs font-bold text-emerald-600/80 uppercase tracking-wider">Total Wins</p><div class="mt-1"><h3 id="statTotalWins" class="text-3xl font-extrabold text-emerald-600 leading-none">0</h3><span id="statTotalWinAmount" class="inline-block mt-1.5 text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">$0.00</span></div></div><div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-trophy"></i></div></div>
+            <div class="bg-white rounded-2xl border border-rose-100 p-6 shadow-lg shadow-rose-100/50 flex justify-between"><div><p class="text-xs font-bold text-rose-600/80 uppercase tracking-wider">Total Losses</p><div class="mt-1"><h3 id="statTotalLosses" class="text-3xl font-extrabold text-rose-600 leading-none">0</h3><span id="statTotalLossAmount" class="inline-block mt-1.5 text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md">$0.00</span></div></div><div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-circle-xmark"></i></div></div>
         </div>
 
-        <!-- --- Table Container Section --- -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/60 overflow-hidden hidden transition-all duration-300 flex flex-col" id="tableContainer">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/60 overflow-hidden hidden transition-all duration-300" id="tableContainer">
             <div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/80">
-                <span class="font-extrabold text-slate-800 text-lg flex items-center gap-2">
-                    <i class="fa-solid fa-table text-indigo-500"></i> Extracted Dispute Dataset
-                </span>
-                <span class="bg-indigo-100 border border-indigo-200 text-indigo-800 text-xs font-extrabold px-4 py-1.5 rounded-full flex items-center gap-1.5" id="totalCountBadge">
-                    0 Records found
-                </span>
+                <span class="font-extrabold text-slate-800 text-lg flex items-center gap-2"><i class="fa-solid fa-table text-indigo-500"></i> Extracted Dispute Dataset</span>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleColumns()" id="toggleViewBtn" class="bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-full text-xs font-extrabold hover:bg-indigo-200 transition-colors shadow-sm"><i class="fa-solid fa-eye-slash"></i> Compact View</button>
+                    <span class="bg-indigo-100 border border-indigo-200 text-indigo-800 text-xs font-extrabold px-4 py-1.5 rounded-full" id="totalCountBadge">0 Records found</span>
+                </div>
             </div>
-            
-            <div class="overflow-x-auto p-4 flex-grow">
-                <table id="resultTable" class="rounded-xl overflow-hidden border border-slate-200 w-full">
+            <div class="table-wrapper border-t-0 border-l-0 border-r-0 rounded-none" id="tableScrollWrapper">
+                <table id="resultTable">
                     <thead>
-                        <tr>
-                            <th>Dispute No</th>
-                            <th>Dispute Group</th>
-                            <th class="w-32 text-center">Det. Date</th>
-                            <th>Status</th>
-                            <th>Det #</th>
-                            <th>Claim No</th>
-                            <th>CPT</th>
-                            <th>Amount</th>
+                        <tr id="tableHeaderRow">
+                            <th class="sticky-col col-1">Dispute Group</th>
+                            <th class="sticky-col col-2 hidable">IDR Number</th>
+                            <th class="sticky-col col-3 hidable text-indigo-700 bg-indigo-50">IDR Type</th>
+                            <th class="sticky-col col-4 text-indigo-700 bg-indigo-50">Ticket Number</th>
+                            <th class="hidable">Claim Number</th>
+                            <th class="hidable">CPT code</th>
+                            <th class="hidable text-indigo-700 bg-indigo-50">Initial Payment (W/PR)</th>
+                            <th class="hidable text-indigo-700 bg-indigo-50">Mediator</th>
+                            <th class="hidable text-indigo-700 bg-indigo-50">Mediator Fee (Admin)</th>
+                            <th class="hidable text-indigo-700 bg-indigo-50">Mediator Fee (Proc)</th>
+                            <th class="hidable">Det #</th>
+                            <th class="hidable">Determination</th>
+                            <th class="hidable text-center">Date Received</th>
+                            <th>WIN/LOSE</th>
+                            <th class="hidable text-emerald-700 bg-emerald-50">Additional Payment Recv</th>
+                            <th class="hidable text-indigo-700 bg-indigo-50">Mediator Refund</th>
+                            <th class="text-rose-700 bg-rose-50" style="min-width:260px; max-width:320px;">Lose Reason</th>
+                            <th class="text-slate-700 bg-amber-50" style="min-width:350px; max-width:450px;">Correspondence Note</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
             </div>
-
-            <!-- --- NEW NEXT BUTTON --- -->
-            <div class="p-5 border-t border-slate-200 bg-slate-50 flex justify-end">
-                <button onclick="goToFinalPage()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-md shadow-indigo-200 hover:shadow-indigo-300 transition-all flex items-center gap-2 group">
-                    Next: Final Determination <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                </button>
-            </div>
         </div>
-
-        <!-- --- Premium Footer Section --- -->
+        
         <footer class="mt-16 border-t border-slate-200/80 pt-8 pb-12 text-center">
-            <div class="flex flex-col items-center gap-4">
-                <div class="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest bg-indigo-50 px-4 py-1.5 rounded-full">
-                    <i class="fa-solid fa-scale-balanced text-base"></i>
-                    <span>Federal IDR Final Payment Determination</span>
-                </div>
-                <p class="text-xs md:text-sm text-slate-500 max-w-3xl leading-relaxed font-medium">
-                    This workspace processes Independent Dispute Resolution (IDR) final payment determination documents under the No Surprises Act. It automatically scans medical provider and plan submissions, extracts claim numbers, CPT codes, approved out-of-network rates, and identifies the prevailing party using cross-verification matching.
-                </p>
-                <div class="h-1 w-16 bg-slate-200 rounded-full my-2"></div>
-                <p class="text-sm text-slate-500 font-semibold flex items-center gap-1.5">
-                    <span>Made with <i class="fa-solid fa-heart text-rose-500 animate-pulse mx-1"></i> by</span>
-                    <span class="font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Pranto's Workspace</span>
-                    <span>© 2026</span>
-                </p>
-            </div>
+            <div class="flex flex-col items-center gap-4"><div class="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest bg-indigo-50 px-4 py-1.5 rounded-full"><i class="fa-solid fa-scale-balanced text-base"></i><span>Federal IDR Workspace</span></div><p class="text-sm text-slate-500 font-semibold mt-2">Made with <i class="fa-solid fa-heart text-rose-500 animate-pulse mx-1"></i> by <span class="font-extrabold text-indigo-600">Pranto's Workspace</span> © 2026</p></div>
         </footer>
-
     </div>
 
-    <!-- --- Toast Notifications System --- -->
-    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-slate-900/50 opacity-0 transition-all duration-300 translate-y-4 z-50 flex items-center gap-3 font-bold border border-slate-700"></div>
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl opacity-0 transition-all translate-y-4 z-50 flex items-center gap-3 font-bold"></div>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-        
-        let allSelectedFiles = []; // Global array to append files
-        let extractedResults = []; 
-
+        let allSelectedFiles = [], extractedResults = [], gSheetData = [];
         const insKeywords = ["BCBS", "BLUE CROSS", "BLUE SHIELD", "AETNA", "CIGNA", "UNITED", "UHC", "HUMANA", "MOLINA", "OSCAR", "AMBETTER", "HEALTH PLAN"];
         const provKeywords = ["LLC", "GROUP", "CENTER", " ER ", "PHYSICIAN", "CLINIC", "HOSPITAL", " PA ", "PLLC", "ASSOCIATES", "EMERGENCY"];
 
-        function handleManualUpload(event) {
-            const input = event.target;
-            const fileCountText = document.getElementById('fileCountText');
-            const processBtn = document.getElementById('processBtn');
-            
-            if(input.files.length > 0) {
-                let newFiles = Array.from(input.files);
-                allSelectedFiles = allSelectedFiles.concat(newFiles); // Append new files to the list
-                
-                fileCountText.innerHTML = `<span class="text-indigo-600 font-extrabold">${allSelectedFiles.length}</span> file(s) queued. Add more or click Extract.`;
-                
-                // Enable button since files are present
-                processBtn.disabled = false;
-                processBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data`;
-                processBtn.className = "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all duration-200 flex items-center justify-center gap-2 text-base";
-            }
-            
-            // Clear input value so same files can be re-selected if user browses same directory
-            input.value = ""; 
+        function showToast(msg, isErr=false){
+            const t=document.getElementById('toast');
+            t.innerHTML=isErr?`<i class="fa-solid fa-circle-exclamation text-rose-500 text-lg"></i> ${msg}`:`<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i> ${msg}`;
+            t.classList.remove('opacity-0','translate-y-4'); t.classList.add('opacity-100','translate-y-0');
+            setTimeout(()=>{t.classList.remove('opacity-100','translate-y-0');t.classList.add('opacity-0','translate-y-4');},3500);
         }
 
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            toast.innerHTML = isError ? `<i class="fa-solid fa-circle-exclamation text-rose-500 text-lg"></i> ${msg}` : `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i> ${msg}`;
-            toast.classList.remove('opacity-0', 'translate-y-4');
-            toast.classList.add('opacity-100', 'translate-y-0');
-            setTimeout(() => {
-                toast.classList.remove('opacity-100', 'translate-y-0');
-                toast.classList.add('opacity-0', 'translate-y-4');
-            }, 3500);
+        function handleManualUpload(e) {
+            const i=e.target, f=document.getElementById('fileCountText'), p=document.getElementById('processBtn');
+            if(i.files.length>0){
+                allSelectedFiles=allSelectedFiles.concat(Array.from(i.files));
+                f.innerHTML=`<span class="text-indigo-600 font-extrabold">${allSelectedFiles.length}</span> file(s) queued.`;
+                p.disabled=false; p.innerHTML=`<i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data`;
+                p.className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md cursor-pointer";
+            } i.value="";
         }
 
         function clearAllData() {
-            allSelectedFiles = [];
-            extractedResults = [];
-            
-            document.getElementById('pdfFiles').value = "";
-            document.getElementById('emailText').value = "";
-            document.getElementById('fileCountText').innerText = "Unlimited files supported (Appends to queue)";
-            document.getElementById('tableBody').innerHTML = "";
-            document.getElementById('tableContainer').classList.add('hidden');
-            document.getElementById('progressContainer').classList.add('hidden');
-            document.getElementById('copyBtn').classList.add('hidden');
+            allSelectedFiles=[]; extractedResults=[]; gSheetData=[];
+            document.getElementById('pdfFiles').value=""; document.getElementById('emailText').value="";
+            document.getElementById('fileCountText').innerText="Unlimited files supported";
+            document.getElementById('tableBody').innerHTML=""; document.getElementById('tableContainer').classList.add('hidden');
+            document.getElementById('progressContainer').classList.add('hidden'); document.getElementById('copyBtn').classList.add('hidden');
             document.getElementById('summaryCardsContainer').classList.add('hidden');
             
-            let processBtn = document.getElementById('processBtn');
-            processBtn.innerHTML = `<i class="fa-solid fa-robot"></i> Select PDFs First...`;
-            processBtn.className = "bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
-            processBtn.disabled = true;
-
+            let p=document.getElementById('processBtn'); p.innerHTML=`<i class="fa-solid fa-robot"></i> Select PDFs First...`; p.className="bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed"; p.disabled=true;
+            let m=document.getElementById('matchBtn'); m.disabled=true; m.className="bg-slate-100 text-slate-400 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed border-2 border-slate-200"; m.innerHTML=`<i class="fa-solid fa-bolt"></i> Match Sheet Data`;
             showToast("Workspace completely reset!");
         }
 
-        // Email Parsing Engine
-        function parseEmailDates() {
-            const text = document.getElementById('emailText').value;
-            const dateMap = {};
-            if (!text) return dateMap;
-
-            // Regex to find dates like "May 17", "May 17, 2024", "January 5"
-            const dateRegex = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s+(\d{4}))?\b/gi;
-            const dispRegex = /DISP-\d+/gi;
-            
-            let dates = [];
-            let match;
-            while ((match = dateRegex.exec(text)) !== null) {
-                dates.push({
-                    index: match.index,
-                    month: match[1].substring(0, 3).toLowerCase(),
-                    day: match[2],
-                    year: match[3] || new Date().getFullYear(),
-                    raw: match[0]
-                });
+        function toggleColumns() {
+            const isHidden = document.body.classList.toggle('hide-mode');
+            const btn = document.getElementById('toggleViewBtn');
+            if(isHidden) {
+                btn.innerHTML = `<i class="fa-solid fa-eye"></i> Show All Columns`;
+                btn.classList.replace('bg-indigo-100', 'bg-indigo-600');
+                btn.classList.replace('text-indigo-700', 'text-white');
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-eye-slash"></i> Compact View`;
+                btn.classList.replace('bg-indigo-600', 'bg-indigo-100');
+                btn.classList.replace('text-white', 'text-indigo-700');
             }
-            
-            const monthMap = {
-                "jan":"01", "feb":"02", "mar":"03", "apr":"04", "may":"05", "jun":"06",
-                "jul":"07", "aug":"08", "sep":"09", "oct":"10", "nov":"11", "dec":"12"
-            };
-
-            while ((match = dispRegex.exec(text)) !== null) {
-                let disp = match[0].toUpperCase();
-                let dispIndex = match.index;
-                
-                // Find the closest date physically appearing before this DISP number in the text
-                let closestDate = null;
-                for (let i = dates.length - 1; i >= 0; i--) {
-                    if (dates[i].index < dispIndex) {
-                        closestDate = dates[i];
-                        break;
-                    }
-                }
-                
-                if (closestDate) {
-                    let dd = closestDate.day.padStart(2, '0');
-                    let mm = monthMap[closestDate.month];
-                    let yyyy = closestDate.year;
-                    dateMap[disp] = `${mm}/${dd}/${yyyy}`;
-                }
-            }
-            return dateMap;
         }
 
-        function extractTextFromPDF(file) {
-            return new Promise((resolve, reject) => {
-                if (!file) return resolve("");
-                const reader = new FileReader();
-                reader.onload = async function() {
-                    try {
-                        const typedarray = new Uint8Array(this.result);
-                        const pdf = await pdfjsLib.getDocument({data: typedarray}).promise;
-                        let fullText = "";
-                        for (let i = 1; i <= pdf.numPages; i++) {
-                            const page = await pdf.getPage(i);
-                            const content = await page.getTextContent();
-                            fullText += content.items.map(item => item.str).join(" ") + " ";
+        function handleReasonInput(el) {
+            if(el.innerText.trim() !== '') {
+                el.classList.remove('empty-reason');
+            } else {
+                el.classList.add('empty-reason');
+            }
+            generateNotes(); // Update real-time without losing focus
+        }
+
+        // Smooth Excel-like Key Navigation with Scrolling Fix
+        document.addEventListener('keydown', function(e) {
+            if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) return;
+            const act = document.activeElement;
+            if(act.tagName === 'TD' || act.tagName === 'DIV') {
+                let cell = act.tagName === 'DIV' ? act.parentElement : act;
+                // ALLOW user to use all arrow keys inside the contenteditable area without jumping cells
+                if(cell.isContentEditable || act.isContentEditable) return; 
+                
+                e.preventDefault();
+                const row = cell.parentElement, idx = Array.from(row.children).indexOf(cell);
+                let next = null;
+                if(e.key === 'ArrowRight') next = cell.nextElementSibling;
+                if(e.key === 'ArrowLeft') next = cell.previousElementSibling;
+                if(e.key === 'ArrowDown' && row.nextElementSibling) next = row.nextElementSibling.children[idx];
+                if(e.key === 'ArrowUp' && row.previousElementSibling) next = row.previousElementSibling.children[idx];
+                
+                if(next) {
+                    let focusTarget = next.querySelector('div') ? next.querySelector('div') : next;
+                    focusTarget.focus({preventScroll: true}); 
+                    const container = document.getElementById('tableScrollWrapper');
+                    const nRect = next.getBoundingClientRect();
+                    const cRect = container.getBoundingClientRect();
+                    const stickyWidth = 510; 
+                    const headerHeight = 45; 
+                    
+                    if (nRect.left < cRect.left + stickyWidth && idx >= 4) {
+                        container.scrollBy({ left: nRect.left - (cRect.left + stickyWidth) - 20, behavior: 'smooth' });
+                    } else if (nRect.right > cRect.right) {
+                        container.scrollBy({ left: nRect.right - cRect.right + 20, behavior: 'smooth' });
+                    }
+                    if (nRect.top < cRect.top + headerHeight) {
+                        container.scrollBy({ top: nRect.top - (cRect.top + headerHeight) - 20, behavior: 'smooth' });
+                    } else if (nRect.bottom > cRect.bottom) {
+                        container.scrollBy({ top: nRect.bottom - cRect.bottom + 20, behavior: 'smooth' });
+                    }
+                }
+            }
+        });
+
+        document.addEventListener('paste', function(e) {
+            const act = document.activeElement;
+            let cell = act.tagName === 'DIV' ? act.parentElement : act;
+            if((act.tagName === 'TD' || act.tagName === 'DIV') && act.isContentEditable) {
+                e.preventDefault();
+                let paste = (e.clipboardData || window.clipboardData).getData('text');
+                let rows = paste.split(/\r\n|\n|\r/);
+                let cRow = cell.parentElement, idx = Array.from(cRow.children).indexOf(cell);
+                for(let r of rows) {
+                    if(!cRow || !r.trim()) break;
+                    let target = cRow.children[idx];
+                    let editableTarget = target.querySelector('div') ? target.querySelector('div') : target;
+                    if(editableTarget && editableTarget.isContentEditable) {
+                        editableTarget.innerText = r.trim();
+                        target.classList.remove('bg-rose-50', 'text-rose-500');
+                        target.classList.add('font-bold', 'text-slate-800');
+                        if(idx === 12) fillAllDates(editableTarget); 
+                        if(idx === 16) handleReasonInput(editableTarget); 
+                    }
+                    cRow = cRow.nextElementSibling;
+                }
+            }
+        });
+
+        function fillAllDates(el) {
+            let val = el.innerText;
+            document.querySelectorAll('td.date-edit-cell').forEach(c => {
+                if(c !== el && c !== el.parentElement) {
+                    c.innerText = val;
+                    c.classList.remove('bg-rose-50', 'text-rose-500');
+                    c.classList.add('font-bold', 'text-slate-800');
+                }
+            });
+        }
+
+        function copyCellData(el) {
+            let text = el.innerText.trim();
+            let parentTd = el.tagName === 'DIV' ? el.parentElement : el;
+            if(text && text !== '-') {
+                const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+                try { document.execCommand('copy'); parentTd.classList.add('copied-anim'); setTimeout(()=>parentTd.classList.remove('copied-anim'), 2000); } catch(e) {}
+                document.body.removeChild(ta);
+            }
+        }
+
+        function copyWinLoseRow(el) {
+            const row = el.closest('tr');
+            const date = row.cells[12].innerText.trim(); 
+            const status = row.cells[13].innerText.trim();
+            const calc = row.cells[14].innerText.trim();
+            const medRefund = row.cells[15].innerText.trim(); 
+            const copyText = `${date}\t${status}\t${calc}\t\t${medRefund}`;
+            
+            const ta = document.createElement("textarea"); ta.value = copyText; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); el.classList.add('copied-anim'); setTimeout(()=>el.classList.remove('copied-anim'), 2000); } catch(e){}
+            document.body.removeChild(ta);
+        }
+
+        function getBdtDate() {
+            return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Dhaka', year: '2-digit', month: '2-digit', day: '2-digit' }).format(new Date());
+        }
+
+        function generateNotes() {
+            const prefix = document.getElementById('notePrefix').value.trim() || "IDR";
+            const name = document.getElementById('noteName').value.trim() || "NAME";
+            const bdtDate = getBdtDate(); 
+            
+            const rows = Array.from(document.querySelectorAll('#tableBody tr.result-row'));
+            const groups = {};
+            rows.forEach(r => {
+                const idr = r.getAttribute('data-idr');
+                if(!groups[idr]) groups[idr] = [];
+                groups[idr].push(r);
+            });
+
+            Object.keys(groups).forEach(idr => {
+                const groupRows = groups[idr];
+                const firstRow = groupRows[0];
+                const cHead = firstRow.querySelectorAll('td');
+                
+                if(cHead[0].innerText.trim() === "") return; 
+
+                const mediatorRaw = cHead[7].innerText.trim() !== '-' ? cHead[7].innerText.trim() : '';
+                const adminFee = parseFloat(cHead[8].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                const procFee = parseFloat(cHead[9].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                const totalFee = adminFee + procFee;
+                
+                const feeStr = totalFee > 0 ? `$${totalFee.toFixed(2)}` : '$0.00';
+                const mediatorText = mediatorRaw ? `${mediatorRaw}(${feeStr})` : `(${feeStr})`;
+                
+                const status = cHead[13].innerText.trim().toUpperCase(); 
+                const typeStr = `${prefix} ${status}`; 
+                const notePrefixStr = `${bdtDate}>${typeStr}>${name}>${idr}, ${mediatorText}`;
+                
+                let headReasonDiv = cHead[16].querySelector('div');
+                let loseReasonHead = headReasonDiv.innerText.trim();
+                let reasonForNote = loseReasonHead || "[REASON REQUIRED - PLEASE UPDATE]";
+
+                if (groupRows.length === 1) {
+                    let detAmt = cHead[11].innerText.trim();
+                    let addAmt = cHead[14].innerText.trim();
+                    
+                    let note = "";
+                    if(status === 'WIN') {
+                        note = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. WIN AMOUNT ${detAmt}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmt} AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                    } else {
+                        note = `${notePrefixStr}. UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${reasonForNote}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmt}. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                    }
+                    
+                    headReasonDiv.setAttribute('title', loseReasonHead);
+                    let noteDiv = cHead[17].querySelector('div');
+                    noteDiv.innerText = note;
+                    noteDiv.setAttribute('title', note);
+                    
+                } else {
+                    let totalDet = 0, totalAdd = 0, cptArr = [];
+                    groupRows.forEach(r => {
+                        const c = r.querySelectorAll('td');
+                        let cpt = c[5].innerText.trim();
+                        let dVal = parseFloat(c[11].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                        let aVal = parseFloat(c[14].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                        totalDet += dVal; totalAdd += aVal;
+                        cptArr.push(`${cpt} FOR CPT ${dVal.toFixed(2)}`);
+                    });
+                    
+                    let cptString = cptArr.join(', ');
+                    let totalDetStr = "$" + totalDet.toFixed(2);
+                    let totalAddStr = "$" + totalAdd.toFixed(2);
+
+                    let note1 = "";
+                    if(status === 'WIN') {
+                        note1 = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. ADDITIONAL AMOUNTS OF ${cptString}. TOTAL WIN AMOUNT ${totalDetStr}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${totalAddStr} AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                    } else {
+                        note1 = `${notePrefixStr}, UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${reasonForNote}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. ADDITIONAL AMOUNTS OF ${cptString}. TOTAL LOSE AMOUNT ${totalDetStr}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${totalAddStr}. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                    }
+                    
+                    headReasonDiv.setAttribute('title', loseReasonHead);
+                    let headNoteDiv = cHead[17].querySelector('div');
+                    headNoteDiv.innerText = note1;
+                    headNoteDiv.setAttribute('title', note1);
+
+                    for(let i=1; i<groupRows.length; i++) {
+                        const cRow = groupRows[i].querySelectorAll('td');
+                        let rDetAmt = cRow[11].innerText.trim();
+                        let rAddAmt = cRow[14].innerText.trim();
+                        let rReasonDiv = cRow[16].querySelector('div');
+                        let rLoseReason = rReasonDiv.innerText.trim() || reasonForNote; 
+                        
+                        let rNote = "";
+                        if(status === 'WIN') {
+                            rNote = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. WIN AMOUNT ${rDetAmt}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${rAddAmt} AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                        } else {
+                            rNote = `${notePrefixStr}. UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${rLoseReason}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${rAddAmt}. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
                         }
-                        resolve(fullText.replace(/\s+/g, ' '));
-                    } catch (e) { resolve(""); }
-                };
-                reader.onerror = () => resolve("");
-                reader.readAsArrayBuffer(file);
+                        
+                        rReasonDiv.setAttribute('title', rLoseReason);
+                        let rNoteDiv = cRow[17].querySelector('div');
+                        rNoteDiv.innerText = rNote;
+                        rNoteDiv.setAttribute('title', rNote);
+                    }
+                }
+            });
+        }
+
+        function parseCurrencyToNumber(cs){return cs&&cs!=="Check PDF"?parseFloat(cs.replace(/[^0-9.-]+/g,""))||0:0;}
+        function formatNumberToCurrency(num){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num);}
+
+        function extractTextFromPDF(file){
+            return new Promise((r)=>{
+                if(!file)return r(""); const rd=new FileReader();
+                rd.onload=async function(){try{const ta=new Uint8Array(this.result),pdf=await pdfjsLib.getDocument({data:ta}).promise;let ft="";for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i),c=await p.getTextContent();ft+=c.items.map(it=>it.str).join(" ")+" ";}r(ft.replace(/\s+/g,' '));}catch(e){r("");}};
+                rd.readAsArrayBuffer(file);
             });
         }
 
         async function processPDFs() {
-            if (allSelectedFiles.length === 0) {
-                showToast("Please add PDF files to extract first.", true);
-                return;
-            }
-
-            const tableBody = document.getElementById('tableBody');
-            const progressContainer = document.getElementById('progressContainer');
-            const progressBar = document.getElementById('progressBar');
-            const progressStatus = document.getElementById('progressStatus');
-            const progressPercentage = document.getElementById('progressPercentage');
-            const processBtn = document.getElementById('processBtn');
-            const copyBtn = document.getElementById('copyBtn');
-            const tableContainer = document.getElementById('tableContainer');
-            const summaryCardsContainer = document.getElementById('summaryCardsContainer');
-
-            // UI Setup for Processing State
-            tableBody.innerHTML = "";
-            tableContainer.classList.add('hidden');
-            copyBtn.classList.add('hidden');
-            summaryCardsContainer.classList.add('hidden');
-            progressContainer.classList.remove('hidden');
+            if(allSelectedFiles.length===0)return showToast("Please add PDF files",true);
+            document.getElementById('tableBody').innerHTML=""; document.getElementById('tableContainer').classList.add('hidden');
+            document.getElementById('summaryCardsContainer').classList.add('hidden'); document.getElementById('progressContainer').classList.remove('hidden');
             
-            // Transform button to processing state
-            processBtn.disabled = true;
-            processBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Processing Extractor...`;
-            processBtn.className = "bg-slate-200 text-indigo-600 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
-
-            extractedResults = [];
-            let totalFiles = allSelectedFiles.length;
-
-            for (let i = 0; i < totalFiles; i++) {
-                let file = allSelectedFiles[i];
-                if (!file || !file.name) continue; 
-                
-                let text = await extractTextFromPDF(file);
-                if(text && text.trim().length > 50) {
-                    extractedResults.push({ fileName: file.name, text: text });
-                }
-            }
-
-            let currentPercent = 0;
-            let duration = Math.max(2000, totalFiles * 150); 
-            let intervalTime = 50; 
-            let steps = duration / intervalTime;
-            let increment = 100 / steps;
-
-            let interval = setInterval(() => {
-                currentPercent += increment;
-                if (currentPercent > 100) currentPercent = 100;
-
-                progressBar.style.width = `${currentPercent}%`;
-                progressPercentage.innerText = `${Math.round(currentPercent)}%`;
-
-                if (currentPercent < 25) {
-                    progressStatus.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin text-blue-500"></i> Reading PDF Metadata...`;
-                } else if (currentPercent < 50) {
-                    progressStatus.innerHTML = `<i class="fa-solid fa-bolt animate-bounce text-indigo-500"></i> Analyzing Data...`;
-                } else if (currentPercent < 75) {
-                    progressStatus.innerHTML = `<i class="fa-solid fa-bezier-curve text-pink-500"></i> Verifying Amounts & Parties...`;
-                } else if (currentPercent < 100) {
-                    progressStatus.innerHTML = `<i class="fa-solid fa-rectangle-list text-teal-500"></i> Formatting Dataset...`;
-                } else {
-                    progressStatus.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> Done!`;
-                }
-
-                if (currentPercent >= 100) {
-                    clearInterval(interval);
-                    renderTableData(); 
-                }
-            }, intervalTime);
-        }
-
-        function parseCurrencyToNumber(currencyStr) {
-            if (!currencyStr || currencyStr === "Check PDF") return 0;
-            let numStr = currencyStr.replace(/[^0-9.-]+/g, "");
-            return parseFloat(numStr) || 0;
-        }
-
-        function formatNumberToCurrency(num) {
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
-        }
-
-        function getSubmittedOffers(textBlock) {
-            let provOffers = [];
-            let insOffers = [];
-            let offerRegex = /(.{1,80}?)\s+(?:SUBMITTED AN OFFER OF|SUBMITTED AN OFFER FOR|OFFER OF|OFFERED)\s*\$\s*([\d,]+\.\d{2})/gi;
+            const pb=document.getElementById('processBtn'); pb.disabled=true; pb.innerHTML=`<i class="fa-solid fa-spinner animate-spin"></i> Processing...`;
+            document.getElementById('matchBtn').disabled=true;
+            extractedResults=[]; let tf=allSelectedFiles.length;
+            for(let i=0;i<tf;i++){let f=allSelectedFiles[i]; if(f&&f.name){let t=await extractTextFromPDF(f); if(t&&t.length>50)extractedResults.push({text:t});}}
             
-            for (let m of textBlock.matchAll(offerRegex)) {
-                let partyName = " " + m[1].toUpperCase() + " ";
-                let amount = parseCurrencyToNumber(m[2]);
-                
-                let firstInsIdx = -1; let firstProvIdx = -1;
-                insKeywords.forEach(kw => { let idx = partyName.indexOf(kw); if (idx !== -1 && (firstInsIdx === -1 || idx < firstInsIdx)) firstInsIdx = idx; });
-                provKeywords.forEach(kw => { let idx = partyName.indexOf(kw); if (idx !== -1 && (firstProvIdx === -1 || idx < firstProvIdx)) firstProvIdx = idx; });
-
-                if (firstInsIdx !== -1 && firstProvIdx !== -1) {
-                    if (firstProvIdx < firstInsIdx) provOffers.push(amount);
-                    else insOffers.push(amount);
-                } else if (firstInsIdx !== -1) {
-                    insOffers.push(amount);
-                } else if (firstProvIdx !== -1) {
-                    provOffers.push(amount);
-                }
-            }
-            return { provOffers, insOffers };
+            let cp=0, iv=setInterval(()=>{cp+=100/(Math.max(2000,tf*150)/50); if(cp>=100){clearInterval(iv); renderTableData(); document.getElementById('progressBar').style.width="100%";}else{document.getElementById('progressBar').style.width=`${cp}%`;}},50);
         }
 
-        function extractDataFromBlock(textBlock, globalOffers) {
-            let amtStr = "Check PDF";
-            let cptStr = "Check PDF";
-            let claimStr = "Check PDF";
-            let blockStatus = null; 
+        function getSubmittedOffers(tb){
+            let po=[], io=[];
+            for(let m of tb.matchAll(/(.{1,80}?)\s+(?:SUBMITTED AN OFFER OF|OFFER OF|OFFERED)\s*\$\s*([\d,]+\.\d{2})/gi)){
+                let pn=" "+m[1].toUpperCase()+" ", am=parseCurrencyToNumber(m[2]), fii=-1, fpi=-1;
+                insKeywords.forEach(k=>{let idx=pn.indexOf(k); if(idx!==-1&&(fii===-1||idx<fii))fii=idx;});
+                provKeywords.forEach(k=>{let idx=pn.indexOf(k); if(idx!==-1&&(fpi===-1||idx<fpi))fpi=idx;});
+                if(fii!==-1&&fpi!==-1){fpi<fii?po.push(am):io.push(am);}else if(fii!==-1)io.push(am);else if(fpi!==-1)po.push(am);
+            } return {provOffers:po,insOffers:io};
+        }
 
-            // 1. Amount Scanner
-            let amtMatch = textBlock.match(/(?:payment amount of|out-of-network rate|rate of)[\s\S]{1,60}?\$\s*([\d,]+\.\d{2})/i) || textBlock.match(/\$\s*([\d,]+\.\d{2})/);
-            if (amtMatch) amtStr = "$" + amtMatch[1];
-            let finalAmtNum = parseCurrencyToNumber(amtStr);
-
-            // 2. CPT Scanner
-            let cptMatch = textBlock.match(/(?:item|service|code|cpt)(?:\s+or\s+service)?\s*[:\-]?\s*([0-9]{4}[A-Za-z0-9])/i);
-            if (!cptMatch) {
-                cptMatch = textBlock.match(/\b(9928\d|9929\d|9921\d|9922\d|\d{5})\b/);
-            }
-            if (cptMatch) {
-                cptStr = cptMatch[1] || cptMatch[0];
-            }
-
-            // 3. Claim Scanner 
-            let safeTextForClaim = textBlock.replace(/DISP-\d+/gi, '');
-            let cRegex = /claim(?:\s+number|\s+no|\s+#)?\s*[:\-]?\s*([A-Za-z0-9\-_]{6,30})/gi;
-            let cMatches = [...safeTextForClaim.matchAll(cRegex)];
-            let foundClaim = null;
-            for (let m of cMatches) {
-                if (/\d/.test(m[1]) && !/^\d{9,10}$/.test(m[1])) {
-                    foundClaim = m[1]; break;
-                }
-            }
-            if (foundClaim) {
-                claimStr = foundClaim;
-            } else {
-                let altMatches = [...safeTextForClaim.matchAll(/\b(?![0-9]{9,10}\b)(?=[A-Za-z0-9\-_]*[A-Za-z])(?=[A-Za-z0-9\-_]*[0-9])[A-Za-z0-9\-_]{8,30}\b/g)];
-                if (altMatches.length > 0) {
-                    claimStr = altMatches[0][0];
-                }
-            }
-
-            // 4. Verification Engine
-            let localOffers = getSubmittedOffers(textBlock);
-            let pOffers = localOffers.provOffers.length > 0 ? localOffers.provOffers : globalOffers.provOffers;
-            let iOffers = localOffers.insOffers.length > 0 ? localOffers.insOffers : globalOffers.insOffers;
-
-            if (finalAmtNum > 0) {
-                let matchesProv = pOffers.includes(finalAmtNum);
-                let matchesIns = iOffers.includes(finalAmtNum);
-
-                if (matchesProv && !matchesIns) {
-                    blockStatus = "Win"; 
-                } else if (matchesIns && !matchesProv) {
-                    blockStatus = "Lose"; 
-                }
-            }
-
-            // 5. Fallback Status
-            if (!blockStatus) {
-                let upperBlock = textBlock.toUpperCase();
-                let offeredByMatch = upperBlock.match(/(?:OFFERED|SUBMITTED) BY\s+(.{1,80}?)\s+(?:IS THE APPROPRIATE|BEST REPRESENTS|BEST REFLECTS)/);
-                
-                if (offeredByMatch) {
-                    let winnerStr = " " + offeredByMatch[1] + " "; 
-                    let firstInsIdx = -1; let firstProvIdx = -1;
-
-                    insKeywords.forEach(kw => { let idx = winnerStr.indexOf(kw); if (idx !== -1 && (firstInsIdx === -1 || idx < firstInsIdx)) firstInsIdx = idx; });
-                    provKeywords.forEach(kw => { let idx = winnerStr.indexOf(kw); if (idx !== -1 && (firstProvIdx === -1 || idx < firstProvIdx)) firstProvIdx = idx; });
-
-                    if (firstInsIdx !== -1 && firstProvIdx !== -1) {
-                        blockStatus = (firstProvIdx < firstInsIdx) ? "Win" : "Lose"; 
-                    } else if (firstInsIdx !== -1) {
-                        blockStatus = "Lose";
-                    } else if (firstProvIdx !== -1) {
-                        blockStatus = "Win";
-                    }
-                } 
-                
-                if (!blockStatus) {
-                    if (upperBlock.includes("NON-INITIATING PARTY'S OFFER BEST REPRESENTS") || upperBlock.includes("NON-INITIATING PARTY'S OFFER BEST REFLECTS") || upperBlock.includes("FAVOR IS FOR THE NON-INITIATING")) {
-                        blockStatus = "Lose";
-                    } else if (upperBlock.includes("INITIATING PARTY'S OFFER BEST REPRESENTS") || upperBlock.includes("INITIATING PARTY'S OFFER BEST REFLECTS") || upperBlock.includes("FAVOR IS FOR THE INITIATING") || upperBlock.includes("INITIATING PARTY PREVAILED")) {
-                        blockStatus = "Win";
-                    }
-                }
-            }
-
-            return { amount: amtStr, cpt: cptStr, claim: claimStr, status: blockStatus };
+        function extractDataFromBlock(tb,go){
+            let as="Check PDF", cs="Check PDF", cls="Check PDF", bs=null;
+            let amMatch=tb.match(/(?:payment amount|out-of-network rate|rate of)[\s\S]{1,60}?\$\s*([\d,]+\.\d{2})/i)||tb.match(/\$\s*([\d,]+\.\d{2})/);
+            if(amMatch)as="$"+amMatch[1]; let fan=parseCurrencyToNumber(as);
+            let cm=tb.match(/(?:code|cpt)(?:\s+or\s+service)?\s*[:\-]?\s*([0-9]{4}[A-Za-z0-9])/i)||tb.match(/\b(9928\d|9929\d|9921\d|9922\d|\d{5})\b/);
+            if(cm)cs=cm[1]||cm[0];
+            let cM=[...tb.replace(/DISP-\d+/gi,'').matchAll(/claim(?:\s+no|\s+#)?\s*[:\-]?\s*([A-Za-z0-9\-_]{6,30})/gi)];
+            for(let m of cM){if(/\d/.test(m[1])&&!/^\d{9,10}$/.test(m[1])){cls=m[1];break;}}
+            if(cls==="Check PDF"){let ams=[...tb.replace(/DISP-\d+/gi,'').matchAll(/\b(?![0-9]{9,10}\b)(?=[A-Za-z0-9\-_]*[A-Za-z])(?=[A-Za-z0-9\-_]*[0-9])[A-Za-z0-9\-_]{8,30}\b/g)]; if(ams.length>0)cls=ams[0][0];}
+            
+            let lo=getSubmittedOffers(tb), po=lo.provOffers.length>0?lo.provOffers:go.provOffers, io=lo.insOffers.length>0?lo.insOffers:go.insOffers;
+            if(fan>0){if(po.includes(fan)&&!io.includes(fan))bs="Win";else if(io.includes(fan)&&!po.includes(fan))bs="Lose";}
+            if(!bs){
+                let ub=tb.toUpperCase(), obm=ub.match(/(?:OFFERED|SUBMITTED) BY\s+(.{1,80}?)\s+(?:IS THE APPROPRIATE|BEST REPRESENTS)/);
+                if(obm){let ws=" "+obm[1]+" ",fii=-1,fpi=-1; insKeywords.forEach(k=>{let i=ws.indexOf(k);if(i!==-1&&(fii===-1||i<fii))fii=i;}); provKeywords.forEach(k=>{let i=ws.indexOf(k);if(i!==-1&&(fpi===-1||i<fpi))fpi=i;}); if(fii!==-1&&fpi!==-1)bs=(fpi<fii)?"Win":"Lose";else if(fii!==-1)bs="Lose";else if(fpi!==-1)bs="Win";}
+                if(!bs){if(ub.includes("NON-INITIATING PARTY'S OFFER BEST REPRESENTS")||ub.includes("FAVOR IS FOR THE NON-INITIATING"))bs="Lose";else if(ub.includes("INITIATING PARTY'S OFFER BEST")||ub.includes("FAVOR IS FOR THE INITIATING"))bs="Win";}
+            } return {amount:as,cpt:cs,claim:cls,status:bs};
         }
 
         function renderTableData() {
-            const tableBody = document.getElementById('tableBody');
-            const tableContainer = document.getElementById('tableContainer');
-            const copyBtn = document.getElementById('copyBtn');
-            const processBtn = document.getElementById('processBtn');
-            const totalCountBadge = document.getElementById('totalCountBadge');
-            const summaryCardsContainer = document.getElementById('summaryCardsContainer');
-
-            tableBody.innerHTML = "";
-            let disputeSerial = 0;
-            let totalRowsCount = 0;
-            let totalWinsCount = 0;
-            let totalLossesCount = 0;
-            let totalWinAmount = 0; 
-            let totalLossAmount = 0; 
-
-            // Initialize email date map
-            let dispDateMap = parseEmailDates();
+            const tableBody=document.getElementById('tableBody'); tableBody.innerHTML="";
+            let disputeSerial=0, totalRowsCount=0, totalWinsCount=0, totalLossesCount=0, totalWinAmount=0, totalLossAmount=0;
+            
+            const emailTxt = document.getElementById('emailText').value;
+            let extractedDate = null;
+            const dr=/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s+(\d{4}))?\b/i;
+            let dMatch = dr.exec(emailTxt);
+            if(dMatch) {
+                const mm={"jan":"01","feb":"02","mar":"03","apr":"04","may":"05","jun":"06","jul":"07","aug":"08","sep":"09","oct":"10","nov":"11","dec":"12"};
+                extractedDate = `${mm[dMatch[1].substring(0,3).toLowerCase()]}/${dMatch[2].padStart(2,'0')}/${dMatch[3]||new Date().getFullYear()}`;
+            }
 
             extractedResults.forEach((item) => {
-                let text = item.text || "";
-                let cleanText = text.replace(/\\/g, '').replace(/\s+/g, ' '); 
-                let upperText = cleanText.toUpperCase();
-                disputeSerial++;
-
-                // 1. Dispute ID Logic
-                let idrMatch = cleanText.match(/(DISP-\d+)/i);
-                let idr = idrMatch ? idrMatch[1] : "Unknown";
-
-                // Map Date from Email
-                let extractedDate = dispDateMap[idr];
-
-                // 2. Global Status Fallback Logic
-                let globalIsLose = false;
-                let isExplicitWin = false;
+                let ct=item.text.replace(/\\/g,'').replace(/\s+/g,' '), ut=ct.toUpperCase(); disputeSerial++;
+                let idrm=ct.match(/(DISP-\d+)/i), idr=idrm?idrm[1]:"Unknown", ed=extractedDate, gil=false, iew=false;
+                let wm=ut.match(/(?:DETERMINED|FINDS)(?: THAT)?\s+(.{1,100}?)\s+(?:IS THE PREVAILING|PREVAILED)/)||ut.match(/(.{1,80}?)\s+(?:IS THE PREVAILING PARTY|PREVAILED IN (?:THE|THIS) DISPUTE)/);
+                if(wm){let ws=" "+wm[1]+" ";if(!ws.includes("NOT THE")&&!ws.includes("NON-")){let fii=-1,fpi=-1; insKeywords.forEach(k=>{let i=ws.indexOf(k);if(i!==-1&&(fii===-1||i<fii))fii=i;}); provKeywords.forEach(k=>{let i=ws.indexOf(k);if(i!==-1&&(fpi===-1||i<fpi))fpi=i;}); if(fii!==-1&&fpi!==-1){if(fpi<fii)iew=true;else gil=true;}else if(fii!==-1)gil=true;else if(fpi!==-1)iew=true;}}
+                if(!iew&&!gil){if(ut.includes("FAVOR IS FOR THE NON-INITIATING")||ut.includes("NON-INITIATING PARTY IS THE PREVAILING"))gil=true;else if(ut.includes("FAVOR IS FOR THE INITIATING")||ut.includes("INITIATING PARTY IS THE PREVAILING"))iew=true;}
+                let gfst=gil?"Lose":"Win", go=getSubmittedOffers(ut), dets=[];
+                if(/Determination\s*1/i.test(ct)&&/Determination\s*2/i.test(ct)){ct.split(/(?=Determination\s*\d+)/i).forEach(b=>{if(/Determination\s*\d+/i.test(b))dets.push(extractDataFromBlock(b,go));});}else{dets.push(extractDataFromBlock(ct,go));}
+                let lw=0, ll=0; dets.forEach(d=>{if(!d.status)d.status=gfst; d.status==="Win"?lw++:ll++;});
+                let fs=gfst; if(dets.length>1){if(lw>ll)fs="Win";else if(ll>lw)fs="Lose";else if(lw===ll)fs="Tie";}else if(dets.length===1)fs=dets[0].status;
+                if(fs==="Win"){totalWinsCount++;dets.forEach(d=>totalWinAmount+=parseCurrencyToNumber(d.amount));}else if(fs==="Lose"){totalLossesCount++;dets.forEach(d=>totalLossAmount+=parseCurrencyToNumber(d.amount));}
                 
-                let winnerRegex = /(?:DETERMINED|FINDS|CONCLUDES)(?: THAT)?\s+(.{1,100}?)\s+(?:IS THE PREVAILING|PREVAILED)/;
-                let winnerMatch = upperText.match(winnerRegex);
-                
-                if (!winnerMatch) {
-                    winnerMatch = upperText.match(/(.{1,80}?)\s+(?:IS THE PREVAILING PARTY|PREVAILED IN (?:THE|THIS) DISPUTE)/);
-                }
+                let sc=fs==="Win"?"win-text":fs==="Lose"?"lose-text":"text-amber-500 font-bold";
+                let dv=ed?ed:"", dc=ed?"font-bold text-slate-800":"bg-rose-50 text-rose-500 font-bold";
 
-                if (winnerMatch) {
-                    let winnerStr = " " + winnerMatch[1] + " "; 
-                    if (!winnerStr.includes("NOT THE") && !winnerStr.includes("NON-")) {
-                        let firstInsIdx = -1; let firstProvIdx = -1;
-                        insKeywords.forEach(kw => { let idx = winnerStr.indexOf(kw); if (idx !== -1 && (firstInsIdx === -1 || idx < firstInsIdx)) firstInsIdx = idx; });
-                        provKeywords.forEach(kw => { let idx = winnerStr.indexOf(kw); if (idx !== -1 && (firstProvIdx === -1 || idx < firstProvIdx)) firstProvIdx = idx; });
-
-                        if (firstInsIdx !== -1 && firstProvIdx !== -1) {
-                            if (firstProvIdx < firstInsIdx) isExplicitWin = true;
-                            else globalIsLose = true;
-                        } else if (firstInsIdx !== -1) {
-                            globalIsLose = true;
-                        } else if (firstProvIdx !== -1) {
-                            isExplicitWin = true;
-                        }
-                    }
-                }
-
-                if (!isExplicitWin && !globalIsLose) {
-                    if (upperText.includes("FAVOR IS FOR THE NON-INITIATING") || upperText.includes("NON-INITIATING PARTY'S OFFER BEST REPRESENTS") || upperText.includes("NON-INITIATING PARTY IS THE PREVAILING")) {
-                        globalIsLose = true;
-                    } else if (upperText.includes("FAVOR IS FOR THE INITIATING") || upperText.includes("INITIATING PARTY'S OFFER BEST REPRESENTS") || upperText.includes("INITIATING PARTY IS THE PREVAILING")) {
-                        isExplicitWin = true;
-                    }
-                }
-                let globalFallbackStatusText = globalIsLose ? "Lose" : "Win";
-
-                // 3. Exact Determinations Extractor
-                let globalOffers = getSubmittedOffers(upperText);
-                let determinations = [];
-                let hasMultiDets = /Determination\s*1/i.test(cleanText) && /Determination\s*2/i.test(cleanText);
-
-                if (hasMultiDets) {
-                    let blocks = cleanText.split(/(?=Determination\s*\d+)/i);
-                    blocks.forEach(block => {
-                        if(!/Determination\s*\d+/i.test(block)) return;
-                        determinations.push(extractDataFromBlock(block, globalOffers));
-                    });
-                } else {
-                    determinations.push(extractDataFromBlock(cleanText, globalOffers));
-                }
-
-                // 4. Resolve Majority and Tie Status
-                let localWins = 0;
-                let localLoses = 0;
-
-                determinations.forEach(det => {
-                    if (!det.status) det.status = globalFallbackStatusText; 
-                    if (det.status === "Win") localWins++;
-                    else localLoses++;
-                });
-
-                let finalStatus = globalFallbackStatusText; 
-                
-                if (determinations.length > 1) {
-                    if (localWins > localLoses) finalStatus = "Win";
-                    else if (localLoses > localWins) finalStatus = "Lose";
-                    else if (localWins === localLoses) finalStatus = "Tie";
-                } else if (determinations.length === 1) {
-                    finalStatus = determinations[0].status; 
-                }
-
-                // Global Counters & Amounts Update
-                if (finalStatus === "Win") {
-                    totalWinsCount++;
-                    determinations.forEach(det => {
-                        totalWinAmount += parseCurrencyToNumber(det.amount);
-                    });
-                } else if (finalStatus === "Lose") {
-                    totalLossesCount++;
-                    determinations.forEach(det => {
-                        totalLossAmount += parseCurrencyToNumber(det.amount);
-                    });
-                }
-
-                // 5. Render Table UI
-                let statusClass = "text-slate-800 font-bold";
-                if (finalStatus === "Win") statusClass = "win-text";
-                else if (finalStatus === "Lose") statusClass = "lose-text";
-                else if (finalStatus === "Tie") statusClass = "text-amber-500 font-bold";
-
-                // Render Det Date Column
-                let dateVal = extractedDate ? extractedDate : "Not Found";
-                let dateClass = extractedDate ? "font-bold text-slate-800 text-center" : "bg-rose-50/60 text-rose-500 text-[11px] font-bold text-center uppercase tracking-wide";
-
-                let totalDetsForThisDispute = determinations.length;
-                
-                if (determinations.length > 0) {
-                    determinations.forEach((det, index) => {
-                        totalRowsCount++;
-                        let isFirst = (index === 0);
+                if(dets.length>0){
+                    dets.forEach((det, index) => {
+                        totalRowsCount++; let isF=(index===0), dl="-";
+                        if(dets.length>1){dl=`Det ${index+1} <span class="text-[10px] font-bold ${det.status==='Win'?'text-emerald-600':'text-rose-600'} ml-1">(${det.status})</span>`;}
                         
-                        let detLabel = "-";
-                        if (totalDetsForThisDispute > 1) {
-                            let detColor = det.status === 'Win' ? 'text-emerald-600' : 'text-rose-600';
-                            detLabel = `Det ${index + 1} <span class="text-[10px] font-bold ${detColor} ml-1">(${det.status})</span>`;
-                        }
-
+                        let winLoseTxt = isF ? fs : "";
+                        let dateEditAttr = (isF && !ed) ? 'contenteditable="true" placeholder="Enter date"' : '';
+                        let dateClickAttr = (!isF || ed) ? 'onclick="copyCellData(this)"' : '';
+                        let isLoseClass = isF && fs === 'Lose' ? 'empty-reason' : '';
+                        
                         let row = document.createElement('tr');
-                        row.className = "fade-in";
+                        row.className = "fade-in result-row match-fail";
+                        row.setAttribute("data-idr", idr);
                         row.innerHTML = `
-                            <td class="font-bold text-slate-800">${isFirst ? idr : ""}</td>
-                            <td class="font-bold text-indigo-700 bg-indigo-50/30">${idr}</td>
-                            <td class="${isFirst ? dateClass : ""}">${isFirst ? dateVal : ""}</td>
-                            <td class="${isFirst ? statusClass : ""}">${isFirst ? finalStatus : ""}</td>
-                            <td class="text-slate-500 font-semibold">${detLabel}</td>
-                            <td class="font-mono text-indigo-900 font-bold">${det.claim}</td>
-                            <td class="font-bold text-slate-700">${det.cpt}</td>
-                            <td class="font-extrabold text-slate-900">${det.amount}</td>
+                            <td tabindex="0" class="sticky-col col-1 font-bold text-slate-800">${isF?idr:""}</td>
+                            <td tabindex="0" class="sticky-col col-2 hidable font-bold text-indigo-700">${idr}</td>
+                            <td tabindex="0" class="sticky-col col-3 hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td tabindex="0" class="sticky-col col-4 font-semibold text-slate-400 bg-slate-50 cursor-pointer" onclick="copyCellData(this)" title="Click to copy">-</td>
+                            <td tabindex="0" class="hidable font-mono text-indigo-900 font-bold">${det.claim}</td>
+                            <td tabindex="0" class="hidable font-bold text-slate-700">${det.cpt}</td>
+                            <td tabindex="0" class="hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td tabindex="0" class="hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td tabindex="0" class="hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td tabindex="0" class="hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td tabindex="0" class="hidable text-slate-500 font-semibold">${dl}</td>
+                            <td tabindex="0" class="hidable font-extrabold text-slate-900">${det.amount}</td>
+                            <td tabindex="0" class="hidable transition-colors date-edit-cell ${isF?dc:''} ${dateEditAttr? 'cursor-text' : 'cursor-pointer hover:bg-slate-100'}" ${dateEditAttr} ${dateClickAttr} title="Date">${dv}</td>
+                            <td tabindex="0" class="cursor-pointer hover:bg-slate-100 transition-colors ${isF?sc:''}" onclick="copyWinLoseRow(this)" title="Click to export Row">${winLoseTxt}</td>
+                            <td tabindex="0" class="hidable font-bold text-emerald-600 bg-emerald-50/50">${det.amount}</td>
+                            <td tabindex="0" class="hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td class="p-0 bg-rose-50/50 hover:bg-rose-100 transition-colors align-top">
+                                <div tabindex="0" contenteditable="true" class="w-full h-full p-3 cursor-text text-rose-700 font-semibold text-xs outline-none ${isLoseClass}" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;" oninput="handleReasonInput(this)" onclick="copyCellData(this)"></div>
+                            </td>
+                            <td class="p-0 bg-amber-50/50 hover:bg-amber-100 transition-colors align-top">
+                                <div tabindex="0" contenteditable="true" class="w-full h-full p-3 cursor-text text-slate-700 font-medium text-xs outline-none" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;" onclick="copyCellData(this)"></div>
+                            </td>
                         `;
                         tableBody.appendChild(row);
                     });
-                } else {
-                    totalRowsCount++;
-                    let row = document.createElement('tr');
-                    row.className = "fade-in";
-                    row.innerHTML = `
-                        <td class="font-bold text-slate-800">${idr}</td>
-                        <td class="font-bold text-indigo-700 bg-indigo-50/30">${idr}</td>
-                        <td class="${dateClass}">${dateVal}</td>
-                        <td class="${statusClass}">${finalStatus}</td>
-                        <td colspan="4" class="text-center text-rose-500 font-bold bg-rose-50/50">Manual check required</td>
-                    `;
-                    tableBody.appendChild(row);
                 }
             });
 
-            // Update Premium Dashboard summary numbers and amounts
-            document.getElementById('statTotalDisputes').innerText = disputeSerial;
-            document.getElementById('statTotalDets').innerText = totalRowsCount;
-            document.getElementById('statTotalWins').innerText = totalWinsCount;
-            document.getElementById('statTotalLosses').innerText = totalLossesCount;
-            document.getElementById('statTotalWinAmount').innerText = formatNumberToCurrency(totalWinAmount);
-            document.getElementById('statTotalLossAmount').innerText = formatNumberToCurrency(totalLossAmount);
+            document.getElementById('statTotalDisputes').innerText=disputeSerial; document.getElementById('statTotalDets').innerText=totalRowsCount;
+            document.getElementById('statTotalWins').innerText=totalWinsCount; document.getElementById('statTotalLosses').innerText=totalLossesCount;
+            
+            document.getElementById('statTotalWinAmount').innerText=formatNumberToCurrency(totalWinAmount); 
+            document.getElementById('statTotalLossAmount').innerText=formatNumberToCurrency(totalLossAmount);
 
-            // Restore button 
-            processBtn.disabled = false;
-            processBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data`;
-            processBtn.className = "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-200 transition-all duration-200 flex items-center justify-center gap-2 text-base";
+            const pb=document.getElementById('processBtn'); pb.disabled=false; pb.innerHTML=`<i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data`;
+            pb.className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md cursor-pointer";
+            let mb=document.getElementById('matchBtn'); mb.disabled=false; mb.className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md cursor-pointer";
+            document.getElementById('totalCountBadge').innerText=`${totalRowsCount} Record(s)`;
+            document.getElementById('tableContainer').classList.remove('hidden'); document.getElementById('summaryCardsContainer').classList.remove('hidden'); document.getElementById('copyBtn').classList.remove('hidden');
+            showToast("Dataset loaded successfully!");
+        }
 
-            // Status Badge text reload
-            totalCountBadge.innerText = `${totalRowsCount} Record(s) Loaded`;
-            tableContainer.classList.remove('hidden');
-            summaryCardsContainer.classList.remove('hidden');
-            copyBtn.classList.remove('hidden');
-            showToast("Dataset loaded and formatted successfully!");
+        function matchGoogleSheet() {
+            const url=document.getElementById('googleSheetUrl').value; if(!url)return showToast("Paste Google Sheet CSV URL!",true);
+            let mb=document.getElementById('matchBtn'); mb.innerHTML=`<i class="fa-solid fa-spinner animate-spin"></i> Syncing...`; showToast("Connecting to Google Sheet...");
+            
+            Papa.parse(url, {
+                download: true, header: true,
+                complete: function(res) {
+                    if(res.data && res.data.length>0) {
+                        gSheetData=res.data; let mCount=0; let newTotalWinCalc = 0, newTotalLossCalc = 0, newWinCount = 0, newLossCount = 0;
+                        let processedIdrsForHead = new Set();
+                        let currentDisputeStatus = "";
+                        
+                        document.querySelectorAll('#tableBody tr.result-row').forEach(row => { gSheetData.forEach(r => r._matched = false); });
+
+                        document.querySelectorAll('#tableBody tr.result-row').forEach(row => {
+                            const idr=row.getAttribute('data-idr'); if(!idr||idr==="Unknown")return;
+                            const c=row.querySelectorAll('td');
+                            const extClaim = c[4].innerText.trim();
+                            const extCpt = c[5].innerText.trim();
+                            
+                            let availableRows = gSheetData.filter(sRow => sRow['IDR Number'] && sRow['IDR Number'].trim().includes(idr) && !sRow._matched);
+                            let mData = null;
+
+                            if(availableRows.length > 0) {
+                                mData = availableRows.find(r => {
+                                    let sCpt = r['CPT code'] ? r['CPT code'].toString().trim() : "";
+                                    let sClaim = r['Claim Number'] ? r['Claim Number'].toString().trim() : "";
+                                    return (sCpt && extCpt.includes(sCpt)) || (sClaim && extClaim.includes(sClaim));
+                                });
+                                if(!mData) mData = availableRows[0];
+                                mData._matched = true; 
+                            }
+
+                            row.classList.remove('match-success','match-fail');
+                            let isHead = !processedIdrsForHead.has(idr);
+                            if(isHead) processedIdrsForHead.add(idr);
+
+                            if(mData) {
+                                mCount++; 
+                                const getV=(k)=>{const fk=Object.keys(mData).find(x=>x.trim().toLowerCase()===k.trim().toLowerCase()); return fk?mData[fk]:null;};
+                                
+                                if(getV('dispute group')) c[0].innerText=getV('dispute group');
+                                if(getV('IDR Number')) c[1].innerText=getV('IDR Number');
+                                if(getV('IDR Type')){c[2].innerText=getV('IDR Type');c[2].classList.add('text-indigo-800','font-bold');}
+                                if(getV('ticket number')){c[3].innerText=getV('ticket number');c[3].classList.add('text-indigo-800','font-bold');}
+                                if(getV('Claim Number')) c[4].innerText=getV('Claim Number');
+                                if(getV('CPT code')) c[5].innerText=getV('CPT code');
+                                
+                                let ip=getV('Initial Payment (W/PR)'); if(ip){c[6].innerText=ip;c[6].classList.add('text-indigo-800');}
+                                let mn=getV('Mediator')||getV('Mediator name'); if(mn){c[7].innerText=mn;c[7].classList.add('text-indigo-800');}
+                                
+                                let stat = c[13].innerText.trim().toUpperCase();
+                                
+                                if(isHead) {
+                                    let mfa=getV('Mediator Fee (Administrative)'); if(mfa){c[8].innerText=mfa;c[8].classList.add('text-indigo-800');}
+                                    if(stat === "WIN") {
+                                        let mfp=getV('Mediator Fee (Processing)'); if(mfp){c[9].innerText=mfp;c[9].classList.add('text-indigo-800');}
+                                        c[15].innerText = mfp ? mfp : "-"; 
+                                        if(mfp) c[15].classList.add('text-indigo-800', 'font-bold');
+                                    } else { c[9].innerText="-"; c[15].innerText="-"; }
+                                } else { c[8].innerText="-"; c[9].innerText="-"; c[15].innerText="-"; }
+                                
+                                if(getV('Determination')) c[11].innerText=getV('Determination');
+                                
+                                let detNum=parseFloat((getV('Determination')||c[11].innerText).replace(/[^0-9.-]+/g,""))||0;
+                                let initNum=parseFloat((ip||"0").replace(/[^0-9.-]+/g,""))||0;
+                                
+                                let calcPay = detNum - initNum;
+                                if(calcPay < 0) calcPay = 0; 
+                                c[14].innerText="$"+calcPay.toFixed(2); c[14].classList.add('text-emerald-800','font-extrabold');
+
+                                row.classList.add('match-success');
+                            } else {
+                                row.classList.add('match-fail');
+                            }
+
+                            let rowStat = c[13].innerText.trim().toUpperCase();
+                            if(rowStat === "WIN" || rowStat === "LOSE") { currentDisputeStatus = rowStat; }
+                            
+                            // Adjust Lose Reason highlight if matched and LOSE and empty
+                            if(isHead && currentDisputeStatus === "LOSE") {
+                                let rDiv = c[16].querySelector('div');
+                                if(!rDiv.innerText.trim()) rDiv.classList.add('empty-reason');
+                            }
+
+                            let rowCalcPay = parseFloat(c[14].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                            
+                            if(currentDisputeStatus === "WIN") { 
+                                newTotalWinCalc += rowCalcPay; 
+                                if(isHead) newWinCount++;
+                            } else if (currentDisputeStatus === "LOSE") { 
+                                newTotalLossCalc += rowCalcPay; 
+                                if(isHead) newLossCount++;
+                            }
+                        });
+                        
+                        document.getElementById('statTotalWins').innerText = newWinCount;
+                        document.getElementById('statTotalLosses').innerText = newLossCount;
+                        document.getElementById('statTotalWinAmount').innerText = formatNumberToCurrency(newTotalWinCalc);
+                        document.getElementById('statTotalLossAmount').innerText = formatNumberToCurrency(newTotalLossCalc);
+
+                        document.getElementById('totalCountBadge').innerText=`${mCount} Matches Found!`; mb.innerHTML=`<i class="fa-solid fa-check-double"></i> Matched`; mb.disabled=true; 
+                        showToast("Match Complete & Dashboard Updated!");
+                        
+                        generateNotes();
+                    }else{showToast("Sheet empty.",true); mb.innerHTML=`<i class="fa-solid fa-bolt"></i> Match`;}
+                },
+                error: function(e){showToast("Connection failed!",true); mb.innerHTML=`<i class="fa-solid fa-bolt"></i> Match`;}
+            });
         }
 
         function copyTableToClipboard() {
-            const table = document.getElementById("resultTable");
-            const range = document.createRange();
-            range.selectNode(table);
+            const t=document.getElementById("resultTable"), r=document.createRange(); r.selectNode(t);
+            window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+            try{document.execCommand("copy");showToast("Copied to clipboard!");}catch(e){showToast("Copy failed!",true);}
             window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            try {
-                document.execCommand("copy");
-                showToast("Copied to clipboard! Ready to paste into Excel.");
-            } catch (err) { 
-                showToast("Clipboard copy failed!", true); 
-            }
-            window.getSelection().removeAllRanges();
-        }
-
-        // ======= REDIRECT & SAVE DATA LOGIC =======
-        function goToFinalPage() {
-            // Save the extracted table HTML to sessionStorage
-            const tableData = document.getElementById('tableBody').innerHTML;
-            if(tableData.trim() === "") {
-                showToast("No data to transfer. Please extract first.", true);
-                return;
-            }
-            
-            sessionStorage.setItem("finalTableData", tableData);
-            
-            // Redirect to the final determination page
-            window.location.href = "finaldetermination.html";
         }
     </script>
 </body>
