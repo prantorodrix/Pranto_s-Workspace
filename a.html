@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pranto's Workspace - IDR Extractor</title>
+    <!-- Tailwind CSS with CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF.js Library for PDF parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- PapaParse for Google Sheet CSV Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- Stylesheet Section --- */
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f8fafc;
+        }
+
+        /* Glassmorphism Navigation Sticky Bar */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Excel-like Table Formatting */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background-color: #ffffff;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13.5px;
+        }
+        th {
+            background-color: #f1f5f9;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+        }
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        .win-text { color: #059669; font-weight: 700; }
+        .lose-text { color: #dc2626; font-weight: 700; }
+
+        /* Smooth fade-in animation for table rows */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen pt-28 pb-12 text-slate-800">
+
+    <!-- --- Top Premium Navigation Bar --- -->
+    <nav class="fixed top-4 left-4 right-4 z-50 max-w-7xl mx-auto px-6 py-3 rounded-full glass-nav shadow-md flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200">
+                <i class="fa-solid fa-briefcase text-lg"></i>
+            </div>
+            <span class="font-bold text-lg bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent">Pranto's Workspace</span>
+        </div>
+
+        <div class="flex items-center gap-1">
+            <a href="#" class="px-6 py-2 rounded-full text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-all duration-200 flex items-center gap-2">
+                <i class="fa-solid fa-house"></i> Home
+            </a>
+        </div>
+
+        <div class="hidden md:flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Workspace Active</span>
+        </div>
+    </nav>
+
+    <!-- --- Main Content Container --- -->
+    <div class="max-w-7xl mx-auto px-4 md:px-8 mt-6">
+        
+        <!-- Upload & Control Box Section -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 p-8 mb-8 transition-all duration-300 hover:shadow-2xl">
+            <div class="mb-8">
+                <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice-dollar text-indigo-500"></i> IDR PDF Auto Data Extractor
+                </h2>
+                <p class="text-slate-500 mt-2 font-medium">Upload multiple PDFs simultaneously to extract IDR final payment determinations. You can keep adding files to the queue.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+                
+                <!-- Input Zone: PDF Drop & Email Paste & Google Sheet URL -->
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <!-- Upload Drop Zone -->
+                    <input type="file" id="pdfFiles" multiple accept=".pdf" class="hidden" onchange="handleManualUpload(event)">
+                    <label for="pdfFiles" class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-indigo-50/60 hover:border-indigo-400 transition-all duration-300 group">
+                        <div class="flex flex-col items-center justify-center transition-transform group-hover:-translate-y-1">
+                            <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-3 shadow-sm">
+                                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                            </div>
+                            <p class="text-sm text-slate-600 font-medium"><span class="font-bold text-indigo-600">Click to upload</span> or drag and drop PDFs</p>
+                            <p class="text-xs text-emerald-600 mt-1.5 font-bold" id="fileCountText">Unlimited files supported (Appends to queue)</p>
+                        </div>
+                    </label>
+
+                    <!-- Email Paste Zone -->
+                    <textarea id="emailText" placeholder="Paste determination emails here to auto-match dates (e.g., Sun, May 17...). Dates will be linked to the extracted disputes." class="w-full h-24 p-4 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:border-indigo-300 focus:bg-white focus:border-indigo-500 outline-none transition-all resize-none text-sm text-slate-700 placeholder-slate-400"></textarea>
+                    
+                    <!-- NEW: Google Sheet URL Box -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Master Data Source (Google Sheet CSV)</label>
+                        <input type="text" id="googleSheetUrl" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vSN4FwFRrFbw56u_JL_KF1XSy2hEageGGvi3r53lszd_iv__uTj3wqMVz7kJHk42yDo9Zb5oWxaQjnD/pub?gid=822684777&single=true&output=csv" placeholder="Paste Google Sheet Public CSV URL here" class="w-full p-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:border-teal-300 focus:bg-white focus:border-teal-500 outline-none transition-all text-sm font-medium text-slate-700">
+                    </div>
+                </div>
+
+                <!-- Interactive Buttons Panel -->
+                <div class="flex flex-col gap-3 justify-center">
+                    <button onclick="processPDFs()" id="processBtn" class="bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed" disabled>
+                        <i class="fa-solid fa-robot"></i> Select PDFs First...
+                    </button>
+
+                    <!-- NEW: Match Data Button -->
+                    <button onclick="matchGoogleSheet()" id="matchBtn" class="bg-slate-100 border-2 border-slate-200 text-slate-400 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed" disabled>
+                        <i class="fa-solid fa-bolt"></i> Match Sheet Data
+                    </button>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="copyTableToClipboard()" id="copyBtn" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all duration-200 hidden flex items-center justify-center gap-1.5 text-sm">
+                            <i class="fa-solid fa-copy"></i> Copy Output
+                        </button>
+                        
+                        <button onclick="clearAllData()" id="clearBtn" class="border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 font-bold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 text-sm">
+                            <i class="fa-solid fa-trash-can"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- --- Animated Progress Bar Section --- -->
+            <div id="progressContainer" class="hidden mt-8 pt-6 border-t border-slate-100">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm font-bold text-slate-700 flex items-center gap-2" id="progressStatus">
+                        <i class="fa-solid fa-circle-notch animate-spin text-indigo-600"></i> Reading PDF metadata...
+                    </span>
+                    <span class="text-sm font-bold text-indigo-600" id="progressPercentage">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-200">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 h-2.5 rounded-full transition-all duration-100" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- Premium Stats Summary Cards Dashboard --- -->
+        <div id="summaryCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 hidden fade-in">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Disputes</p>
+                    <h3 id="statTotalDisputes" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl shadow-inner">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Dets</p>
+                    <h3 id="statTotalDets" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl shadow-inner">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+            </div>
+            
+            <!-- Wins Card with Total Amount Badge -->
+            <div class="bg-white rounded-2xl border border-emerald-100 p-6 shadow-lg shadow-emerald-100/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-50 rounded-full z-0"></div>
+                <div class="z-10 relative">
+                    <p class="text-xs font-bold text-emerald-600/80 uppercase tracking-wider">Total Wins</p>
+                    <div class="mt-1">
+                        <h3 id="statTotalWins" class="text-3xl font-extrabold text-emerald-600 leading-none">0</h3>
+                        <span id="statTotalWinAmount" class="inline-block mt-1.5 text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md shadow-sm border border-emerald-200/50">$0.00</span>
+                    </div>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl shadow-inner z-10 relative">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+            </div>
+            
+            <!-- Losses Card with Total Amount Badge -->
+            <div class="bg-white rounded-2xl border border-rose-100 p-6 shadow-lg shadow-rose-100/50 hover:shadow-xl transition-all duration-300 flex items-center justify-between relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 w-16 h-16 bg-rose-50 rounded-full z-0"></div>
+                <div class="z-10 relative">
+                    <p class="text-xs font-bold text-rose-600/80 uppercase tracking-wider">Total Losses</p>
+                    <div class="mt-1">
+                        <h3 id="statTotalLosses" class="text-3xl font-extrabold text-rose-600 leading-none">0</h3>
+                        <span id="statTotalLossAmount" class="inline-block mt-1.5 text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md shadow-sm border border-rose-200/50">$0.00</span>
+                    </div>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl shadow-inner z-10 relative">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- Table Container Section --- -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/60 overflow-hidden hidden transition-all duration-300" id="tableContainer">
+            <div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/80">
+                <span class="font-extrabold text-slate-800 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-table text-indigo-500"></i> Extracted Dispute Dataset
+                </span>
+                <span class="bg-indigo-100 border border-indigo-200 text-indigo-800 text-xs font-extrabold px-4 py-1.5 rounded-full flex items-center gap-1.5" id="totalCountBadge">
+                    0 Records found
+                </span>
+            </div>
+            
+            <div class="overflow-x-auto p-4">
+                <table id="resultTable" class="rounded-xl overflow-hidden border border-slate-200">
+                    <thead>
+                        <tr id="tableHeaderRow">
+                            <th>dispute group</th>
+                            <th>IDR Number</th>
+                            <th class="w-32 text-center">Date - Determination Received from Mediator</th>
+                            <th>WIN/LOSE</th>
+                            <th>Det #</th>
+                            <th>Claim Number</th>
+                            <th>CPT code</th>
+                            <th>Determination</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- --- Premium Footer Section --- -->
+        <footer class="mt-16 border-t border-slate-200/80 pt-8 pb-12 text-center">
+            <div class="flex flex-col items-center gap-4">
+                <div class="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest bg-indigo-50 px-4 py-1.5 rounded-full">
+                    <i class="fa-solid fa-scale-balanced text-base"></i>
+                    <span>Federal IDR Final Payment Determination</span>
+                </div>
+                <p class="text-xs md:text-sm text-slate-500 max-w-3xl leading-relaxed font-medium">
+                    This workspace processes Independent Dispute Resolution (IDR) final payment determination documents under the No Surprises Act. It automatically scans medical provider and plan submissions, extracts claim numbers, CPT codes, approved out-of-network rates, and identifies the prevailing party using cross-verification matching.
+                </p>
+                <div class="h-1 w-16 bg-slate-200 rounded-full my-2"></div>
+                <p class="text-sm text-slate-500 font-semibold flex items-center gap-1.5">
+                    <span>Made with <i class="fa-solid fa-heart text-rose-500 animate-pulse mx-1"></i> by</span>
+                    <span class="font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Pranto's Workspace</span>
+                    <span>© 2026</span>
+                </p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- --- Toast Notifications System --- -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-slate-900/50 opacity-0 transition-all duration-300 translate-y-4 z-50 flex items-center gap-3 font-bold border border-slate-700"></div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        
+        let allSelectedFiles = []; // Global array to append files
+        let extractedResults = []; 
+        let gSheetData = []; // Store fetched google sheet data
+
+        const insKeywords = ["BCBS", "BLUE CROSS", "BLUE SHIELD", "AETNA", "CIGNA", "UNITED", "UHC", "HUMANA", "MOLINA", "OSCAR", "AMBETTER", "HEALTH PLAN"];
+        const provKeywords = ["LLC", "GROUP", "CENTER", " ER ", "PHYSICIAN", "CLINIC", "HOSPITAL", " PA ", "PLLC", "ASSOCIATES", "EMERGENCY"];
+
+        function handleManualUpload(event) {
+            const input = event.target;
+            const fileCountText = document.getElementById('fileCountText');
+            const processBtn = document.getElementById('processBtn');
+            
+            if(input.files.length > 0) {
+                let newFiles = Array.from(input.files);
+                allSelectedFiles = allSelectedFiles.concat(newFiles); 
+                
+                fileCountText.innerHTML = `<span class="text-indigo-600 font-extrabold">${allSelectedFiles.length}</span> file(s) queued. Add more or click Extract.`;
+                
+                processBtn.disabled = false;
+                processBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data`;
+                processBtn.className = "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all duration-200 flex items-center justify-center gap-2 text-base";
+            }
+            
+            input.value = ""; 
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = isError ? `<i class="fa-solid fa-circle-exclamation text-rose-500 text-lg"></i> ${msg}` : `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i> ${msg}`;
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-4');
+            }, 3500);
+        }
+
+        function clearAllData() {
+            allSelectedFiles = [];
+            extractedResults = [];
+            gSheetData = [];
+            
+            document.getElementById('pdfFiles').value = "";
+            document.getElementById('emailText').value = "";
+            document.getElementById('googleSheetUrl').value = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSN4FwFRrFbw56u_JL_KF1XSy2hEageGGvi3r53lszd_iv__uTj3wqMVz7kJHk42yDo9Zb5oWxaQjnD/pub?gid=822684777&single=true&output=csv";
+            document.getElementById('fileCountText').innerText = "Unlimited files supported (Appends to queue)";
+            document.getElementById('tableBody').innerHTML = "";
+            document.getElementById('tableContainer').classList.add('hidden');
+            document.getElementById('progressContainer').classList.add('hidden');
+            document.getElementById('copyBtn').classList.add('hidden');
+            document.getElementById('summaryCardsContainer').classList.add('hidden');
+            
+            // Reset Table Headers
+            document.getElementById('tableHeaderRow').innerHTML = `<th>dispute group</th><th>IDR Number</th><th class="w-32 text-center">Date - Determination Received from Mediator</th><th>WIN/LOSE</th><th>Det #</th><th>Claim Number</th><th>CPT code</th><th>Determination</th>`;
+
+            let processBtn = document.getElementById('processBtn');
+            processBtn.innerHTML = `<i class="fa-solid fa-robot"></i> Select PDFs First...`;
+            processBtn.className = "bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
+            processBtn.disabled = true;
+
+            let matchBtn = document.getElementById('matchBtn');
+            matchBtn.disabled = true;
+            matchBtn.className = "bg-slate-100 border-2 border-slate-200 text-slate-400 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
+            matchBtn.innerHTML = `<i class="fa-solid fa-bolt"></i> Match Sheet Data`;
+
+            showToast("Workspace completely reset!");
+        }
+
+        function parseEmailDates() {
+            const text = document.getElementById('emailText').value;
+            const dateMap = {};
+            if (!text) return dateMap;
+
+            const dateRegex = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s+(\d{4}))?\b/gi;
+            const dispRegex = /DISP-\d+/gi;
+            
+            let dates = [];
+            let match;
+            while ((match = dateRegex.exec(text)) !== null) {
+                dates.push({
+                    index: match.index,
+                    month: match[1].substring(0, 3).toLowerCase(),
+                    day: match[2],
+                    year: match[3] || new Date().getFullYear(),
+                    raw: match[0]
+                });
+            }
+            
+            const monthMap = {
+                "jan":"01", "feb":"02", "mar":"03", "apr":"04", "may":"05", "jun":"06",
+                "jul":"07", "aug":"08", "sep":"09", "oct":"10", "nov":"11", "dec":"12"
+            };
+
+            while ((match = dispRegex.exec(text)) !== null) {
+                let disp = match[0].toUpperCase();
+                let dispIndex = match.index;
+                
+                let closestDate = null;
+                for (let i = dates.length - 1; i >= 0; i--) {
+                    if (dates[i].index < dispIndex) {
+                        closestDate = dates[i];
+                        break;
+                    }
+                }
+                
+                if (closestDate) {
+                    let dd = closestDate.day.padStart(2, '0');
+                    let mm = monthMap[closestDate.month];
+                    let yyyy = closestDate.year;
+                    dateMap[disp] = `${mm}/${dd}/${yyyy}`;
+                }
+            }
+            return dateMap;
+        }
+
+        function extractTextFromPDF(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) return resolve("");
+                const reader = new FileReader();
+                reader.onload = async function() {
+                    try {
+                        const typedarray = new Uint8Array(this.result);
+                        const pdf = await pdfjsLib.getDocument({data: typedarray}).promise;
+                        let fullText = "";
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            fullText += content.items.map(item => item.str).join(" ") + " ";
+                        }
+                        resolve(fullText.replace(/\s+/g, ' '));
+                    } catch (e) { resolve(""); }
+                };
+                reader.onerror = () => resolve("");
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        async function processPDFs() {
+            if (allSelectedFiles.length === 0) {
+                showToast("Please add PDF files to extract first.", true);
+                return;
+            }
+
+            const tableBody = document.getElementById('tableBody');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressStatus = document.getElementById('progressStatus');
+            const progressPercentage = document.getElementById('progressPercentage');
+            const processBtn = document.getElementById('processBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const tableContainer = document.getElementById('tableContainer');
+            const summaryCardsContainer = document.getElementById('summaryCardsContainer');
+
+            // Reset UI for processing
+            tableBody.innerHTML = "";
+            tableContainer.classList.add('hidden');
+            copyBtn.classList.add('hidden');
+            summaryCardsContainer.classList.add('hidden');
+            progressContainer.classList.remove('hidden');
+            
+            // Disable buttons during process
+            processBtn.disabled = true;
+            processBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Processing...`;
+            processBtn.className = "bg-slate-200 text-indigo-600 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
+            
+            let matchBtn = document.getElementById('matchBtn');
+            matchBtn.disabled = true;
+            matchBtn.className = "bg-slate-100 border-2 border-slate-200 text-slate-400 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
+
+            extractedResults = [];
+            let totalFiles = allSelectedFiles.length;
+
+            for (let i = 0; i < totalFiles; i++) {
+                let file = allSelectedFiles[i];
+                if (!file || !file.name) continue; 
+                
+                let text = await extractTextFromPDF(file);
+                if(text && text.trim().length > 50) {
+                    extractedResults.push({ fileName: file.name, text: text });
+                }
+            }
+
+            let currentPercent = 0;
+            let duration = Math.max(2000, totalFiles * 150); 
+            let intervalTime = 50; 
+            let steps = duration / intervalTime;
+            let increment = 100 / steps;
+
+            let interval = setInterval(() => {
+                currentPercent += increment;
+                if (currentPercent > 100) currentPercent = 100;
+
+                progressBar.style.width = `${currentPercent}%`;
+                progressPercentage.innerText = `${Math.round(currentPercent)}%`;
+
+                if (currentPercent < 25) {
+                    progressStatus.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin text-blue-500"></i> Reading PDF Metadata...`;
+                } else if (currentPercent < 50) {
+                    progressStatus.innerHTML = `<i class="fa-solid fa-bolt animate-bounce text-indigo-500"></i> Analyzing Data...`;
+                } else if (currentPercent < 75) {
+                    progressStatus.innerHTML = `<i class="fa-solid fa-bezier-curve text-pink-500"></i> Verifying Amounts & Parties...`;
+                } else if (currentPercent < 100) {
+                    progressStatus.innerHTML = `<i class="fa-solid fa-rectangle-list text-teal-500"></i> Formatting Dataset...`;
+                } else {
+                    progressStatus.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> Done!`;
+                }
+
+                if (currentPercent >= 100) {
+                    clearInterval(interval);
+                    renderTableData(); 
+                }
+            }, intervalTime);
+        }
+
+        function parseCurrencyToNumber(currencyStr) {
+            if (!currencyStr || currencyStr === "Check PDF") return 0;
+            let numStr = currencyStr.replace(/[^0-9.-]+/g, "");
+            return parseFloat(numStr) || 0;
+        }
+
+        function formatNumberToCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+        }
+
+        function getSubmittedOffers(textBlock) {
+            let provOffers = [];
+            let insOffers = [];
+            let offerRegex = /(.{1,80}?)\s+(?:SUBMITTED AN OFFER OF|SUBMITTED AN OFFER FOR|OFFER OF|OFFERED)\s*\$\s*([\d,]+\.\d{2})/gi;
+            
+            for (let m of textBlock.matchAll(offerRegex)) {
+                let partyName = " " + m[1].toUpperCase() + " ";
+                let amount = parseCurrencyToNumber(m[2]);
+                
+                let firstInsIdx = -1; let firstProvIdx = -1;
+                insKeywords.forEach(kw => { let idx = partyName.indexOf(kw); if (idx !== -1 && (firstInsIdx === -1 || idx < firstInsIdx)) firstInsIdx = idx; });
+                provKeywords.forEach(kw => { let idx = partyName.indexOf(kw); if (idx !== -1 && (firstProvIdx === -1 || idx < firstProvIdx)) firstProvIdx = idx; });
+
+                if (firstInsIdx !== -1 && firstProvIdx !== -1) {
+                    if (firstProvIdx < firstInsIdx) provOffers.push(amount);
+                    else insOffers.push(amount);
+                } else if (firstInsIdx !== -1) {
+                    insOffers.push(amount);
+                } else if (firstProvIdx !== -1) {
+                    provOffers.push(amount);
+                }
+            }
+            return { provOffers, insOffers };
+        }
+
+        function extractDataFromBlock(textBlock, globalOffers) {
+            let amtStr = "Check PDF";
+            let cptStr = "Check PDF";
+            let claimStr = "Check PDF";
+            let blockStatus = null; 
+
+            let amtMatch = textBlock.match(/(?:payment amount of|out-of-network rate|rate of)[\s\S]{1,60}?\$\s*([\d,]+\.\d{2})/i) || textBlock.match(/\$\s*([\d,]+\.\d{2})/);
+            if (amtMatch) amtStr = "$" + amtMatch[1];
+            let finalAmtNum = parseCurrencyToNumber(amtStr);
+
+            let cptMatch = textBlock.match(/(?:item|service|code|cpt)(?:\s+or\s+service)?\s*[:\-]?\s*([0-9]{4}[A-Za-z0-9])/i);
+            if (!cptMatch) {
+                cptMatch = textBlock.match(/\b(9928\d|9929\d|9921\d|9922\d|\d{5})\b/);
+            }
+            if (cptMatch) {
+                cptStr = cptMatch[1] || cptMatch[0];
+            }
+
+            let safeTextForClaim = textBlock.replace(/DISP-\d+/gi, '');
+            let cRegex = /claim(?:\s+number|\s+no|\s+#)?\s*[:\-]?\s*([A-Za-z0-9\-_]{6,30})/gi;
+            let cMatches = [...safeTextForClaim.matchAll(cRegex)];
+            let foundClaim = null;
+            for (let m of cMatches) {
+                if (/\d/.test(m[1]) && !/^\d{9,10}$/.test(m[1])) {
+                    foundClaim = m[1]; break;
+                }
+            }
+            if (foundClaim) {
+                claimStr = foundClaim;
+            } else {
+                let altMatches = [...safeTextForClaim.matchAll(/\b(?![0-9]{9,10}\b)(?=[A-Za-z0-9\-_]*[A-Za-z])(?=[A-Za-z0-9\-_]*[0-9])[A-Za-z0-9\-_]{8,30}\b/g)];
+                if (altMatches.length > 0) {
+                    claimStr = altMatches[0][0];
+                }
+            }
+
+            let localOffers = getSubmittedOffers(textBlock);
+            let pOffers = localOffers.provOffers.length > 0 ? localOffers.provOffers : globalOffers.provOffers;
+            let iOffers = localOffers.insOffers.length > 0 ? localOffers.insOffers : globalOffers.insOffers;
+
+            if (finalAmtNum > 0) {
+                let matchesProv = pOffers.includes(finalAmtNum);
+                let matchesIns = iOffers.includes(finalAmtNum);
+
+                if (matchesProv && !matchesIns) {
+                    blockStatus = "Win"; 
+                } else if (matchesIns && !matchesProv) {
+                    blockStatus = "Lose"; 
+                }
+            }
+
+            if (!blockStatus) {
+                let upperBlock = textBlock.toUpperCase();
+                let offeredByMatch = upperBlock.match(/(?:OFFERED|SUBMITTED) BY\s+(.{1,80}?)\s+(?:IS THE APPROPRIATE|BEST REPRESENTS|BEST REFLECTS)/);
+                
+                if (offeredByMatch) {
+                    let winnerStr = " " + offeredByMatch[1] + " "; 
+                    let firstInsIdx = -1; let firstProvIdx = -1;
+
+                    insKeywords.forEach(kw => { let idx = winnerStr.indexOf(kw); if (idx !== -1 && (firstInsIdx === -1 || idx < firstInsIdx)) firstInsIdx = idx; });
+                    provKeywords.forEach(kw => { let idx = winnerStr.indexOf(kw); if (idx !== -1 && (firstProvIdx === -1 || idx < firstProvIdx)) firstProvIdx = idx; });
+
+                    if (firstInsIdx !== -1 && firstProvIdx !== -1) {
+                        blockStatus = (firstProvIdx < firstInsIdx) ? "Win" : "Lose"; 
+                    } else if (firstInsIdx !== -1) {
+                        blockStatus = "Lose";
+                    } else if (firstProvIdx !== -1) {
+                        blockStatus = "Win";
+                    }
+                } 
+                
+                if (!blockStatus) {
+                    if (upperBlock.includes("NON-INITIATING PARTY'S OFFER BEST REPRESENTS") || upperBlock.includes("NON-INITIATING PARTY'S OFFER BEST REFLECTS") || upperBlock.includes("FAVOR IS FOR THE NON-INITIATING")) {
+                        blockStatus = "Lose";
+                    } else if (upperBlock.includes("INITIATING PARTY'S OFFER BEST REPRESENTS") || upperBlock.includes("INITIATING PARTY'S OFFER BEST REFLECTS") || upperBlock.includes("FAVOR IS FOR THE INITIATING") || upperBlock.includes("INITIATING PARTY PREVAILED")) {
+                        blockStatus = "Win";
+                    }
+                }
+            }
+
+            return { amount: amtStr, cpt: cptStr, claim: claimStr, status: blockStatus };
+        }
+
+        function renderTableData() {
+            const tableBody = document.getElementById('tableBody');
+            const tableContainer = document.getElementById('tableContainer');
+            const copyBtn = document.getElementById('copyBtn');
+            const processBtn = document.getElementById('processBtn');
+            const totalCountBadge = document.getElementById('totalCountBadge');
+            const summaryCardsContainer = document.getElementById('summaryCardsContainer');
+
+            tableBody.innerHTML = "";
+            let disputeSerial = 0;
+            let totalRowsCount = 0;
+            let totalWinsCount = 0;
+            let totalLossesCount = 0;
+            let totalWinAmount = 0; 
+            let totalLossAmount = 0; 
+
+            let dispDateMap = parseEmailDates();
+
+            extractedResults.forEach((item) => {
+                let text = item.text || "";
+                let cleanText = text.replace(/\\/g, '').replace(/\s+/g, ' '); 
+                let upperText = cleanText.toUpperCase();
+                disputeSerial++;
+
+                let idrMatch = cleanText.match(/(DISP-\d+)/i);
+                let idr = idrMatch ? idrMatch[1] : "Unknown";
+
+                let extractedDate = dispDateMap[idr];
+
+                let globalIsLose = false;
+                let isExplicitWin = false;
+                
+                let winnerRegex = /(?:DETERMINED|FINDS|CONCLUDES)(?: THAT)?\s+(.{1,100}?)\s+(?:IS THE PREVAILING|PREVAILED)/;
+                let winnerMatch = upperText.match(winnerRegex);
+                
+                if (!winnerMatch) {
+                    winnerMatch = upperText.match(/(.{1,80}?)\s+(?:IS THE PREVAILING PARTY|PREVAILED IN (?:THE|THIS) DISPUTE)/);
+                }
+
+                if (winnerMatch) {
+                    let winnerStr = " " + winnerMatch[1] + " "; 
+                    if (!winnerStr.includes("NOT THE") && !winnerStr.includes("NON-")) {
+                        let firstInsIdx = -1; let firstProvIdx = -1;
+                        insKeywords.forEach(kw => { let idx = winnerStr.indexOf(kw); if (idx !== -1 && (firstInsIdx === -1 || idx < firstInsIdx)) firstInsIdx = idx; });
+                        provKeywords.forEach(kw => { let idx = winnerStr.indexOf(kw); if (idx !== -1 && (firstProvIdx === -1 || idx < firstProvIdx)) firstProvIdx = idx; });
+
+                        if (firstInsIdx !== -1 && firstProvIdx !== -1) {
+                            if (firstProvIdx < firstInsIdx) isExplicitWin = true;
+                            else globalIsLose = true;
+                        } else if (firstInsIdx !== -1) {
+                            globalIsLose = true;
+                        } else if (firstProvIdx !== -1) {
+                            isExplicitWin = true;
+                        }
+                    }
+                }
+
+                if (!isExplicitWin && !globalIsLose) {
+                    if (upperText.includes("FAVOR IS FOR THE NON-INITIATING") || upperText.includes("NON-INITIATING PARTY'S OFFER BEST REPRESENTS") || upperText.includes("NON-INITIATING PARTY IS THE PREVAILING")) {
+                        globalIsLose = true;
+                    } else if (upperText.includes("FAVOR IS FOR THE INITIATING") || upperText.includes("INITIATING PARTY'S OFFER BEST REPRESENTS") || upperText.includes("INITIATING PARTY IS THE PREVAILING")) {
+                        isExplicitWin = true;
+                    }
+                }
+                let globalFallbackStatusText = globalIsLose ? "Lose" : "Win";
+
+                let globalOffers = getSubmittedOffers(upperText);
+                let determinations = [];
+                let hasMultiDets = /Determination\s*1/i.test(cleanText) && /Determination\s*2/i.test(cleanText);
+
+                if (hasMultiDets) {
+                    let blocks = cleanText.split(/(?=Determination\s*\d+)/i);
+                    blocks.forEach(block => {
+                        if(!/Determination\s*\d+/i.test(block)) return;
+                        determinations.push(extractDataFromBlock(block, globalOffers));
+                    });
+                } else {
+                    determinations.push(extractDataFromBlock(cleanText, globalOffers));
+                }
+
+                let localWins = 0;
+                let localLoses = 0;
+
+                determinations.forEach(det => {
+                    if (!det.status) det.status = globalFallbackStatusText; 
+                    if (det.status === "Win") localWins++;
+                    else localLoses++;
+                });
+
+                let finalStatus = globalFallbackStatusText; 
+                
+                if (determinations.length > 1) {
+                    if (localWins > localLoses) finalStatus = "Win";
+                    else if (localLoses > localWins) finalStatus = "Lose";
+                    else if (localWins === localLoses) finalStatus = "Tie";
+                } else if (determinations.length === 1) {
+                    finalStatus = determinations[0].status; 
+                }
+
+                if (finalStatus === "Win") {
+                    totalWinsCount++;
+                    determinations.forEach(det => {
+                        totalWinAmount += parseCurrencyToNumber(det.amount);
+                    });
+                } else if (finalStatus === "Lose") {
+                    totalLossesCount++;
+                    determinations.forEach(det => {
+                        totalLossAmount += parseCurrencyToNumber(det.amount);
+                    });
+                }
+
+                let statusClass = "text-slate-800 font-bold";
+                if (finalStatus === "Win") statusClass = "win-text";
+                else if (finalStatus === "Lose") statusClass = "lose-text";
+                else if (finalStatus === "Tie") statusClass = "text-amber-500 font-bold";
+
+                let dateVal = extractedDate ? extractedDate : "Not Found";
+                let dateClass = extractedDate ? "font-bold text-slate-800 text-center" : "bg-rose-50/60 text-rose-500 text-[11px] font-bold text-center uppercase tracking-wide";
+
+                let totalDetsForThisDispute = determinations.length;
+                
+                if (determinations.length > 0) {
+                    determinations.forEach((det, index) => {
+                        totalRowsCount++;
+                        let isFirst = (index === 0);
+                        
+                        let detLabel = "-";
+                        if (totalDetsForThisDispute > 1) {
+                            let detColor = det.status === 'Win' ? 'text-emerald-600' : 'text-rose-600';
+                            detLabel = `Det ${index + 1} <span class="text-[10px] font-bold ${detColor} ml-1">(${det.status})</span>`;
+                        }
+
+                        let row = document.createElement('tr');
+                        row.className = "fade-in";
+                        row.setAttribute("data-idr", idr);
+                        row.innerHTML = `
+                            <td class="font-bold text-slate-800">${isFirst ? idr : ""}</td>
+                            <td class="font-bold text-indigo-700 bg-indigo-50/30">${idr}</td>
+                            <td class="${isFirst ? dateClass : ""}">${isFirst ? dateVal : ""}</td>
+                            <td class="${isFirst ? statusClass : ""}">${isFirst ? finalStatus : ""}</td>
+                            <td class="text-slate-500 font-semibold">${detLabel}</td>
+                            <td class="font-mono text-indigo-900 font-bold">${det.claim}</td>
+                            <td class="font-bold text-slate-700">${det.cpt}</td>
+                            <td class="font-extrabold text-slate-900">${det.amount}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    totalRowsCount++;
+                    let row = document.createElement('tr');
+                    row.className = "fade-in";
+                    row.setAttribute("data-idr", idr);
+                    row.innerHTML = `
+                        <td class="font-bold text-slate-800">${idr}</td>
+                        <td class="font-bold text-indigo-700 bg-indigo-50/30">${idr}</td>
+                        <td class="${dateClass}">${dateVal}</td>
+                        <td class="${statusClass}">${finalStatus}</td>
+                        <td colspan="4" class="text-center text-rose-500 font-bold bg-rose-50/50">Manual check required</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            });
+
+            document.getElementById('statTotalDisputes').innerText = disputeSerial;
+            document.getElementById('statTotalDets').innerText = totalRowsCount;
+            document.getElementById('statTotalWins').innerText = totalWinsCount;
+            document.getElementById('statTotalLosses').innerText = totalLossesCount;
+            document.getElementById('statTotalWinAmount').innerText = formatNumberToCurrency(totalWinAmount);
+            document.getElementById('statTotalLossAmount').innerText = formatNumberToCurrency(totalLossAmount);
+
+            // Restore Extract Button 
+            processBtn.disabled = false;
+            processBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data`;
+            processBtn.className = "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-200 transition-all duration-200 flex items-center justify-center gap-2 text-base";
+
+            // Enable Match Button
+            let matchBtn = document.getElementById('matchBtn');
+            matchBtn.disabled = false;
+            matchBtn.className = "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition-all duration-200 flex items-center justify-center gap-2 text-base";
+            
+            totalCountBadge.innerText = `${totalRowsCount} Record(s) Loaded`;
+            tableContainer.classList.remove('hidden');
+            summaryCardsContainer.classList.remove('hidden');
+            copyBtn.classList.remove('hidden');
+            showToast("Dataset loaded and formatted successfully!");
+        }
+
+        // --- Google Sheet Data Matcher Verification Function ---
+        function matchGoogleSheet() {
+            const url = document.getElementById('googleSheetUrl').value;
+            if(!url) return showToast("Please paste Google Sheet CSV URL!", true);
+            showToast("Connecting to Google Sheet...");
+            
+            let matchBtn = document.getElementById('matchBtn');
+            matchBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Syncing Data...`;
+            
+            Papa.parse(url, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    if(results.data && results.data.length > 0) {
+                        showToast("Connected! Matching data with IDR Numbers...");
+                        gSheetData = results.data;
+                        
+                        let matchCount = 0;
+                        const rows = document.querySelectorAll('#tableBody tr');
+                        
+                        // Loop through each extracted row in the table
+                        rows.forEach(row => {
+                            const idr = row.getAttribute('data-idr');
+                            if (!idr || idr === "Unknown") return;
+                            
+                            // Find matching row in Google Sheet by IDR Number
+                            const matchedData = gSheetData.find(sheetRow => 
+                                sheetRow['IDR Number'] && sheetRow['IDR Number'].trim().includes(idr)
+                            );
+                            
+                            if (matchedData) {
+                                matchCount++;
+                                const cells = row.querySelectorAll('td');
+                                
+                                // Replace data from Sheet if available, else keep extracted data
+                                if(matchedData['dispute group']) cells[0].innerText = matchedData['dispute group'];
+                                if(matchedData['IDR Number']) cells[1].innerText = matchedData['IDR Number'];
+                                if(matchedData['Date - Determination Received from Mediator']) cells[2].innerText = matchedData['Date - Determination Received from Mediator'];
+                                if(matchedData['WIN/LOSE']) cells[3].innerText = matchedData['WIN/LOSE'];
+                                
+                                // cells[4] is 'Det #' which we keep local and don't overwrite
+                                
+                                if(matchedData['Claim Number']) cells[5].innerText = matchedData['Claim Number'];
+                                if(matchedData['CPT code']) cells[6].innerText = matchedData['CPT code'];
+                                if(matchedData['Determination']) cells[7].innerText = matchedData['Determination'];
+                                
+                                // Highlight row with Green to show success
+                                row.classList.add('bg-emerald-50/60');
+                                cells[0].classList.add('text-emerald-800');
+                            } else {
+                                // Highlight row with Red if no match found in sheet
+                                row.classList.add('bg-rose-50/30');
+                            }
+                        });
+                        
+                        document.getElementById('totalCountBadge').innerText = `${matchCount} Matches Found!`;
+                        document.getElementById('totalCountBadge').className = "bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-extrabold px-4 py-1.5 rounded-full flex items-center gap-1.5";
+                        
+                        matchBtn.innerHTML = `<i class="fa-solid fa-check-double"></i> Data Matched`;
+                        matchBtn.className = "bg-emerald-100 border-2 border-emerald-300 text-emerald-700 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-not-allowed";
+                        matchBtn.disabled = true;
+                    } else {
+                        showToast("Failed to read data. The sheet might be empty.", true);
+                        matchBtn.innerHTML = `<i class="fa-solid fa-bolt"></i> Match Sheet Data`;
+                    }
+                },
+                error: function(err) {
+                    showToast("Connection failed! Check if link is Public CSV.", true);
+                    console.error("PapaParse Error:", err);
+                    matchBtn.innerHTML = `<i class="fa-solid fa-bolt"></i> Match Sheet Data`;
+                }
+            });
+        }
+
+        function copyTableToClipboard() {
+            const table = document.getElementById("resultTable");
+            const range = document.createRange();
+            range.selectNode(table);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            try {
+                document.execCommand("copy");
+                showToast("Copied to clipboard! Ready to paste into Excel.");
+            } catch (err) { 
+                showToast("Clipboard copy failed!", true); 
+            }
+            window.getSelection().removeAllRanges();
+        }
+    </script>
+</body>
+</html>
