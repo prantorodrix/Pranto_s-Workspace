@@ -1,832 +1,720 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pranto's Workspace</title>
-    <link rel="icon" type="image/png" href="index.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap & Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+    <title>Pranto's Workspace - IDR Extractor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* =========================================
-           PREMIUM VARIABLES & THEMES
-           ========================================= */
-        :root {
-            --font-head: 'Outfit', sans-serif;
-            --font-body: 'Inter', sans-serif;
-            --font-num: 'Space Grotesk', monospace;
-            
-            --primary: #4f46e5;       
-            --primary-rgb: 79, 70, 229;
-            --secondary: #0ea5e9;     
-            --accent: #e11d48;        
-            --success: #059669;       
-            --warning: #d97706;       
-            
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.9);
-            --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-            --card-radius: 24px;
-            
-            --text-main: #0f172a;
-            --text-sub: #475569;
-            --input-bg: rgba(255,255,255,0.85);
-            --bg-color: #f0f4f8;
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body{font-family:'Plus Jakarta Sans',sans-serif;scroll-behavior:smooth;background-color:#f8fafc;}
+        .glass-nav{background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(226,232,240,0.8);transition:all 0.3s;}
+        
+        .table-wrapper { max-height: 75vh; overflow: auto; scroll-behavior: smooth; background: #fff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); border-radius: 0.75rem;}
+        table{border-collapse:separate;border-spacing:0;width:100%;white-space:nowrap;}
+        th,td{border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;padding:12px 14px;text-align:left;font-size:13.5px;outline:none;transition:background-color 0.15s;}
+        
+        thead th {
+            position: sticky; top: 0; z-index: 30; background-color: #f1f5f9;
+            font-weight: 700; color: #475569; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; border-top: 1px solid #e2e8f0; white-space: normal; line-height: 1.4; vertical-align: middle;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-
-        [data-bs-theme="dark"] {
-            --primary: #6366f1;
-            --glass-bg: rgba(20, 27, 45, 0.7);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.07);
-            --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --input-bg: rgba(15, 23, 42, 0.7);
-            --bg-color: #060b14;
-        }
-
-        /* =========================================
-           GLOBAL & DYNAMIC BLUR BACKGROUNDS
-           ========================================= */
-        body { font-family: var(--font-body); color: var(--text-main); min-height: 100vh; background-color: var(--bg-color); transition: all 0.5s ease; overflow-x: hidden; }
-        .bg-mesh { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-        .blob { position: absolute; filter: blur(90px); opacity: 0.6; border-radius: 50%; animation: floatBlob 15s infinite alternate ease-in-out; }
+        th:first-child,td:first-child{border-left:1px solid #e2e8f0;}
+        tr{background-color:#ffffff;transition:background-color 0.2s;}
+        tr:hover{background-color:#f8fafc;}
         
-        [data-bs-theme="light"] .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: rgba(79, 70, 229, 0.3); }
-        [data-bs-theme="light"] .blob-2 { bottom: -20%; right: -10%; width: 600px; height: 600px; background: rgba(14, 165, 233, 0.2); }
-        [data-bs-theme="light"] .blob-3 { top: 40%; left: 40%; width: 400px; height: 400px; background: rgba(255, 255, 255, 0.8); }
-
-        [data-bs-theme="dark"] .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: rgba(79, 70, 229, 0.15); }
-        [data-bs-theme="dark"] .blob-2 { bottom: -20%; right: -10%; width: 600px; height: 600px; background: rgba(225, 29, 72, 0.1); }
-        [data-bs-theme="dark"] .blob-3 { top: 40%; left: 40%; width: 400px; height: 400px; background: rgba(0, 0, 0, 0.4); }
-
-        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
-
-        .font-head { font-family: var(--font-head); }
-        .font-num { font-family: var(--font-num); letter-spacing: -0.5px; }
-        .text-gradient { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* Glass Panel Styling */
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--card-radius); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .glass-panel:hover { box-shadow: 0 15px 50px rgba(0,0,0,0.1); transform: translateY(-2px); }
-        [data-bs-theme="dark"] .glass-panel:hover { box-shadow: 0 15px 50px rgba(0,0,0,0.5); }
-        .btn-premium { background: linear-gradient(135deg, var(--primary), #818cf8); color: white !important; border: none; border-radius: 12px; padding: 10px 24px; font-weight: 700; transition: 0.3s; box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3); }
-        .btn-premium:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.5); filter: brightness(1.1); }
-
-        /* =========================================
-           NAVBAR
-           ========================================= */
-        #nav-container { position: fixed; top: 20px; left: 0; width: 100%; z-index: 1000; display: flex; justify-content: center; padding: 0 20px; }
-        .nav-pill { width: 100%; max-width: 1400px; height: 65px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-radius: 100px; background: var(--glass-bg); backdrop-filter: blur(30px); border: var(--glass-border); box-shadow: 0 5px 25px rgba(0,0,0,0.05); }
-        .nav-brand { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; }
-        .nav-links { display: flex; gap: 28px; align-items: center; }
-        .nav-item { text-decoration: none; color: var(--text-sub); font-weight: 600; font-size: 0.85rem; transition: 0.3s; position: relative; text-transform: uppercase; letter-spacing: 0.5px; }
-        .nav-item:hover, .nav-item.active { color: var(--primary); }
-        .nav-item.active::after { content:''; position:absolute; bottom:-6px; left:0; width:100%; height:3px; background:var(--primary); border-radius:10px; }
-       .nav-drop-menu { background: var(--glass-bg); backdrop-filter: blur(25px); border: var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow); padding: 10px; margin-top: 20px; min-width: 200px; overflow: hidden; }
-.nav-drop-item { color: var(--text-main); font-size: 0.9rem; padding: 10px 15px; border-radius: 10px; transition: 0.2s; display: block; text-decoration: none; font-weight: 500; }
-.nav-drop-item:hover { background: rgba(var(--primary-rgb), 0.1); color: var(--primary); transform: translateX(5px); }
-  .user-pill { display: flex; align-items: center; gap: 15px; }
-        .theme-tog { width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; transition: 0.3s; font-size: 1.1rem; }
-        .theme-tog:hover { background: var(--primary); color: white; transform: rotate(15deg) scale(1.1); }
-        .user-av { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); padding: 2px; cursor: pointer; transition: 0.3s; background: var(--input-bg); }
-        .user-av:hover { transform: scale(1.1); box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.4); }
-
-        /* =========================================
-           MAIN WRAPPER & 8/4 GRID LAYOUT
-           ========================================= */
-        #main-wrapper { margin-top: 105px; padding-bottom: 50px; max-width: 1400px; margin-left: auto; margin-right: auto; padding-left: 20px; padding-right: 20px; }
-
-        /* Left 8-Grid: Tall Profile Banner */
-        .prof-banner-card { padding: 0; overflow: hidden; position: relative; border-radius: 24px; display: flex; flex-direction: column; }
-        .cover-area { height: 360px; width: 100%; position: relative; overflow: hidden; background: rgba(0,0,0,0.05); }
-        .cover-img { width: 100%; height: 100%; object-fit: cover; transition: transform 12s ease; }
-        .prof-banner-card:hover .cover-img { transform: scale(1.08); }
+        td:focus{box-shadow:inset 0 0 0 2px #10b981;outline:none;z-index:25;position:relative;}
+        td[contenteditable="true"]{cursor:text;transition:background-color 0.2s;}
+        td[contenteditable="true"]:focus{background-color:#fefce8;box-shadow:inset 0 0 0 2px #10b981;}
         
-        .prof-info-wrapper { padding: 0 30px 30px; margin-top: -100px; z-index: 10; display: flex; flex-direction: column; justify-content: center; }
-        .prof-pic-container { position: relative; perspective: 1000px; margin-bottom: 15px; text-align: left !important}
-        /* Ultra Large Avatar */
-        .prof-pic-main { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 6px solid var(--glass-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative; z-index: 3; animation: avatarFloat 6s ease-in-out infinite; background: var(--input-bg); }
-        .float-el-1 { position: absolute; top: 127px; left: 26%; width: 25px; height: 25px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 50%; animation: float3d 5s infinite ease-in-out; z-index: 4; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-        .float-el-2 { position: absolute; bottom: 40px; left: 28%; width: 22px; height: 22px; background: linear-gradient(135deg, #f43f5e, #fb923c); border-radius: 50%; animation: float3dReverse 6s infinite ease-in-out; z-index: 1; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        /* Empty Reason Red Highlight */
+        .empty-reason { background-color: #fee2e2 !important; box-shadow: inset 0 0 0 1.5px #ef4444 !important; }
         
-        .prof-text-box { background: var(--glass-bg); backdrop-filter: blur(20px); padding: 25px 30px; border-radius: 16px; border: var(--glass-border); box-shadow: 0 5px 25px rgba(0,0,0,0.05); }
-
-        @keyframes avatarFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        @keyframes float3d { 0%, 100% { transform: translateZ(20px) translateY(0); } 50% { transform: translateZ(50px) translateY(-20px); } }
-        @keyframes float3dReverse { 0%, 100% { transform: translateZ(-20px) translateY(0); } 50% { transform: translateZ(-50px) translateY(20px); } }
-
-        /* Right 4-Grid: Stats, Weather, Calendar */
-        .stat-icon { border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .stat-icon-hover:hover .stat-icon { transform: scale(1.15) rotate(5deg); }
-        .stat-val-big { font-weight: 800; line-height: 1; font-family: var(--font-num); letter-spacing: -1px; }
-
-        /* Custom scrollbar for lists */
-        .custom-scroll::-webkit-scrollbar { width: 5px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(var(--primary-rgb), 0.3); border-radius: 10px; }
-
-        .cal-mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
-        .cal-mini-day { aspect-ratio: 1; border-radius: 6px; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.03); color: var(--text-sub); transition: 0.2s; }
-        [data-bs-theme="dark"] .cal-mini-day { background: rgba(255,255,255,0.03); }
-        .cal-mini-day:hover { transform: scale(1.2); z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
-        /* =========================================
-           CONTROLS & VISUAL CHART & SUMMARY
-           ========================================= */
-        .mini-stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
-        .mini-box { padding: 12px; text-align: center; background: var(--input-bg); border-radius: 16px; border: var(--glass-border); transition: 0.3s; }
-        .mini-box:hover { background: var(--primary); transform: translateY(-4px); box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.3); border-color: transparent; }
-        .mini-box:hover .mini-val, .mini-box:hover .mini-label { color: white !important; }
-        .mini-val { font-size: 1.4rem; font-weight: 800; font-family: var(--font-num); color: var(--text-main); transition: 0.2s; margin-bottom: 4px; }
-        .mini-label { font-size: 0.65rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; transition: 0.2s; }
+        /* Sticky Column Widths & Backgrounds */
+        .sticky-col{position:sticky;z-index:20;background-color:#ffffff;} 
+        thead th.sticky-col{z-index:40;background-color:#f1f5f9;} 
+        thead th.sticky-col.bg-indigo-50{background-color:#eef2ff !important;}
         
-        .control-panel-select { background: var(--input-bg); color: var(--primary); border: var(--glass-border); font-size: 1.1rem; padding: 12px; border-radius: 14px; }
-        .control-panel-select:focus { box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15); }
-
-        /* Attendance Chart (Hours) */
-        .chart-bar-container { height: 12px; border-radius: 20px; background: rgba(0,0,0,0.05); overflow: hidden; display: flex; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
-        [data-bs-theme="dark"] .chart-bar-container { background: rgba(255,255,255,0.05); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
-        .chart-segment { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-
-        /* =========================================
-           EXPANDED REMARKS SECTION (INLINE FLEX)
-           ========================================= */
-        .notes-container { padding: 20px; border-radius: 20px; margin-bottom: 30px; }
-        .notes-inline-area { display: flex; flex-wrap: wrap; gap: 10px; max-height: 180px; overflow-y: auto; padding-right: 5px; }
-        .note-chip { background: var(--input-bg); padding: 8px 16px; border-radius: 50px; font-size: 0.85rem; border: var(--glass-border); border-left: 4px solid var(--primary); display: inline-flex; align-items: center; gap: 8px; white-space: normal; line-height: 1.3; }
+        tr:hover .sticky-col { background-color: #f8fafc; }
+        tr.match-success{background-color:#ecfdf5 !important;} tr.match-success .sticky-col {background-color:#ecfdf5 !important;}
+        tr.match-success:hover{background-color:#d1fae5 !important;} tr.match-success:hover .sticky-col {background-color:#d1fae5 !important;}
+        tr.match-fail{background-color:#fff1f2 !important;} tr.match-fail .sticky-col {background-color:#fff1f2 !important;}
+        tr.match-fail:hover{background-color:#ffe4e6 !important;} tr.match-fail:hover .sticky-col {background-color:#ffe4e6 !important;}
         
-        /* =========================================
-           TABLE & DYNAMIC INPUTS
-           ========================================= */
-        .table-container { padding: 25px; margin-bottom: 40px; border-radius: 24px; }
-        .modern-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; }
-        .modern-table th { padding: 12px 10px; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-sub); font-weight: 800; border: none; }
-        .modern-table td { background: var(--input-bg); padding: 8px 10px; vertical-align: middle; font-size: 0.9rem; border-top: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; font-weight: 600; }
-        .modern-table td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; padding-left: 15px; }
-        .modern-table td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; padding-right: 15px; }
-        .tr-hover:hover td { background: rgba(var(--primary-rgb), 0.08); transform: scale(1.002); }
-
-        .t-inp { width: 100%; background: transparent; border: 2px solid transparent; text-align: center; color: var(--text-main); font-weight: 700; font-size: 0.85rem; padding: 6px; border-radius: 8px; transition: all 0.3s; }
-        .t-inp:focus { outline: none; background: var(--glass-bg); border-color: rgba(var(--primary-rgb), 0.5); box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15); }
-        .t-inp.text-start { text-align: left; }
-
-        .badge-btn { border: none; padding: 6px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; width: 90px; text-transform: uppercase; transition: 0.2s; letter-spacing: 0.5px; }
-        .badge-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .badge-btn:active { transform: scale(0.95); }
-
-        .st-Present { background: rgba(5, 150, 105, 0.15); color: #059669; }
-        [data-bs-theme="dark"] .st-Present { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-        .st-Absent { background: rgba(225, 29, 72, 0.15); color: #e11d48; }
-        [data-bs-theme="dark"] .st-Absent { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
-        .st-Weekend { background: rgba(79, 70, 229, 0.15); color: #4f46e5; }
-        [data-bs-theme="dark"] .st-Weekend { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
-        .st-Holiday { background: rgba(217, 119, 6, 0.15); color: #d97706; }
-        [data-bs-theme="dark"] .st-Holiday { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-        .st-- { background: rgba(100, 116, 139, 0.1); color: var(--text-sub); }
-        .badge-toggle { background: var(--input-bg); color: var(--text-main); border: 1px solid var(--text-sub); }
-
-        /* =========================================
-           FOOTER & ANIMATIONS 
-           ========================================= */
-        .footer-sec { margin-top: auto; padding: 40px 0 30px; background: var(--glass-bg); border-top: var(--glass-border); backdrop-filter: blur(30px); }
-        .footer-brand { font-family: var(--font-head); font-weight: 800; font-size: 1.5rem; }
-        .social-icon { width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--input-bg); color: var(--primary); font-size: 1.1rem; transition: 0.3s; margin-right: 8px; }
-        .social-icon:hover { background: var(--primary); color: white; transform: translateY(-4px); }
-
-        .anim { opacity: 0; transform: translateY(30px); animation: fadeInUp 0.7s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-
-        /* =========================================
-           PRINT PREVIEW 
-           ========================================= */
-        #print-view { display: none; position: fixed; inset: 0; background: #fff; color: #000; z-index: 9999; overflow-y: auto; padding: 40px; }
-        .print-header { border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .print-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .print-box { border: 1px solid #ddd; padding: 12px; text-align: center; border-radius: 8px; font-size: 0.9rem; }
-        .print-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        .print-table th { border-bottom: 2px solid #000; text-align: left; padding: 6px; }
-        .print-table td { border-bottom: 1px solid #eee; padding: 6px; }
-        .print-btn-float { position: fixed; bottom: 30px; right: 30px; display: flex; gap: 10px; }
-        @media print { body > *:not(#print-view) { display: none !important; } #print-view { display: block !important; overflow: visible; height: auto; padding: 0; } .print-btn-float { display: none !important; } @page { margin: 1cm; size: A4; } }
+        .col-1{left:0; width:130px; min-width:130px; max-width:130px; white-space:normal; word-wrap:break-word;}
+        .col-2{left:130px; width:130px; min-width:130px; max-width:130px; white-space:normal; word-wrap:break-word;}
+        .col-3{left:260px; width:120px; min-width:120px; max-width:120px; white-space:normal; word-wrap:break-word;}
+        .col-4{left:380px; width:130px; min-width:130px; max-width:130px; white-space:normal; word-wrap:break-word; box-shadow:4px 0 8px -2px rgba(0,0,0,0.15); transition: left 0.3s;}
+        
+        /* Compact View Mode Classes */
+        body.hide-mode .hidable { display: none !important; }
+        body.hide-mode .col-4 { left: 130px; } 
+        
+        .win-text{color:#059669;font-weight:700;} .lose-text{color:#dc2626;font-weight:700;}
+        .copied-anim{background-color:#a7f3d0 !important;color:#064e3b !important;font-weight:800;transition:all 0.2s ease;}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(15px);}to{opacity:1;transform:translateY(0);}}
+        .fade-in{animation:fadeIn 0.5s ease-out forwards;}
     </style>
 </head>
-<body>
+<body class="min-h-screen pt-28 pb-12 text-slate-800">
+    <nav class="fixed top-4 left-4 right-4 z-50 max-w-7xl mx-auto px-6 py-3 rounded-full glass-nav shadow-md flex items-center justify-between">
+        <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200"><i class="fa-solid fa-briefcase text-lg"></i></div><span class="font-bold text-lg bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent">Pranto's Workspace</span></div>
+        <div class="flex items-center gap-1"><a href="index.html" class="px-6 py-2 rounded-full text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-all duration-200 flex items-center gap-2"><i class="fa-solid fa-house"></i> Home</a></div>
+        <div class="hidden md:flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Workspace Active</span></div>
+    </nav>
 
-<!-- Dynamic Ambient Background -->
-<div class="bg-mesh"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
-
-<!-- NAVIGATION BAR -->
-<div id="nav-container" class="anim" style="animation-delay: 0s">
-    <div class="nav-pill">
-        <div class="nav-brand text-gradient">Pranto's Workspace</div>
-<div class="nav-links d-none d-lg-flex">
-            <a href="#" class="nav-item active">Home</a>
-            <div class="dropdown">
-                <span class="nav-item dropdown-toggle" data-bs-toggle="dropdown">BCBS</span>
-                <div class="dropdown-menu nav-drop-menu border-0">
-                    <a href="idr.html" class="nav-drop-item"><i class="bi bi-file-text me-2"></i>IDR</a>
-                    <a href="nsa.html" class="nav-drop-item"><i class="bi bi-shield me-2"></i>NSA</a>
-                    <a href="appeal.html" class="nav-drop-item"><i class="bi bi-arrow-repeat me-2"></i>Appeal</a>
-                    <a href="email.html" class="nav-drop-item"><i class="bi bi-envelope me-2"></i>IDR Email</a>
-                    <a href="accept.html" class="nav-drop-item"><i class="bi bi-envelope-check-fill me-2"></i>Accepted</a>
-                    <a href="drg.html" class="nav-drop-item"><i class="bi bi-file-earmark-medical-fill me-2"></i>DRG Appeal</a>
-                    <a href="offer.html" class="nav-drop-item"><i class="bi bi-check-circle me-2"></i>Offer Letter</a>
-                    <a href="improve.html" class="nav-drop-item"><i class="bi bi-people me-2"></i>Improve Health Email</a>
-                    <a href="determination.html" class="nav-drop-item"><i class="bi bi-lightning-charge me-2"></i>Determination</a>
-                </div>
-            </div>
-            <a href="report.html" class="nav-item">Daily Report</a>
-            <div class="dropdown">
-                <span class="nav-item dropdown-toggle" data-bs-toggle="dropdown">Tools</span>
-                <div class="dropdown-menu nav-drop-menu border-0">
-                    <a href="typing.html" class="nav-drop-item"><i class="bi bi-keyboard me-2"></i>Typing</a>
-                    <a href="chat.html" class="nav-drop-item"><i class="bi bi-joystick me-2"></i>Meeting</a>
-                </div>
-            </div>
-            <a href="#" class="nav-item">Contact</a>
-        </div>
-        <div class="user-pill">
-            <button id="t-tog" class="theme-tog"><i class="bi bi-moon-stars-fill"></i></button>
-            <div class="dropdown">
-                <img id="nav-avatar" src="https://placehold.co/100/4f46e5/fff?text=PR" class="user-av" data-bs-toggle="dropdown">
-                <ul class="dropdown-menu dropdown-menu-end nav-drop-menu border-0 mt-3">
-                    <li><a class="nav-drop-item text-danger" href="#" onclick="localStorage.clear();location.reload()"><i class="bi bi-trash3-fill me-2"></i>Reset System</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="main-wrapper">
-    <!-- TOP SECTION: 8/4 Grid Setup -->
-    <div class="row g-4 mb-4 anim" style="animation-delay: 0.1s">
-        
-        <!-- LEFT: 8-Grid (Tall Profile Section) -->
-        <div class="col-lg-8">
-            <div class="glass-panel prof-banner-card h-100">
-                <div class="cover-area"><img id="cv-ph" src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop" class="cover-img"></div>
-                <div class="prof-info-wrapper flex-grow-1">
-                    <div class="prof-pic-container text-center">
-                        <div class="float-el-1"></div>
-                        <div class="float-el-2"></div>
-                        <img id="p-ph" src="https://placehold.co/200/4f46e5/fff?text=PR" class="prof-pic-main mx-auto" alt="Avatar">
+    <div class="max-w-[95%] mx-auto px-4 mt-6">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 p-8 mb-8">
+            <div class="mb-8"><h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar text-indigo-500"></i> IDR PDF Auto Data Extractor</h2><p class="text-slate-500 mt-2 font-medium">Upload multiple PDFs to extract IDR final payment determinations.</p></div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <input type="file" id="pdfFiles" multiple accept=".pdf" class="hidden" onchange="handleManualUpload(event)">
+                    <label for="pdfFiles" class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-indigo-50/60 hover:border-indigo-400 transition-all duration-300 group"><div class="flex flex-col items-center justify-center transition-transform group-hover:-translate-y-1"><div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-3 shadow-sm"><i class="fa-solid fa-cloud-arrow-up text-xl"></i></div><p class="text-sm text-slate-600 font-medium"><span class="font-bold text-indigo-600">Click to upload</span> or drag and drop PDFs</p><p class="text-xs text-emerald-600 mt-1.5 font-bold" id="fileCountText">Unlimited files supported</p></div></label>
+                    <textarea id="emailText" placeholder="Paste determination emails here to auto-match dates..." class="w-full h-24 p-4 rounded-2xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none text-sm text-slate-700"></textarea>
+                    
+                    <div class="flex justify-between mt-[-10px] mb-2">
+                        <button onclick="document.getElementById('sheetInputContainer').classList.toggle('hidden')" class="text-[11px] text-teal-600 font-bold hover:text-teal-800 transition-colors flex items-center gap-1"><i class="fa-solid fa-link"></i> Master Sheet Link</button>
                     </div>
-                    <div class="prof-text-box text-center mt-3 flex-grow-1 d-flex flex-column justify-content-center">
-                        <h2 id="u-nm" class="font-head fw-bolder m-0" style="font-size: 2rem;">Setup Profile</h2>
-                        <p id="u-ds" class="text-gradient fw-bold mb-3 fs-5">Add Designation</p>
-                        <div class="d-flex justify-content-center gap-4 text-muted flex-wrap mb-3" style="font-size: 0.85rem; font-weight: 700;">
-                            <span><i class="bi bi-diagram-3-fill me-1 text-primary"></i><span id="u-tm">Team</span></span>
-                            <span><i class="bi bi-fingerprint me-1 text-primary"></i><span id="u-id">ID</span></span>
-                            <span><i class="bi bi-clock-history me-1 text-primary"></i><span id="j-dur">--</span></span>
+                    <div id="sheetInputContainer" class="hidden"><input type="text" id="googleSheetUrl" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vSnIe4C4_UxR8iPoTSAFy0Nr9DQIatx_SUJkB9jPW2xDbE85zeFnuPWtikrE6J8ZOhAAQT9_EaQ1mLY/pub?gid=2036811380&single=true&output=csv" placeholder="Paste Google Sheet Public CSV URL" class="w-full p-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 focus:bg-white outline-none text-sm font-medium text-slate-700"></div>
+                    
+                    <div class="flex items-center justify-between p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl mt-1 shadow-sm">
+                        <div class="flex items-center gap-3 w-full">
+                            <span class="text-[11px] font-extrabold text-indigo-800 uppercase tracking-wide"><i class="fa-solid fa-pen-nib"></i> Note Setup:</span>
+                            <input type="text" id="notePrefix" value="IDR" class="w-20 p-2 rounded-lg border border-slate-300 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500" title="Prefix">
+                            <input type="text" id="noteName" value="PRANTO R" class="w-40 p-2 rounded-lg border border-slate-300 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500" title="Name">
+                            <button onclick="generateNotes()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 ml-auto transition-colors shadow-sm"><i class="fa-solid fa-arrows-rotate"></i> Generate Notes</button>
                         </div>
-                        <button class="btn btn-premium w-100 fs-6 mt-auto" data-bs-toggle="modal" data-bs-target="#ed-mod"><i class="bi bi-sliders2 me-2"></i>Edit Setup</button>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-3 justify-center">
+                    <button onclick="processPDFs()" id="processBtn" class="bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-not-allowed" disabled><i class="fa-solid fa-robot"></i> Select PDFs First...</button>
+                    <button onclick="matchGoogleSheet()" id="matchBtn" class="bg-slate-100 border-2 border-slate-200 text-slate-400 font-bold py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-not-allowed" disabled><i class="fa-solid fa-bolt"></i> Match Sheet Data</button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="copyTableToClipboard()" id="copyBtn" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 px-4 rounded-xl hidden flex items-center justify-center gap-1.5 text-sm shadow-md"><i class="fa-solid fa-copy"></i> Copy Output</button>
+                        <button onclick="clearAllData()" id="clearBtn" class="border-2 border-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-1.5 text-sm"><i class="fa-solid fa-trash-can"></i> Clear All</button>
                     </div>
                 </div>
             </div>
+            <div id="progressContainer" class="hidden mt-8 pt-6 border-t border-slate-100"><div class="flex justify-between items-center mb-3"><span class="text-sm font-bold text-slate-700 flex items-center gap-2" id="progressStatus"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600"></i> Reading PDF metadata...</span><span class="text-sm font-bold text-indigo-600" id="progressPercentage">0%</span></div><div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-200"><div id="progressBar" class="bg-gradient-to-r from-blue-500 to-emerald-500 h-2.5 rounded-full" style="width:0%"></div></div></div>
+        </div>
+
+        <div id="summaryCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 hidden fade-in">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg shadow-slate-200/50 flex justify-between"><div><p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Disputes</p><h3 id="statTotalDisputes" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3></div><div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-folder-open"></i></div></div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg shadow-slate-200/50 flex justify-between"><div><p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Dets</p><h3 id="statTotalDets" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3></div><div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-file-invoice"></i></div></div>
+            <div class="bg-white rounded-2xl border border-emerald-100 p-6 shadow-lg shadow-emerald-100/50 flex justify-between"><div><p class="text-xs font-bold text-emerald-600/80 uppercase tracking-wider">Total Wins</p><div class="mt-1"><h3 id="statTotalWins" class="text-3xl font-extrabold text-emerald-600 leading-none">0</h3><span id="statTotalWinAmount" class="inline-block mt-1.5 text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">$0.00</span></div></div><div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-trophy"></i></div></div>
+            <div class="bg-white rounded-2xl border border-rose-100 p-6 shadow-lg shadow-rose-100/50 flex justify-between"><div><p class="text-xs font-bold text-rose-600/80 uppercase tracking-wider">Total Losses</p><div class="mt-1"><h3 id="statTotalLosses" class="text-3xl font-extrabold text-rose-600 leading-none">0</h3><span id="statTotalLossAmount" class="inline-block mt-1.5 text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md">$0.00</span></div></div><div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-circle-xmark"></i></div></div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/60 overflow-hidden hidden transition-all duration-300" id="tableContainer">
+            <div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/80">
+                <span class="font-extrabold text-slate-800 text-lg flex items-center gap-2"><i class="fa-solid fa-table text-indigo-500"></i> Extracted Dispute Dataset</span>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleColumns()" id="toggleViewBtn" class="bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-full text-xs font-extrabold hover:bg-indigo-200 transition-colors shadow-sm"><i class="fa-solid fa-eye-slash"></i> Compact View</button>
+                    <span class="bg-indigo-100 border border-indigo-200 text-indigo-800 text-xs font-extrabold px-4 py-1.5 rounded-full" id="totalCountBadge">0 Records found</span>
+                </div>
+            </div>
+            <div class="table-wrapper border-t-0 border-l-0 border-r-0 rounded-none" id="tableScrollWrapper">
+                <table id="resultTable">
+                    <thead>
+                        <tr id="tableHeaderRow">
+                            <th class="sticky-col col-1">Dispute Group</th>
+                            <th class="sticky-col col-2 hidable">IDR Number</th>
+                            <th class="sticky-col col-3 hidable text-indigo-700 bg-indigo-50">IDR Type</th>
+                            <th class="sticky-col col-4 text-indigo-700 bg-indigo-50">Ticket Number</th>
+                            <th class="hidable">Claim Number</th>
+                            <th class="hidable">CPT code</th>
+                            <th class="hidable text-indigo-700 bg-indigo-50">Initial Payment (W/PR)</th>
+                            <th class="hidable text-indigo-700 bg-indigo-50">Mediator</th>
+                            <th class="hidable text-indigo-700 bg-indigo-50">Mediator Fee (Admin)</th>
+                            <th class="hidable text-indigo-700 bg-indigo-50">Mediator Fee (Proc)</th>
+                            <th class="hidable">Det #</th>
+                            <th class="hidable">Determination</th>
+                            <th class="hidable text-center">Date Received</th>
+                            <th>WIN/LOSE</th>
+                            <th class="hidable text-emerald-700 bg-emerald-50">Additional Payment Recv</th>
+                            <th class="hidable text-indigo-700 bg-indigo-50">Mediator Refund</th>
+                            <th class="text-rose-700 bg-rose-50" style="min-width:260px; max-width:320px;">Lose Reason</th>
+                            <th class="text-slate-700 bg-amber-50" style="min-width:350px; max-width:450px;">Correspondence Note</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
         </div>
         
-        <!-- RIGHT: 4-Grid (Stats, Weather, Calendar) -->
-        <div class="col-lg-4">
-            <div class="d-flex flex-column h-100" style="gap: 20px;">
+        <footer class="mt-16 border-t border-slate-200/80 pt-8 pb-12 text-center">
+            <div class="flex flex-col items-center gap-4"><div class="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest bg-indigo-50 px-4 py-1.5 rounded-full"><i class="fa-solid fa-scale-balanced text-base"></i><span>Federal IDR Workspace</span></div><p class="text-sm text-slate-500 font-semibold mt-2">Made with <i class="fa-solid fa-heart text-rose-500 animate-pulse mx-1"></i> by <span class="font-extrabold text-indigo-600">Pranto's Workspace</span> © 2026</p></div>
+        </footer>
+    </div>
+
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl opacity-0 transition-all translate-y-4 z-50 flex items-center gap-3 font-bold"></div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        let allSelectedFiles = [], extractedResults = [], gSheetData = [];
+        const insKeywords = ["BCBS", "BLUE CROSS", "BLUE SHIELD", "AETNA", "CIGNA", "UNITED", "UHC", "HUMANA", "MOLINA", "OSCAR", "AMBETTER", "HEALTH PLAN"];
+        const provKeywords = ["LLC", "GROUP", "CENTER", " ER ", "PHYSICIAN", "CLINIC", "HOSPITAL", " PA ", "PLLC", "ASSOCIATES", "EMERGENCY"];
+
+        function showToast(msg, isErr=false){
+            const t=document.getElementById('toast');
+            t.innerHTML=isErr?`<i class="fa-solid fa-circle-exclamation text-rose-500 text-lg"></i> ${msg}`:`<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i> ${msg}`;
+            t.classList.remove('opacity-0','translate-y-4'); t.classList.add('opacity-100','translate-y-0');
+            setTimeout(()=>{t.classList.remove('opacity-100','translate-y-0');t.classList.add('opacity-0','translate-y-4');},3500);
+        }
+
+        function handleManualUpload(e) {
+            const i=e.target, f=document.getElementById('fileCountText'), p=document.getElementById('processBtn');
+            if(i.files.length>0){
+                allSelectedFiles=allSelectedFiles.concat(Array.from(i.files));
+                f.innerHTML=`<span class="text-indigo-600 font-extrabold">${allSelectedFiles.length}</span> file(s) queued.`;
+                p.disabled=false; p.innerHTML=`<i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data`;
+                p.className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md cursor-pointer";
+            } i.value="";
+        }
+
+        function clearAllData() {
+            allSelectedFiles=[]; extractedResults=[]; gSheetData=[];
+            document.getElementById('pdfFiles').value=""; document.getElementById('emailText').value="";
+            document.getElementById('fileCountText').innerText="Unlimited files supported";
+            document.getElementById('tableBody').innerHTML=""; document.getElementById('tableContainer').classList.add('hidden');
+            document.getElementById('progressContainer').classList.add('hidden'); document.getElementById('copyBtn').classList.add('hidden');
+            document.getElementById('summaryCardsContainer').classList.add('hidden');
+            
+            document.getElementById('tableHeaderRow').innerHTML = `<th class="sticky-col col-1">Dispute Group</th><th class="sticky-col col-2">IDR Number</th><th class="sticky-col col-3 text-indigo-700 bg-indigo-50">IDR Type</th><th class="sticky-col col-4 text-indigo-700 bg-indigo-50">Ticket Number</th><th>Claim Number</th><th>CPT code</th><th class="text-indigo-700 bg-indigo-50">Initial Payment (W/PR)</th><th class="text-indigo-700 bg-indigo-50">Mediator</th><th class="text-indigo-700 bg-indigo-50">Mediator Fee (Administrative)</th><th class="text-indigo-700 bg-indigo-50">Mediator Fee (Processing)</th><th>Det #</th><th>Determination</th><th class="text-center">Date - Determination Received from Mediator</th><th>WIN/LOSE</th><th class="text-emerald-700 bg-emerald-50">Additional Payment Receivable</th><th class="text-indigo-700 bg-indigo-50">Mediator Refund</th><th class="text-rose-700 bg-rose-50">Lose Reason</th><th class="text-slate-700 bg-amber-50">Correspondence Note</th>`;
+
+            let p=document.getElementById('processBtn'); p.innerHTML=`<i class="fa-solid fa-robot"></i> Select PDFs First...`; p.className="bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed"; p.disabled=true;
+            let m=document.getElementById('matchBtn'); m.disabled=true; m.className="bg-slate-100 text-slate-400 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed border-2 border-slate-200"; m.innerHTML=`<i class="fa-solid fa-bolt"></i> Match Sheet Data`;
+            showToast("Workspace completely reset!");
+        }
+
+        function toggleColumns() {
+            const isHidden = document.body.classList.toggle('hide-mode');
+            const btn = document.getElementById('toggleViewBtn');
+            if(isHidden) {
+                btn.innerHTML = `<i class="fa-solid fa-eye"></i> Show All Columns`;
+                btn.classList.replace('bg-indigo-100', 'bg-indigo-600');
+                btn.classList.replace('text-indigo-700', 'text-white');
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-eye-slash"></i> Compact View`;
+                btn.classList.replace('bg-indigo-600', 'bg-indigo-100');
+                btn.classList.replace('text-white', 'text-indigo-700');
+            }
+        }
+
+        function handleReasonInput(el) {
+            if(el.innerText.trim() !== '') {
+                el.classList.remove('empty-reason');
+            } else {
+                let rowStat = el.closest('tr').cells[13].innerText.trim().toUpperCase();
+                if(rowStat === "LOSE") el.classList.add('empty-reason');
+            }
+            generateNotes(); 
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) return;
+            const act = document.activeElement;
+            if(act.tagName === 'TD' || act.tagName === 'DIV') {
+                let cell = act.tagName === 'DIV' ? act.parentElement : act;
+                if(cell.isContentEditable || act.isContentEditable) { if(e.key==='ArrowLeft' || e.key==='ArrowRight') return; } 
                 
-                <!-- 1. Stats Row: Working Days & COLA -->
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="glass-panel stat-icon-hover d-flex flex-column justify-content-center align-items-center p-3 text-center h-100" style="min-height: 110px;">
-                            <div class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Work Days</div>
-                            <div id="wd-cnt" class="stat-val-big text-success" style="font-size: 1.8rem;">0</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="glass-panel stat-icon-hover d-flex flex-column justify-content-center align-items-center p-3 text-center h-100" style="min-height: 110px;">
-                            <div class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">COLA Stat</div>
-                            <div id="cola-st" class="stat-val-big text-primary" style="font-size: 1.8rem;">0/22</div>
-                            <div class="progress w-100 mt-2 rounded-pill" style="height:4px; background: rgba(0,0,0,0.05);"><div id="cola-bar" class="progress-bar rounded-pill" style="width:0%; background: var(--primary);"></div></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Performance -->
-                <div class="glass-panel stat-icon-hover d-flex align-items-center justify-content-between p-3 px-4">
-                    <div>
-                        <div class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem;">Performance Rate</div>
-                        <div id="cat-desc" class="text-muted" style="font-size: 0.7rem; font-weight: 700;">Rate: 0%</div>
-                    </div>
-                    <div id="cat-st" class="stat-val-big text-warning m-0" style="font-size: 1.8rem;">N/A</div>
-                </div>
-
-                <!-- 3. Dual Weather Widget -->
-                <div class="glass-panel p-3 px-4 d-flex justify-content-between align-items-center">
-                    <div class="text-center">
-                        <div class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Dhaka (BDT)</div>
-                        <div class="fw-bold text-primary font-num" style="font-size: 1.2rem;"><i class="bi bi-cloud-sun me-1"></i>32°C</div>
-                    </div>
-                    <div style="width: 1px; background: var(--text-sub); opacity: 0.3; height: 35px;"></div>
-                    <div class="text-center">
-                        <div class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">New York (EST)</div>
-                        <div class="fw-bold text-secondary font-num" style="font-size: 1.2rem;"><i class="bi bi-moon-stars me-1"></i>12°C</div>
-                    </div>
-                </div>
-
-                <!-- 4. Calendar -->
-                <div class="glass-panel p-4 flex-grow-1 d-flex flex-column justify-content-center">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-bold text-muted text-uppercase" style="font-size: 0.75rem;">Month View</span><i class="bi bi-calendar-range text-primary" style="font-size: 1.1rem;"></i>
-                    </div>
-                    <div class="d-flex justify-content-between px-1 mb-1 fw-bold" style="font-size:0.75rem; color:var(--text-sub)">
-                        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                    </div>
-                    <div id="cal-gr" class="cal-mini-grid flex-grow-1 mt-2"></div>
-                </div>
+                e.preventDefault();
+                const row = cell.parentElement, idx = Array.from(row.children).indexOf(cell);
+                let next = null;
+                if(e.key === 'ArrowRight') next = cell.nextElementSibling;
+                if(e.key === 'ArrowLeft') next = cell.previousElementSibling;
+                if(e.key === 'ArrowDown' && row.nextElementSibling) next = row.nextElementSibling.children[idx];
+                if(e.key === 'ArrowUp' && row.previousElementSibling) next = row.previousElementSibling.children[idx];
                 
-            </div>
-        </div>
-    </div>
-
-    <!-- CONTROLS & VISUAL CHART & DETAILED SUMMARY -->
-    <div class="row g-4 mb-4 anim" style="animation-delay: 0.2s">
-        <!-- Control Center & Chart -->
-        <div class="col-lg-4">
-            <div class="glass-panel p-4 h-100 d-flex flex-column">
-                <h6 class="font-head fw-bold mb-3 fs-5 d-flex align-items-center"><i class="bi bi-sliders me-2 text-primary"></i> Control Center</h6>
-                <select id="m-sel" class="form-select shadow-none control-panel-select mb-3 fw-bold"></select>
-                <div class="d-flex justify-content-between p-3 rounded-3 mb-3" style="background:var(--input-bg); border: var(--glass-border);">
-                    <div><span class="d-block text-muted text-uppercase" style="font-size:0.65rem; font-weight:800;">From</span><span id="d-fr" class="fw-bold font-num fs-6">--</span></div>
-                    <div class="text-end"><span class="d-block text-muted text-uppercase" style="font-size:0.65rem; font-weight:800;">To</span><span id="d-to" class="fw-bold font-num fs-6">--</span></div>
-                </div>
-                <!-- Attendance Chart (Hours based) -->
-                <div class="mt-auto">
-                    <span class="d-block text-muted text-uppercase mb-2" style="font-size:0.7rem; font-weight:800;">Attendance Visual (Hours)</span>
-                    <div class="chart-bar-container">
-                        <div class="chart-segment bg-success" id="chart-pr" style="width: 0%;" title="Present"></div>
-                        <div class="chart-segment bg-warning" id="chart-lt" style="width: 0%;" title="Late"></div>
-                        <div class="chart-segment bg-danger" id="chart-ab" style="width: 0%;" title="Absent"></div>
-                    </div>
-                    <div class="d-flex justify-content-between mt-2" style="font-size: 0.65rem; font-weight: 700;" id="chart-labels">
-                        <span class="text-success"><i class="bi bi-circle-fill me-1"></i>Present</span>
-                        <span class="text-warning"><i class="bi bi-circle-fill me-1"></i>Late</span>
-                        <span class="text-danger"><i class="bi bi-circle-fill me-1"></i>Absent</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Detailed Breakdown -->
-        <div class="col-lg-8">
-            <div class="glass-panel p-4 h-100">
-                <h6 class="font-head fw-bold mb-3 fs-5 d-flex align-items-center"><i class="bi bi-grid-fill me-2 text-primary"></i> Data Breakdown</h6>
-                <div class="mini-stat-grid">
-                    <div class="mini-box"><span class="mini-label">Hours</span><div id="s-hr" class="mini-val text-primary">0</div></div>
-                    <div class="mini-box"><span class="mini-label">Late</span><div id="s-lt" class="mini-val text-danger">0</div></div>
-                    <div class="mini-box"><span class="mini-label">Absent</span><div id="s-ab" class="mini-val text-danger">0</div></div>
-                    <div class="mini-box"><span class="mini-label">Weekend</span><div id="s-wk" class="mini-val text-primary">0</div></div>
-                    <div class="mini-box"><span class="mini-label">Holiday</span><div id="s-hl" class="mini-val text-warning">0</div></div>
-                    <div class="mini-box"><span class="mini-label">Work Day</span><div id="s-wd" class="mini-val text-success">0</div></div>
-                    <div class="mini-box"><span class="mini-label">Present</span><div id="s-pr" class="mini-val text-success">0</div></div>
-                    <div class="mini-box"><span class="mini-label">Night</span><div id="s-ns" class="mini-val text-secondary">0</div></div>
-                    <div class="mini-box"><span class="mini-label">Day</span><div id="s-ds" class="mini-val text-warning">0</div></div>
-                    <div class="mini-box"><span class="mini-label">Grace</span><div id="s-gr" class="mini-val text-primary">0</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- EXPANDED REMARKS/NOTES SECTION (INLINE FLEX) -->
-    <div class="glass-panel notes-container anim" style="animation-delay: 0.3s">
-        <h6 class="font-head fw-bold m-0 fs-5 d-flex align-items-center text-primary border-bottom border-primary border-opacity-25 pb-2 mb-3">
-            <i class="bi bi-journal-text me-2"></i> Activity Remarks
-        </h6>
-        <!-- Inline flex container for notes -->
-        <div id="full-notes-area" class="notes-inline-area custom-scroll text-muted">
-            <div class="text-center w-100 py-2 font-num opacity-50">No remarks documented for this period.</div>
-        </div>
-    </div>
-
-    <!-- MAIN DATA TABLE -->
-    <div class="glass-panel table-container anim" style="animation-delay: 0.4s">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <h6 class="font-head fw-bold m-0 fs-4 d-flex align-items-center"><i class="bi bi-list-columns-reverse me-2 text-primary"></i> Activity Logs</h6>
-                <span class="text-muted" style="font-size: 0.85rem; font-weight: 700;" id="att-sub">Loading...</span>
-            </div>
-            <button class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold shadow-sm" onclick="openPrintView()"><i class="bi bi-printer-fill me-2"></i> Print Report</button>
-        </div>
-        
-        <div class="table-responsive custom-scroll">
-            <table class="modern-table align-middle">
-                <thead>
-                    <tr>
-                        <th width="10%">Date</th><th width="8%">Day</th><th width="12%">Status</th>
-                        <th width="8%">Hrs</th><th width="8%">Extra</th><th width="8%">Late</th>
-                        <th width="10%">Shift</th><th width="10%">Grace</th><th width="26%">Remarks</th>
-                    </tr>
-                </thead>
-                <tbody id="att-bd"></tbody>
-            </table>
-        </div>
-    </div>
-
-</div>
-
-<!-- PREMIUM SAAS FOOTER -->
-<footer class="footer-sec">
-    <div class="container px-4 text-center text-md-start">
-        <div class="row align-items-center">
-            <div class="col-md-6 mb-3 mb-md-0">
-                <div class="footer-brand mb-1">Pranto's <span class="text-primary">Workspace</span></div>
-                <p class="text-muted m-0" style="font-weight: 500; font-size: 0.85rem;">Precision Dashboard v3.0 Ultra. Professional SaaS UI.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <div class="mb-2">
-                    <a href="#" class="social-icon"><i class="bi bi-github"></i></a>
-                    <a href="#" class="social-icon"><i class="bi bi-linkedin"></i></a>
-                </div>
-                <div class="text-muted" style="font-weight: 700; font-size: 0.8rem;">&copy; 2026. All Rights Reserved.</div>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<!-- PRINT PREVIEW OVERLAY -->
-<div id="print-view">
-    <div class="print-header">
-        <div><h2 class="font-head fw-bolder m-0">Attendance Report</h2><p class="text-muted m-0 mt-1" id="p-sub-date">Period: --</p></div>
-        <div class="text-end"><h4 class="font-head fw-bold m-0" id="p-u-name">--</h4><p class="text-muted m-0" id="p-u-id">--</p></div>
-    </div>
-    <div class="print-grid">
-        <div class="print-box"><strong>Work Days</strong><div class="fs-4 fw-bold font-num" id="p-wd">0</div></div>
-        <div class="print-box"><strong>Present</strong><div class="fs-4 fw-bold font-num text-success" id="p-pr">0</div></div>
-        <div class="print-box"><strong>Absent</strong><div class="fs-4 fw-bold font-num text-danger" id="p-ab">0</div></div>
-        <div class="print-box"><strong>Rate</strong><div class="fs-4 fw-bold font-num" id="p-grd">--</div></div>
-    </div>
-    <table class="print-table">
-        <thead><tr><th>Date</th><th>Day</th><th>Status</th><th>Hrs</th><th>Extra</th><th>Late</th><th>Grace</th><th>Note</th></tr></thead>
-        <tbody id="p-table-body"></tbody>
-    </table>
-    <div class="print-btn-float"><button class="btn btn-secondary rounded-pill shadow" onclick="closePrintView()"><i class="bi bi-x-lg"></i> Close</button><button class="btn btn-primary rounded-pill shadow" onclick="window.print()"><i class="bi bi-printer me-2"></i> Print</button></div>
-</div>
-
-<!-- EDIT PROFILE MODAL -->
-<div class="modal fade" id="ed-mod" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content glass-panel border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title font-head fw-bolder text-primary fs-4">Setup Profile</h5>
-                <button class="btn-close shadow-none" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="ed-form">
-                    <div class="mb-3"><label class="small text-muted fw-bold mb-1">Name</label><input id="in-nm" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div>
-                    <div class="mb-3"><label class="small text-muted fw-bold mb-1">Designation</label><input id="in-ds" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div>
-                    <div class="row g-3 mb-3"><div class="col"><label class="small text-muted fw-bold mb-1">Team</label><input id="in-tm" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div><div class="col"><label class="small text-muted fw-bold mb-1">ID</label><input id="in-id" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div></div>
-                    <div class="mb-3"><label class="small text-muted fw-bold mb-1">Joined Date</label><input type="date" id="in-jd" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);"></div>
-                    <div class="mb-3"><label class="small text-muted fw-bold mb-1">Avatar Image</label><input type="file" id="in-ph" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);" accept="image/*"></div>
-                    <div class="mb-4"><label class="small text-muted fw-bold mb-1">Cover Image</label><input type="file" id="in-cv" class="form-control rounded-3 shadow-none border-secondary-subtle" style="background:var(--input-bg); color:var(--text-main);" accept="image/*"></div>
-                    <button type="submit" class="btn btn-premium w-100 py-2 fs-6">Save Profile</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-let app={p:{n:'',d:'',t:'',i:'',j:'',ph:'',cv:''},d:[]};
-const mN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-document.addEventListener('DOMContentLoaded',()=>{
-    load(); obs();
-    
-    const ms = document.getElementById('m-sel');
-    for (let i = -6; i <= 6; i++) {
-        const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + i);
-        const o = document.createElement('option');
-        o.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        o.textContent = `${mN[d.getMonth()]} ${d.getFullYear()}`;
-        if (i === 0) o.selected = true;
-        ms.appendChild(o);
-    }
-    ms.addEventListener('change',e=>upd(e.target.value));
-    upd(ms.value);
-
-    const pIn=document.getElementById('in-ph'), cIn=document.getElementById('in-cv');
-    pIn.addEventListener('change',e=>{const r=new FileReader(); r.onload=ev=>{app.p.ph=ev.target.result}; r.readAsDataURL(e.target.files[0]);});
-    cIn.addEventListener('change',e=>{const r=new FileReader(); r.onload=ev=>{app.p.cv=ev.target.result}; r.readAsDataURL(e.target.files[0]);});
-
-    document.getElementById('ed-form').addEventListener('submit',e=>{
-        e.preventDefault();
-        app.p.n=document.getElementById('in-nm').value; app.p.d=document.getElementById('in-ds').value;
-        app.p.t=document.getElementById('in-tm').value; app.p.i=document.getElementById('in-id').value;
-        app.p.j=document.getElementById('in-jd').value; 
-        save(); rProf(); bootstrap.Modal.getInstance(document.getElementById('ed-mod')).hide();
-    });
-    
-    document.getElementById('t-tog').addEventListener('click',function(){
-        const h=document.documentElement, n=h.getAttribute('data-bs-theme')==='light'?'dark':'light';
-        h.setAttribute('data-bs-theme',n);
-        this.innerHTML = n === 'dark' ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-stars-fill"></i>';
-    });
-});
-
-function load(){
-    const s=localStorage.getItem('ws_data'); if(s){ const p=JSON.parse(s); app.p={...app.p,...p.p}; app.d=p.d||[]; }
-    rProf();
-    document.getElementById('in-nm').value=app.p.n; document.getElementById('in-ds').value=app.p.d;
-    document.getElementById('in-tm').value=app.p.t; document.getElementById('in-id').value=app.p.i;
-    document.getElementById('in-jd').value=app.p.j; 
-}
-function save(){ localStorage.setItem('ws_data',JSON.stringify(app)); }
-
-function rProf(){
-    document.getElementById('u-nm').textContent=app.p.n || 'Setup Profile';
-    document.getElementById('u-ds').textContent=app.p.d || 'Add Designation';
-    document.getElementById('u-tm').textContent=app.p.t || 'Team';
-    document.getElementById('u-id').textContent=app.p.i || 'ID';
-    
-    if(app.p.ph) { document.getElementById('p-ph').src=app.p.ph; document.getElementById('nav-avatar').src=app.p.ph; }
-    if(app.p.cv) document.getElementById('cv-ph').src=app.p.cv;
-    
-    if(app.p.j) {
-        const diff=new Date()-new Date(app.p.j), y=Math.floor(diff/31536000000), m=Math.floor((diff%31536000000)/2628000000), d=Math.floor((diff%2628000000)/86400000);
-        document.getElementById('j-dur').textContent=`${y}y ${m}m ${d}d`;
-    } else { document.getElementById('j-dur').textContent='Date not set'; }
-}
-
-function upd(my){
-    const [y,m]=my.split('-').map(Number), fr=new Date(y,m-2,26), to=new Date(y,m-1,25);
-    document.getElementById('d-fr').textContent=fr.toLocaleDateString(); document.getElementById('d-to').textContent=to.toLocaleDateString();
-    document.getElementById('att-sub').textContent=`${fr.toLocaleDateString('en-GB')} to ${to.toLocaleDateString('en-GB')}`;
-    
-    let cur=new Date(fr), html='', calHtml='', notesArray=[];
-    
-    const fDom=new Date(y,m-1,1), dIm=new Date(y,m,0).getDate(), sDay=fDom.getDay();
-    for(let k=0;k<sDay;k++) calHtml+=`<span></span>`;
-    
-    let tWdPot=0, tP=0, tA=0, tH=0, tL=0, tNs=0, tDs=0, tGr=0, tWk=0, tHl=0;
-    
-    let defaultShift = localStorage.getItem('ws_default_shift') || 'Day';
-    
-    while(cur<=to){
-        const iso=cur.toISOString().split('T')[0], day=cur.toLocaleDateString('en',{weekday:'short'});
-        let r=app.d.find(d=>d.id===iso);
-        if(!r){ r={id:iso,date:cur.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),day,stat:'-',hr:'-',ex:'-',lt:'-',sh:defaultShift,gr:'-',nt:''}; app.d.push(r); }
-        
-        const isW=cur.getDay()===0; 
-        if(!isW && r.stat !== 'Weekend' && r.stat !== 'Holiday') tWdPot++;
-
-        if(r.stat==='Present'){ tP++; tH+=(parseFloat(r.hr)||0)+(parseFloat(r.ex)||0); tL+=(parseFloat(r.lt)||0); if(r.sh==='Night')tNs++; else tDs++; if(r.gr==='Yes')tGr++; }
-        else if(r.stat==='Absent'){ tA++; } 
-        else if(r.stat==='Weekend') { tWk++; if(!isW) tWdPot--; } 
-        else if(r.stat==='Holiday') { tHl++; if(!isW) tWdPot--; }
-
-        if(r.nt && r.nt.trim()) notesArray.push({date: r.date, note: r.nt});
-
-        let lowerNt = r.nt.toLowerCase();
-        let inpStyle = '';
-        if(lowerNt.includes('done')) {
-            inpStyle = 'border-color: var(--success) !important; color: var(--success); background: rgba(5,150,105,0.05); font-weight: bold;';
-        } else if(lowerNt.includes('shift change')) {
-            inpStyle = 'border-color: var(--accent) !important; color: var(--accent); background: rgba(225,29,72,0.05); font-weight: bold;';
-        }
-
-        html+=`<tr class="tr-hover">
-            <td class="${isW?'text-danger':''} font-num fw-bold">${r.date}</td>
-            <td class="text-muted" style="font-size:0.8rem; font-weight:700;">${r.day}</td>
-            <td><button class="badge-btn ${btnCls(r.stat)}" onclick="cyc('${iso}')">${r.stat}</button></td>
-            <td><input class="t-inp font-num text-muted" value="${r.hr}" disabled></td>
-            <td><input class="t-inp font-num" value="${r.ex}" onchange="edt('${iso}','ex',this.value)" ${r.stat!=='Present'?'disabled':''}></td>
-            <td><input class="t-inp font-num" value="${r.lt}" onchange="edt('${iso}','lt',this.value)" ${r.stat!=='Present'?'disabled':''}></td>
-            <td><button class="badge-btn badge-toggle shadow-sm" style="width:60px" onclick="tgl('${iso}','sh')" ${r.stat!=='Present'?'disabled':''}>${r.sh}</button></td>
-            <td><button class="badge-btn badge-toggle shadow-sm" style="width:50px" onclick="tgl('${iso}','gr')" ${r.stat!=='Present'?'disabled':''}>${r.gr}</button></td>
-            <td>
-                <input class="t-inp text-start" style="${inpStyle}" value="${r.nt}" oninput="updNoteLive('${iso}', this.value, this)" onblur="save()" ${r.stat!=='Present'?'disabled':''} placeholder="Write a remark...">
-            </td>
-        </tr>`;
-        cur.setDate(cur.getDate()+1);
-    }
-    
-    document.getElementById('att-bd').innerHTML=html;
-    updTickerUI(notesArray);
-
-    for(let d=1;d<=dIm;d++){
-        const cDt=new Date(y,m-1,d), cIso=cDt.toISOString().split('T')[0];
-        const row=app.d.find(x=>x.id===cIso);
-        let bgStyle='';
-        if(row){
-            if(row.stat==='Present') bgStyle='background:var(--success); color:white; border-radius:10px;';
-            else if(row.stat==='Absent') bgStyle='background:var(--accent); color:white; border-radius:10px;';
-            else if(row.stat==='Weekend') bgStyle='background:var(--primary); color:white; border-radius:10px;';
-            else if(row.stat==='Holiday') bgStyle='background:var(--warning); color:white; border-radius:10px;';
-        }
-        calHtml+=`<div class="cal-mini-day" style="${bgStyle}">${d}</div>`;
-    }
-    document.getElementById('cal-gr').innerHTML=calHtml;
-    
-    animVal('wd-cnt', tWdPot);
-    const tWdActual = tP + tA;
-    let colaBar = document.getElementById('cola-bar');
-    let colaSt = document.getElementById('cola-st');
-    if (colaSt) colaSt.textContent=`${tP}/22`;
-    if (colaBar) colaBar.style.width=`${Math.min((tP/22)*100, 100)}%`;
-    const presP = tWdActual>0 ? Math.round((tP/tWdActual)*100) : 0;
-    
-    let cat='N/A';
-    if(tWdActual>0){ if(presP>=95) cat='A+'; else if(presP>=90) cat='A'; else if(presP>=85) cat='B'; else if(presP>=80) cat='C'; else cat='D'; }
-    document.getElementById('cat-st').textContent=cat;
-    document.getElementById('cat-desc').textContent=`Rate: ${presP}%`;
-
-    document.getElementById('s-hr').textContent=tH.toFixed(1);
-    document.getElementById('s-lt').textContent=tL;
-    document.getElementById('s-ab').textContent=tA;
-    document.getElementById('s-wk').textContent=tWk;
-    document.getElementById('s-hl').textContent=tHl;
-    document.getElementById('s-wd').textContent=tWdActual; 
-    document.getElementById('s-pr').textContent=tP;
-    document.getElementById('s-ns').textContent=tNs;
-    document.getElementById('s-ds').textContent=tDs;
-    document.getElementById('s-gr').textContent=tGr;
-    
-    // Updated visual chart mapping (Hours based)
-    let totalPresentHours = tH; 
-    let totalLateHours = tL; 
-    let totalAbsentHours = tA * 9; 
-    let totalChartHours = totalPresentHours + totalAbsentHours + totalLateHours;
-    
-    let prPct = totalChartHours > 0 ? (totalPresentHours / totalChartHours) * 100 : 0;
-    let abPct = totalChartHours > 0 ? (totalAbsentHours / totalChartHours) * 100 : 0;
-    let ltPct = totalChartHours > 0 ? (totalLateHours / totalChartHours) * 100 : 0;
-    
-    // Safety check for null elements before assigning style
-    let chartPr = document.getElementById('chart-pr');
-    let chartLt = document.getElementById('chart-lt');
-    let chartAb = document.getElementById('chart-ab');
-    
-    if(chartPr) chartPr.style.width = `${Math.max(0, prPct - ltPct)}%`;
-    if(chartLt) chartLt.style.width = `${ltPct}%`;
-    if(chartAb) chartAb.style.width = `${abPct}%`;
-
-    const chartLabels = document.getElementById('chart-labels');
-    if (chartLabels) {
-        chartLabels.innerHTML = `
-            <span class="text-success"><i class="bi bi-circle-fill me-1"></i>Present (${totalPresentHours}h)</span>
-            <span class="text-warning"><i class="bi bi-circle-fill me-1"></i>Late (${totalLateHours}h)</span>
-            <span class="text-danger"><i class="bi bi-circle-fill me-1"></i>Absent (${totalAbsentHours}h)</span>
-        `;
-    }
-
-    save();
-}
-
-function updNoteLive(id, val, el) {
-    const r = app.d.find(d => d.id === id);
-    if(r) r.nt = val;
-    
-    let lowerVal = val.toLowerCase();
-    if(lowerVal.includes('done')) {
-        el.style.borderColor = 'var(--success)'; el.style.color = 'var(--success)';
-        el.style.background = 'rgba(5,150,105,0.05)'; el.style.fontWeight = 'bold';
-    } else if(lowerVal.includes('shift change')) {
-        el.style.borderColor = 'var(--accent)'; el.style.color = 'var(--accent)';
-        el.style.background = 'rgba(225,29,72,0.05)'; el.style.fontWeight = 'bold';
-    } else {
-        el.style.borderColor = 'transparent'; el.style.color = 'var(--text-main)';
-        el.style.background = 'transparent'; el.style.fontWeight = '700';
-    }
-    refreshTickerOnly();
-}
-
-function refreshTickerOnly() {
-    const ms = document.getElementById('m-sel').value;
-    const [y,m]=ms.split('-').map(Number), fr=new Date(y,m-2,26), to=new Date(y,m-1,25);
-    let cur=new Date(fr), notes=[];
-    while(cur<=to){
-        const iso=cur.toISOString().split('T')[0];
-        const r=app.d.find(d=>d.id===iso);
-        if(r && r.nt && r.nt.trim()) notes.push({date: r.date, note: r.nt});
-        cur.setDate(cur.getDate()+1);
-    }
-    updTickerUI(notes);
-}
-
-function updTickerUI(arr) {
-    const el = document.getElementById('full-notes-area');
-    if(arr.length > 0) {
-        let h = '';
-        arr.forEach(item => { h += `<div class="note-chip"><span class="text-primary fw-bolder font-num">${item.date}:</span> <span class="fw-semibold">${item.note}</span></div>`; });
-        el.innerHTML = h;
-    } else {
-        el.innerHTML = '<div class="text-center w-100 py-2 font-num opacity-50">No remarks documented for this period.</div>';
-    }
-}
-
-function cyc(id){
-    const r=app.d.find(d=>d.id===id), s=['-','Present','Absent','Weekend','Holiday'];
-    r.stat=s[(s.indexOf(r.stat)+1)%5];
-    if(r.stat==='Present'){r.hr=9;r.lt=0;r.ex=0;} else {r.hr='-';r.lt='-';r.ex='-';}
-    save(); upd(document.getElementById('m-sel').value);
-}
-
-function tgl(id,k){
-    if(k === 'sh') {
-        const idx = app.d.findIndex(d => d.id === id);
-        const r = app.d[idx];
-        const newSh = r.sh === 'Day' ? 'Night' : 'Day';
-        
-        r.sh = newSh;
-        if(!r.nt.toLowerCase().includes('shift change') && r.stat === 'Present') {
-            r.nt = (r.nt ? r.nt + ' | ' : '') + 'Shift change';
-        }
-
-        localStorage.setItem('ws_default_shift', newSh);
-
-        app.d.forEach(d => {
-            if(d.id > id) { d.sh = newSh; }
+                if(next) {
+                    let focusTarget = next.querySelector('div') ? next.querySelector('div') : next;
+                    focusTarget.focus({preventScroll: true}); 
+                    const container = document.getElementById('tableScrollWrapper');
+                    const nRect = next.getBoundingClientRect();
+                    const cRect = container.getBoundingClientRect();
+                    const stickyWidth = 510; 
+                    const headerHeight = 45; 
+                    
+                    if (nRect.left < cRect.left + stickyWidth && idx >= 4) {
+                        container.scrollBy({ left: nRect.left - (cRect.left + stickyWidth) - 20, behavior: 'smooth' });
+                    } else if (nRect.right > cRect.right) {
+                        container.scrollBy({ left: nRect.right - cRect.right + 20, behavior: 'smooth' });
+                    }
+                    if (nRect.top < cRect.top + headerHeight) {
+                        container.scrollBy({ top: nRect.top - (cRect.top + headerHeight) - 20, behavior: 'smooth' });
+                    } else if (nRect.bottom > cRect.bottom) {
+                        container.scrollBy({ top: nRect.bottom - cRect.bottom + 20, behavior: 'smooth' });
+                    }
+                }
+            }
         });
-    } else {
-        const r = app.d.find(d => d.id === id);
-        r[k] = (r[k] === '-' ? 'Yes' : '-'); 
-    }
-    save(); upd(document.getElementById('m-sel').value);
-}
 
-function edt(id,k,v){
-    const r=app.d.find(d=>d.id===id); r[k]=v; 
-    if(k==='lt'){ r.hr=9-(parseFloat(v)||0); }
-    save(); upd(document.getElementById('m-sel').value);
-}
+        document.addEventListener('paste', function(e) {
+            const act = document.activeElement;
+            let cell = act.tagName === 'DIV' ? act.parentElement : act;
+            if((act.tagName === 'TD' || act.tagName === 'DIV') && act.isContentEditable) {
+                e.preventDefault();
+                let paste = (e.clipboardData || window.clipboardData).getData('text');
+                let rows = paste.split(/\r\n|\n|\r/);
+                let cRow = cell.parentElement, idx = Array.from(cRow.children).indexOf(cell);
+                for(let r of rows) {
+                    if(!cRow || !r.trim()) break;
+                    let target = cRow.children[idx];
+                    let editableTarget = target.querySelector('div') ? target.querySelector('div') : target;
+                    if(editableTarget && editableTarget.isContentEditable) {
+                        editableTarget.innerText = r.trim();
+                        target.classList.remove('bg-rose-50', 'text-rose-500');
+                        target.classList.add('font-bold', 'text-slate-800');
+                        if(idx === 12) fillAllDates(editableTarget); 
+                        if(idx === 16) handleReasonInput(editableTarget); 
+                    }
+                    cRow = cRow.nextElementSibling;
+                }
+            }
+        });
 
-function btnCls(s){
-    if(s==='Present')return 'st-Present'; 
-    if(s==='Absent')return 'st-Absent'; 
-    if(s==='Weekend')return 'st-Weekend'; 
-    if(s==='Holiday')return 'st-Holiday'; 
-    return 'st--';
-}
-
-function animVal(id, end) {
-    const obj = document.getElementById(id);
-    let start = parseInt(obj.textContent) || 0;
-    if(start === end) return;
-    let range = end - start;
-    let current = start;
-    let increment = end > start ? 1 : -1;
-    let stepTime = Math.abs(Math.floor(400 / range));
-    if(stepTime < 15) stepTime = 15;
-    let timer = setInterval(function() {
-        current += increment;
-        obj.textContent = current;
-        if (current == end) clearInterval(timer);
-    }, stepTime);
-}
-
-function openPrintView() {
-    const pv = document.getElementById('print-view');
-    pv.style.display = 'block';
-    
-    document.getElementById('p-sub-date').textContent = document.getElementById('att-sub').textContent;
-    document.getElementById('p-u-name').textContent = app.p.n || 'N/A';
-    document.getElementById('p-u-id').textContent = app.p.i || 'N/A';
-    
-    document.getElementById('p-wd').textContent = document.getElementById('s-wd').textContent; 
-    document.getElementById('p-pr').textContent = document.getElementById('s-pr').textContent;
-    document.getElementById('p-ab').textContent = document.getElementById('s-ab').textContent;
-    document.getElementById('p-grd').textContent = document.getElementById('cat-st').textContent;
-
-    const ms = document.getElementById('m-sel').value;
-    const [y,m]=ms.split('-').map(Number), fr=new Date(y,m-2,26), to=new Date(y,m-1,25);
-    let cur=new Date(fr), rows='';
-    
-    while(cur<=to){
-        const iso=cur.toISOString().split('T')[0];
-        const r=app.d.find(d=>d.id===iso);
-        if(r) {
-            const style = (r.stat==='Weekend'||r.stat==='Holiday') ? 'background:#f9f9f9; color:#888' : '';
-            rows += `<tr style="${style}">
-                <td>${r.date}</td>
-                <td>${r.day}</td>
-                <td style="font-weight:bold;">${r.stat}</td>
-                <td>${r.hr}</td>
-                <td>${r.ex}</td>
-                <td>${r.lt}</td>
-                <td>${r.gr}</td>
-                <td style="font-size:0.75rem; font-style:italic">${r.nt || ''}</td>
-            </tr>`;
+        function fillAllDates(el) {
+            let val = el.innerText;
+            document.querySelectorAll('td.date-edit-cell').forEach(c => {
+                if(c !== el && c !== el.parentElement) {
+                    c.innerText = val;
+                    c.classList.remove('bg-rose-50', 'text-rose-500');
+                    c.classList.add('font-bold', 'text-slate-800');
+                }
+            });
         }
-        cur.setDate(cur.getDate()+1);
-    }
-    document.getElementById('p-table-body').innerHTML = rows;
-}
 
-function closePrintView() { document.getElementById('print-view').style.display = 'none'; }
-function obs(){const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting)i.target.classList.add('vis')})},{threshold:0.1}); document.querySelectorAll('.anim').forEach(s=>o.observe(s));}
-</script>
+        function copyCellData(el) {
+            let text = el.innerText.trim();
+            let parentTd = el.tagName === 'DIV' ? el.parentElement : el;
+            if(text && text !== '-') {
+                const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+                try { document.execCommand('copy'); parentTd.classList.add('copied-anim'); setTimeout(()=>parentTd.classList.remove('copied-anim'), 2000); } catch(e) {}
+                document.body.removeChild(ta);
+            }
+        }
+
+        function copyWinLoseRow(el) {
+            const row = el.closest('tr');
+            const date = row.cells[12].innerText.trim(); 
+            const status = row.cells[13].innerText.trim();
+            const calc = row.cells[14].innerText.trim();
+            const medRefund = row.cells[15].innerText.trim(); 
+            const copyText = `${date}\t${status}\t${calc}\t\t${medRefund}`;
+            
+            const ta = document.createElement("textarea"); ta.value = copyText; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); el.classList.add('copied-anim'); setTimeout(()=>el.classList.remove('copied-anim'), 2000); } catch(e){}
+            document.body.removeChild(ta);
+        }
+
+        function getBdtDate() {
+            return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Dhaka', year: '2-digit', month: '2-digit', day: '2-digit' }).format(new Date());
+        }
+
+        function generateNotes() {
+            const prefix = document.getElementById('notePrefix').value.trim() || "IDR";
+            const name = document.getElementById('noteName').value.trim() || "NAME";
+            const bdtDate = getBdtDate(); 
+            
+            const rows = Array.from(document.querySelectorAll('#tableBody tr.result-row'));
+            const groups = {};
+            rows.forEach(r => {
+                const idr = r.getAttribute('data-idr');
+                if(!groups[idr]) groups[idr] = [];
+                groups[idr].push(r);
+            });
+
+            Object.keys(groups).forEach(idr => {
+                const groupRows = groups[idr];
+                const firstRow = groupRows[0];
+                const cHead = firstRow.querySelectorAll('td');
+                
+                if(cHead[0].innerText.trim() === "") return; 
+
+                const mediatorRaw = cHead[7].innerText.trim() !== '-' ? cHead[7].innerText.trim() : '';
+                const adminFee = parseFloat(cHead[8].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                const procFee = parseFloat(cHead[9].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                const totalFee = adminFee + procFee;
+                
+                const feeStr = totalFee > 0 ? `$${totalFee.toFixed(2)}` : '$0.00';
+                const mediatorText = mediatorRaw ? `${mediatorRaw}(${feeStr})` : `(${feeStr})`;
+                
+                const status = cHead[13].innerText.trim().toUpperCase(); 
+                const typeStr = `${prefix} ${status}`; 
+                const notePrefixStr = `${bdtDate}>${typeStr}>${name}>${idr}, ${mediatorText}`;
+                
+                let headReasonDiv = cHead[16].querySelector('div');
+                let loseReasonHead = headReasonDiv.innerText.trim();
+                
+                // If Lose but reason is empty, make note empty
+                if(status === 'LOSE' && !loseReasonHead) {
+                    let noteDiv = cHead[17].querySelector('div');
+                    noteDiv.innerText = "";
+                    noteDiv.setAttribute('title', "");
+                    
+                    // Clear subsequent notes for batch
+                    for(let i=1; i<groupRows.length; i++) {
+                        groupRows[i].querySelectorAll('td')[17].querySelector('div').innerText = "";
+                    }
+                    return; 
+                }
+
+                if (groupRows.length === 1) {
+                    let detAmt = cHead[11].innerText.trim();
+                    let addAmt = cHead[14].innerText.trim();
+                    
+                    let note = "";
+                    if(status === 'WIN') {
+                        note = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. WIN AMOUNT ${detAmt}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmt} AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                    } else if (status === 'LOSE' && loseReasonHead !== "") {
+                        note = `${notePrefixStr}. UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${loseReasonHead}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmt}. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                    }
+                    
+                    headReasonDiv.setAttribute('title', loseReasonHead);
+                    let noteDiv = cHead[17].querySelector('div');
+                    if(noteDiv.innerText !== note) noteDiv.innerText = note;
+                    noteDiv.setAttribute('title', note);
+                    
+                } else {
+                    let totalDet = 0, totalAdd = 0, cptArr = [];
+                    groupRows.forEach(r => {
+                        const c = r.querySelectorAll('td');
+                        let cpt = c[5].innerText.trim();
+                        let dVal = parseFloat(c[11].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                        let aVal = parseFloat(c[14].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                        totalDet += dVal; totalAdd += aVal;
+                        cptArr.push(`${cpt} FOR CPT ${dVal.toFixed(2)}`);
+                    });
+                    
+                    let cptString = cptArr.join(', ');
+                    let totalDetStr = "$" + totalDet.toFixed(2);
+                    let totalAddStr = "$" + totalAdd.toFixed(2);
+
+                    let note1 = "";
+                    if(status === 'WIN') {
+                        note1 = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. ADDITIONAL AMOUNTS OF ${cptString}. TOTAL WIN AMOUNT ${totalDetStr}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${totalAddStr} AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                    } else if (status === 'LOSE' && loseReasonHead !== "") {
+                        note1 = `${notePrefixStr}. UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${loseReasonHead}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. ADDITIONAL AMOUNTS OF ${cptString}. TOTAL LOSE AMOUNT ${totalDetStr}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${totalAddStr}. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                    }
+                    
+                    headReasonDiv.setAttribute('title', loseReasonHead);
+                    let headNoteDiv = cHead[17].querySelector('div');
+                    if(headNoteDiv.innerText !== note1) headNoteDiv.innerText = note1;
+                    headNoteDiv.setAttribute('title', note1);
+
+                    for(let i=1; i<groupRows.length; i++) {
+                        const cRow = groupRows[i].querySelectorAll('td');
+                        let rDetAmt = cRow[11].innerText.trim();
+                        let rAddAmt = cRow[14].innerText.trim();
+                        let rReasonDiv = cRow[16].querySelector('div');
+                        let rLoseReason = rReasonDiv.innerText.trim() || loseReasonHead; 
+                        
+                        let rNote = "";
+                        // Subsequent lines in a batch are cleared for note, since we only need the note on the first line
+                        cRow[17].querySelector('div').innerText = ""; 
+                    }
+                }
+            });
+        }
+
+        function parseCurrencyToNumber(cs){return cs&&cs!=="Check PDF"?parseFloat(cs.replace(/[^0-9.-]+/g,""))||0:0;}
+        function formatNumberToCurrency(num){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num);}
+
+        function extractTextFromPDF(file){
+            return new Promise((r)=>{
+                if(!file)return r(""); const rd=new FileReader();
+                rd.onload=async function(){try{const ta=new Uint8Array(this.result),pdf=await pdfjsLib.getDocument({data:ta}).promise;let ft="";for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i),c=await p.getTextContent();ft+=c.items.map(it=>it.str).join(" ")+" ";}r(ft.replace(/\s+/g,' '));}catch(e){r("");}};
+                rd.readAsArrayBuffer(file);
+            });
+        }
+
+        async function processPDFs() {
+            if(allSelectedFiles.length===0)return showToast("Please add PDF files",true);
+            document.getElementById('tableBody').innerHTML=""; document.getElementById('tableContainer').classList.add('hidden');
+            document.getElementById('summaryCardsContainer').classList.add('hidden'); document.getElementById('progressContainer').classList.remove('hidden');
+            
+            const pb=document.getElementById('processBtn'); pb.disabled=true; pb.innerHTML=`<i class="fa-solid fa-spinner animate-spin"></i> Processing...`;
+            document.getElementById('matchBtn').disabled=true;
+            extractedResults=[]; let tf=allSelectedFiles.length;
+            for(let i=0;i<tf;i++){let f=allSelectedFiles[i]; if(f&&f.name){let t=await extractTextFromPDF(f); if(t&&t.length>50)extractedResults.push({text:t});}}
+            
+            // Robust Sorting Logic to prevent 'toUpperCase' undefined errors
+            extractedResults.sort((a, b) => {
+                let textA = a.text ? String(a.text) : ""; 
+                let textB = b.text ? String(b.text) : "";
+                let mA = textA.match(/DISP-\d+/i); 
+                let mB = textB.match(/DISP-\d+/i);
+                let idrA = (mA && mA[0]) ? String(mA[0]).toUpperCase() : "ZZZZZZ";
+                let idrB = (mB && mB[0]) ? String(mB[0]).toUpperCase() : "ZZZZZZ";
+                return idrA.localeCompare(idrB, undefined, {numeric: true});
+            });
+
+            let cp=0, iv=setInterval(()=>{cp+=100/(Math.max(2000,tf*150)/50); if(cp>=100){clearInterval(iv); renderTableData(); document.getElementById('progressBar').style.width="100%";}else{document.getElementById('progressBar').style.width=`${cp}%`;}},50);
+        }
+
+        function getSubmittedOffers(tb){
+            let po=[], io=[];
+            for(let m of tb.matchAll(/(.{1,80}?)\s+(?:SUBMITTED AN OFFER OF|OFFER OF|OFFERED)\s*\$\s*([\d,]+\.\d{2})/gi)){
+                let pn=" "+m[1].toUpperCase()+" ", am=parseCurrencyToNumber(m[2]), fii=-1, fpi=-1;
+                insKeywords.forEach(k=>{let idx=pn.indexOf(k); if(idx!==-1&&(fii===-1||idx<fii))fii=idx;});
+                provKeywords.forEach(k=>{let idx=pn.indexOf(k); if(idx!==-1&&(fpi===-1||idx<fpi))fpi=idx;});
+                if(fii!==-1&&fpi!==-1){fpi<fii?po.push(am):io.push(am);}else if(fii!==-1)io.push(am);else if(fpi!==-1)po.push(am);
+            } return {provOffers:po,insOffers:io};
+        }
+
+        function extractDataFromBlock(tb,go){
+            let as="Check PDF", cs="Check PDF", cls="Check PDF", bs=null;
+            let amMatch=tb.match(/(?:payment amount|out-of-network rate|rate of)[\s\S]{1,60}?\$\s*([\d,]+\.\d{2})/i)||tb.match(/\$\s*([\d,]+\.\d{2})/);
+            if(amMatch)as="$"+amMatch[1]; let fan=parseCurrencyToNumber(as);
+            let cm=tb.match(/(?:code|cpt)(?:\s+or\s+service)?\s*[:\-]?\s*([0-9]{4}[A-Za-z0-9])/i)||tb.match(/\b(9928\d|9929\d|9921\d|9922\d|\d{5})\b/);
+            if(cm)cs=cm[1]||cm[0];
+            let cM=[...tb.replace(/DISP-\d+/gi,'').matchAll(/claim(?:\s+no|\s+#)?\s*[:\-]?\s*([A-Za-z0-9\-_]{6,30})/gi)];
+            for(let m of cM){if(/\d/.test(m[1])&&!/^\d{9,10}$/.test(m[1])){cls=m[1];break;}}
+            if(cls==="Check PDF"){let ams=[...tb.replace(/DISP-\d+/gi,'').matchAll(/\b(?![0-9]{9,10}\b)(?=[A-Za-z0-9\-_]*[A-Za-z])(?=[A-Za-z0-9\-_]*[0-9])[A-Za-z0-9\-_]{8,30}\b/g)]; if(ams.length>0)cls=ams[0][0];}
+            
+            let lo=getSubmittedOffers(tb), po=lo.provOffers.length>0?lo.provOffers:go.provOffers, io=lo.insOffers.length>0?lo.insOffers:go.insOffers;
+            if(fan>0){if(po.includes(fan)&&!io.includes(fan))bs="Win";else if(io.includes(fan)&&!po.includes(fan))bs="Lose";}
+            if(!bs){
+                let ub=tb.toUpperCase(), obm=ub.match(/(?:OFFERED|SUBMITTED) BY\s+(.{1,80}?)\s+(?:IS THE APPROPRIATE|BEST REPRESENTS)/);
+                if(obm){let ws=" "+obm[1]+" ",fii=-1,fpi=-1; insKeywords.forEach(k=>{let i=ws.indexOf(k);if(i!==-1&&(fii===-1||i<fii))fii=i;}); provKeywords.forEach(k=>{let i=ws.indexOf(k);if(i!==-1&&(fpi===-1||i<fpi))fpi=i;}); if(fii!==-1&&fpi!==-1)bs=(fpi<fii)?"Win":"Lose";else if(fii!==-1)bs="Lose";else if(fpi!==-1)bs="Win";}
+                if(!bs){if(ub.includes("NON-INITIATING PARTY'S OFFER BEST REPRESENTS")||ub.includes("FAVOR IS FOR THE NON-INITIATING"))bs="Lose";else if(ub.includes("INITIATING PARTY'S OFFER BEST")||ub.includes("FAVOR IS FOR THE INITIATING"))bs="Win";}
+            } return {amount:as,cpt:cs,claim:cls,status:bs};
+        }
+
+        function renderTableData() {
+            const tableBody=document.getElementById('tableBody'); tableBody.innerHTML="";
+            let disputeSerial=0, totalRowsCount=0, totalWinsCount=0, totalLossesCount=0, totalWinAmount=0, totalLossAmount=0;
+            
+            const emailTxt = document.getElementById('emailText').value;
+            let extractedDate = null;
+            const dr=/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s+(\d{4}))?\b/i;
+            let dMatch = dr.exec(emailTxt);
+            if(dMatch) {
+                const mm={"jan":"01","feb":"02","mar":"03","apr":"04","may":"05","jun":"06","jul":"07","aug":"08","sep":"09","oct":"10","nov":"11","dec":"12"};
+                extractedDate = `${mm[dMatch[1].substring(0,3).toLowerCase()]}/${dMatch[2].padStart(2,'0')}/${dMatch[3]||new Date().getFullYear()}`;
+            }
+
+            extractedResults.forEach((item) => {
+                let ct=item.text.replace(/\\/g,'').replace(/\s+/g,' '), ut=ct.toUpperCase(); disputeSerial++;
+                let idrm=ct.match(/(DISP-\d+)/i), idr=idrm?idrm[1]:"Unknown", ed=extractedDate, gil=false, iew=false;
+                let wm=ut.match(/(?:DETERMINED|FINDS)(?: THAT)?\s+(.{1,100}?)\s+(?:IS THE PREVAILING|PREVAILED)/)||ut.match(/(.{1,80}?)\s+(?:IS THE PREVAILING PARTY|PREVAILED IN (?:THE|THIS) DISPUTE)/);
+                if(wm){let ws=" "+wm[1]+" ";if(!ws.includes("NOT THE")&&!ws.includes("NON-")){let fii=-1,fpi=-1; insKeywords.forEach(k=>{let i=ws.indexOf(k);if(i!==-1&&(fii===-1||i<fii))fii=i;}); provKeywords.forEach(k=>{let i=ws.indexOf(k);if(i!==-1&&(fpi===-1||i<fpi))fpi=i;}); if(fii!==-1&&fpi!==-1){if(fpi<fii)iew=true;else gil=true;}else if(fii!==-1)gil=true;else if(fpi!==-1)iew=true;}}
+                if(!iew&&!gil){if(ut.includes("FAVOR IS FOR THE NON-INITIATING")||ut.includes("NON-INITIATING PARTY IS THE PREVAILING"))gil=true;else if(ut.includes("FAVOR IS FOR THE INITIATING")||ut.includes("INITIATING PARTY IS THE PREVAILING"))iew=true;}
+                let gfst=gil?"Lose":"Win", go=getSubmittedOffers(ut), dets=[];
+                if(/Determination\s*1/i.test(ct)&&/Determination\s*2/i.test(ct)){ct.split(/(?=Determination\s*\d+)/i).forEach(b=>{if(/Determination\s*\d+/i.test(b))dets.push(extractDataFromBlock(b,go));});}else{dets.push(extractDataFromBlock(ct,go));}
+                let lw=0, ll=0; dets.forEach(d=>{if(!d.status)d.status=gfst; d.status==="Win"?lw++:ll++;});
+                let fs=gfst; if(dets.length>1){if(lw>ll)fs="Win";else if(ll>lw)fs="Lose";else if(lw===ll)fs="Tie";}else if(dets.length===1)fs=dets[0].status;
+                if(fs==="Win"){totalWinsCount++;dets.forEach(d=>totalWinAmount+=parseCurrencyToNumber(d.amount));}else if(fs==="Lose"){totalLossesCount++;dets.forEach(d=>totalLossAmount+=parseCurrencyToNumber(d.amount));}
+                
+                let sc=fs==="Win"?"win-text":fs==="Lose"?"lose-text":"text-amber-500 font-bold";
+                let dv=ed?ed:"", dc=ed?"font-bold text-slate-800":"bg-rose-50 text-rose-500 font-bold";
+
+                if(dets.length>0){
+                    dets.forEach((det, index) => {
+                        totalRowsCount++; let isF=(index===0), dl="-";
+                        if(dets.length>1){dl=`Det ${index+1} <span class="text-[10px] font-bold ${det.status==='Win'?'text-emerald-600':'text-rose-600'} ml-1">(${det.status})</span>`;}
+                        
+                        let winLoseTxt = isF ? fs : "";
+                        let dateEditAttr = (isF && !ed) ? 'contenteditable="true" placeholder="Enter date"' : '';
+                        let dateClickAttr = (!isF || ed) ? 'onclick="copyCellData(this)"' : '';
+                        let isLoseClass = isF && fs === 'Lose' ? 'empty-reason' : '';
+                        
+                        let row = document.createElement('tr');
+                        row.className = "fade-in result-row match-fail";
+                        row.setAttribute("data-idr", idr);
+                        row.innerHTML = `
+                            <td tabindex="0" class="sticky-col col-1 font-bold text-slate-800">${isF?idr:""}</td>
+                            <td tabindex="0" class="sticky-col col-2 hidable font-bold text-indigo-700">${idr}</td>
+                            <td tabindex="0" class="sticky-col col-3 hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td class="sticky-col col-4 p-0 bg-slate-50 hover:bg-slate-100 transition-colors align-middle cursor-pointer" onclick="copyCellData(this)" title="Click to copy">
+                                <div tabindex="0" class="w-full h-full p-3 font-semibold text-slate-400 outline-none">-</div>
+                            </td>
+                            <td tabindex="0" class="hidable font-mono text-indigo-900 font-bold">${det.claim}</td>
+                            <td tabindex="0" class="hidable font-bold text-slate-700">${det.cpt}</td>
+                            <td tabindex="0" class="hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td tabindex="0" class="hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td tabindex="0" class="hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td tabindex="0" class="hidable font-semibold text-slate-400 bg-slate-50">-</td>
+                            <td tabindex="0" class="hidable text-slate-500 font-semibold">${dl}</td>
+                            <td tabindex="0" class="hidable font-extrabold text-slate-900">${det.amount}</td>
+                            <td tabindex="0" class="hidable transition-colors date-edit-cell ${isF?dc:''} ${dateEditAttr? 'cursor-text' : 'cursor-pointer hover:bg-slate-100'}" ${dateEditAttr} ${dateClickAttr} title="Date">${dv}</td>
+                            <td class="p-0 hover:bg-slate-100 transition-colors align-middle cursor-pointer" onclick="copyWinLoseRow(this)" title="Click to export Row">
+                                <div tabindex="0" class="w-full h-full p-3 ${isF?sc:''} outline-none">${winLoseTxt}</div>
+                            </td>
+                            <td class="hidable p-0 bg-emerald-50/50 hover:bg-emerald-100 transition-colors align-middle cursor-pointer" onclick="copyCellData(this)" title="Click to copy">
+                                <div tabindex="0" class="w-full h-full p-3 font-bold text-emerald-600 outline-none">${det.amount}</div>
+                            </td>
+                            <td class="hidable p-0 bg-slate-50 hover:bg-slate-100 transition-colors align-middle cursor-pointer" onclick="copyCellData(this)" title="Click to copy">
+                                <div tabindex="0" class="w-full h-full p-3 font-semibold text-slate-400 outline-none">-</div>
+                            </td>
+                            <td class="p-0 bg-rose-50/50 hover:bg-rose-100 transition-colors align-top cursor-pointer" onclick="copyCellData(this)">
+                                <div tabindex="0" contenteditable="true" class="w-full h-full p-3 cursor-text text-rose-700 font-semibold text-xs outline-none ${isLoseClass}" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;" oninput="handleReasonInput(this)"></div>
+                            </td>
+                            <td class="p-0 bg-amber-50/50 hover:bg-amber-100 transition-colors align-top cursor-pointer" onclick="copyCellData(this)">
+                                <div tabindex="0" contenteditable="true" class="w-full h-full p-3 cursor-text text-slate-700 font-medium text-xs outline-none" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;"></div>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+            });
+
+            document.getElementById('statTotalDisputes').innerText=disputeSerial; document.getElementById('statTotalDets').innerText=totalRowsCount;
+            document.getElementById('statTotalWins').innerText=totalWinsCount; document.getElementById('statTotalLosses').innerText=totalLossesCount;
+            
+            document.getElementById('statTotalWinAmount').innerText=formatNumberToCurrency(totalWinAmount); 
+            document.getElementById('statTotalLossAmount').innerText=formatNumberToCurrency(totalLossAmount);
+
+            const pb=document.getElementById('processBtn'); pb.disabled=false; pb.innerHTML=`<i class="fa-solid fa-wand-magic-sparkles"></i> Extract Data`;
+            pb.className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md cursor-pointer";
+            let mb=document.getElementById('matchBtn'); mb.disabled=false; mb.className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md cursor-pointer";
+            document.getElementById('totalCountBadge').innerText=`${totalRowsCount} Record(s)`;
+            document.getElementById('tableContainer').classList.remove('hidden'); document.getElementById('summaryCardsContainer').classList.remove('hidden'); document.getElementById('copyBtn').classList.remove('hidden');
+            showToast("Dataset loaded successfully!");
+        }
+
+        function matchGoogleSheet() {
+            const url=document.getElementById('googleSheetUrl').value; if(!url)return showToast("Paste Google Sheet CSV URL!",true);
+            let mb=document.getElementById('matchBtn'); mb.innerHTML=`<i class="fa-solid fa-spinner animate-spin"></i> Syncing...`; showToast("Connecting to Google Sheet...");
+            
+            Papa.parse(url, {
+                download: true, header: true,
+                complete: function(res) {
+                    if(res.data && res.data.length>0) {
+                        gSheetData=res.data; let mCount=0; let newTotalWinCalc = 0, newTotalLossCalc = 0, newWinCount = 0, newLossCount = 0;
+                        let processedIdrsForHead = new Set();
+                        let currentDisputeStatus = "";
+                        
+                        document.querySelectorAll('#tableBody tr.result-row').forEach(row => { gSheetData.forEach(r => r._matched = false); });
+
+                        document.querySelectorAll('#tableBody tr.result-row').forEach(row => {
+                            const idr=row.getAttribute('data-idr'); if(!idr||idr==="Unknown")return;
+                            const c=row.querySelectorAll('td');
+                            const extClaim = c[4].innerText.trim();
+                            const extCpt = c[5].innerText.trim();
+                            
+                            let availableRows = gSheetData.filter(sRow => sRow['IDR Number'] && sRow['IDR Number'].trim().includes(idr) && !sRow._matched);
+                            let mData = null;
+
+                            if(availableRows.length > 0) {
+                                mData = availableRows.find(r => {
+                                    let sCpt = r['CPT code'] ? r['CPT code'].toString().trim() : "";
+                                    let sClaim = r['Claim Number'] ? r['Claim Number'].toString().trim() : "";
+                                    return (sCpt && extCpt.includes(sCpt)) || (sClaim && extClaim.includes(sClaim));
+                                });
+                                if(!mData) mData = availableRows[0];
+                                mData._matched = true; 
+                            }
+
+                            row.classList.remove('match-success','match-fail');
+                            let isHead = !processedIdrsForHead.has(idr);
+                            if(isHead) processedIdrsForHead.add(idr);
+
+                            if(mData) {
+                                mCount++; 
+                                const getV=(k)=>{const fk=Object.keys(mData).find(x=>x.trim().toLowerCase()===k.trim().toLowerCase()); return fk?mData[fk]:null;};
+                                
+                                if(getV('dispute group')) c[0].innerText=getV('dispute group');
+                                if(getV('IDR Number')) c[1].innerText=getV('IDR Number');
+                                if(getV('IDR Type')){c[2].innerText=getV('IDR Type');c[2].classList.add('text-indigo-800','font-bold');}
+                                
+                                if(getV('ticket number')){
+                                    let tDiv = c[3].querySelector('div');
+                                    tDiv.innerText=getV('ticket number');
+                                    tDiv.classList.replace('text-slate-400', 'text-indigo-800');
+                                    tDiv.classList.add('font-bold');
+                                }
+                                
+                                if(getV('Claim Number')) c[4].innerText=getV('Claim Number');
+                                if(getV('CPT code')) c[5].innerText=getV('CPT code');
+                                
+                                let ip=getV('Initial Payment (W/PR)'); if(ip){c[6].innerText=ip;c[6].classList.add('text-indigo-800');}
+                                let mn=getV('Mediator')||getV('Mediator name'); if(mn){c[7].innerText=mn;c[7].classList.add('text-indigo-800');}
+                                
+                                let stat = c[13].innerText.trim().toUpperCase();
+                                
+                                if(isHead) {
+                                    let mfa=getV('Mediator Fee (Administrative)'); if(mfa){c[8].innerText=mfa;c[8].classList.add('text-indigo-800');}
+                                    
+                                    // Always show Mediator Fee Processing for Head Row
+                                    let mfp=getV('Mediator Fee (Processing)'); 
+                                    if(mfp){c[9].innerText=mfp;c[9].classList.add('text-indigo-800');}
+                                    else {c[9].innerText="-";}
+                                    
+                                    let mRefundDiv = c[15].querySelector('div');
+                                    // Mediator Refund only gets populated if WIN
+                                    if(stat === "WIN") {
+                                        mRefundDiv.innerText = mfp ? mfp : "-"; 
+                                        if(mfp) {
+                                            mRefundDiv.classList.replace('text-slate-400', 'text-indigo-800'); 
+                                            mRefundDiv.classList.add('font-bold');
+                                        }
+                                    } else { 
+                                        mRefundDiv.innerText="-"; 
+                                    }
+                                } else { 
+                                    c[8].innerText="-"; c[9].innerText="-"; c[15].querySelector('div').innerText="-"; 
+                                }
+                                
+                                if(getV('Determination')) c[11].innerText=getV('Determination');
+                                
+                                let detNum=parseFloat((getV('Determination')||c[11].innerText).replace(/[^0-9.-]+/g,""))||0;
+                                let initNum=parseFloat((ip||"0").replace(/[^0-9.-]+/g,""))||0;
+                                
+                                let calcPay = detNum - initNum;
+                                if(calcPay < 0) calcPay = 0; 
+                                
+                                let calcDiv = c[14].querySelector('div');
+                                calcDiv.innerText="$"+calcPay.toFixed(2); 
+
+                                row.classList.add('match-success');
+                            } else {
+                                row.classList.add('match-fail');
+                            }
+
+                            let rowStat = c[13].innerText.trim().toUpperCase();
+                            if(rowStat === "WIN" || rowStat === "LOSE") { currentDisputeStatus = rowStat; }
+                            
+                            if(isHead && currentDisputeStatus === "LOSE") {
+                                let rDiv = c[16].querySelector('div');
+                                if(!rDiv.innerText.trim()) rDiv.classList.add('empty-reason');
+                            }
+
+                            let rowCalcPay = parseFloat(c[14].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                            
+                            if(currentDisputeStatus === "WIN") { 
+                                newTotalWinCalc += rowCalcPay; 
+                                if(isHead) newWinCount++;
+                            } else if (currentDisputeStatus === "LOSE") { 
+                                newTotalLossCalc += rowCalcPay; 
+                                if(isHead) newLossCount++;
+                            }
+                        });
+                        
+                        document.getElementById('statTotalWins').innerText = newWinCount;
+                        document.getElementById('statTotalLosses').innerText = newLossCount;
+                        document.getElementById('statTotalWinAmount').innerText = formatNumberToCurrency(newTotalWinCalc);
+                        document.getElementById('statTotalLossAmount').innerText = formatNumberToCurrency(newTotalLossCalc);
+
+                        document.getElementById('totalCountBadge').innerText=`${mCount} Matches Found!`; mb.innerHTML=`<i class="fa-solid fa-check-double"></i> Matched`; mb.disabled=true; 
+                        showToast("Match Complete & Dashboard Updated!");
+                        
+                        generateNotes();
+                    }else{showToast("Sheet empty.",true); mb.innerHTML=`<i class="fa-solid fa-bolt"></i> Match`;}
+                },
+                error: function(e){showToast("Connection failed!",true); mb.innerHTML=`<i class="fa-solid fa-bolt"></i> Match`;}
+            });
+        }
+
+        function copyTableToClipboard() {
+            const t=document.getElementById("resultTable"), r=document.createRange(); r.selectNode(t);
+            window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+            try{document.execCommand("copy");showToast("Copied to clipboard!");}catch(e){showToast("Copy failed!",true);}
+            window.getSelection().removeAllRanges();
+        }
+    </script>
 </body>
 </html>
