@@ -27,7 +27,7 @@
         tr:hover{background-color:#f8fafc;}
         
         td:focus{box-shadow:inset 0 0 0 2px #10b981;outline:none;z-index:25;position:relative;}
-        td[contenteditable="true"]{cursor:text;transition:background-color 0.2s;}
+        td[contenteditable="true"]{transition:all 0.2s;}
         td[contenteditable="true"]:focus{background-color:#fefce8;box-shadow:inset 0 0 0 2px #10b981;}
         
         /* Empty Reason Red Highlight */
@@ -183,7 +183,7 @@
             document.getElementById('progressContainer').classList.add('hidden'); document.getElementById('copyBtn').classList.add('hidden');
             document.getElementById('summaryCardsContainer').classList.add('hidden');
             
-            document.getElementById('tableHeaderRow').innerHTML = `<th class="sticky-col col-1">Dispute Group</th><th class="sticky-col col-2">IDR Number</th><th class="sticky-col col-3 text-indigo-700 bg-indigo-50">IDR Type</th><th class="sticky-col col-4 text-indigo-700 bg-indigo-50">Ticket Number</th><th>Claim Number</th><th>CPT code</th><th class="text-indigo-700 bg-indigo-50">Initial Payment (W/PR)</th><th class="text-indigo-700 bg-indigo-50">Mediator</th><th class="text-indigo-700 bg-indigo-50">Mediator Fee (Administrative)</th><th class="text-indigo-700 bg-indigo-50">Mediator Fee (Processing)</th><th>Det #</th><th>Determination</th><th class="text-center">Date - Determination Received from Mediator</th><th>WIN/LOSE</th><th class="text-emerald-700 bg-emerald-50">Additional Payment Receivable</th><th class="text-indigo-700 bg-indigo-50">Mediator Refund</th><th class="text-rose-700 bg-rose-50">Lose Reason</th><th class="text-slate-700 bg-amber-50">Correspondence Note</th>`;
+            document.getElementById('tableHeaderRow').innerHTML = `<th class="sticky-col col-1">Dispute Group</th><th class="sticky-col col-2 hidable">IDR Number</th><th class="sticky-col col-3 hidable text-indigo-700 bg-indigo-50">IDR Type</th><th class="sticky-col col-4 text-indigo-700 bg-indigo-50">Ticket Number</th><th class="hidable">Claim Number</th><th class="hidable">CPT code</th><th class="hidable text-indigo-700 bg-indigo-50">Initial Payment (W/PR)</th><th class="hidable text-indigo-700 bg-indigo-50">Mediator</th><th class="hidable text-indigo-700 bg-indigo-50">Mediator Fee (Admin)</th><th class="hidable text-indigo-700 bg-indigo-50">Mediator Fee (Proc)</th><th class="hidable">Det #</th><th class="hidable">Determination</th><th class="hidable text-center">Date Received</th><th>WIN/LOSE</th><th class="hidable text-emerald-700 bg-emerald-50">Additional Payment Recv</th><th class="hidable text-indigo-700 bg-indigo-50">Mediator Refund</th><th class="text-rose-700 bg-rose-50" style="min-width:260px; max-width:320px;">Lose Reason</th><th class="text-slate-700 bg-amber-50" style="min-width:350px; max-width:450px;">Correspondence Note</th>`;
 
             let p=document.getElementById('processBtn'); p.innerHTML=`<i class="fa-solid fa-robot"></i> Select PDFs First...`; p.className="bg-slate-200 text-slate-500 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed"; p.disabled=true;
             let m=document.getElementById('matchBtn'); m.disabled=true; m.className="bg-slate-100 text-slate-400 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed border-2 border-slate-200"; m.innerHTML=`<i class="fa-solid fa-bolt"></i> Match Sheet Data`;
@@ -334,6 +334,8 @@
                 
                 if(cHead[0].innerText.trim() === "") return; 
 
+                const idrType = cHead[2].innerText.trim().toUpperCase();
+
                 const mediatorRaw = cHead[7].innerText.trim() !== '-' ? cHead[7].innerText.trim() : '';
                 const adminFee = parseFloat(cHead[8].innerText.replace(/[^0-9.-]+/g,"")) || 0;
                 const procFee = parseFloat(cHead[9].innerText.replace(/[^0-9.-]+/g,"")) || 0;
@@ -349,71 +351,63 @@
                 let headReasonDiv = cHead[16].querySelector('div');
                 let loseReasonHead = headReasonDiv.innerText.trim();
                 
-                // If Lose but reason is empty, make note empty
                 if(status === 'LOSE' && !loseReasonHead) {
                     let noteDiv = cHead[17].querySelector('div');
                     noteDiv.innerText = "";
                     noteDiv.setAttribute('title', "");
                     
-                    // Clear subsequent notes for batch
                     for(let i=1; i<groupRows.length; i++) {
                         groupRows[i].querySelectorAll('td')[17].querySelector('div').innerText = "";
                     }
                     return; 
                 }
 
-                if (groupRows.length === 1) {
-                    let detAmt = cHead[11].innerText.trim();
-                    let addAmt = cHead[14].innerText.trim();
-                    
-                    let note = "";
-                    if(status === 'WIN') {
-                        note = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. WIN AMOUNT ${detAmt}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmt} AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
-                    } else if (status === 'LOSE' && loseReasonHead !== "") {
-                        note = `${notePrefixStr}. UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${loseReasonHead}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmt}. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                if (groupRows.length === 1 || idrType === 'BATCH') {
+                    for(let i=0; i<groupRows.length; i++) {
+                        const cRow = groupRows[i].querySelectorAll('td');
+                        let detAmt = cRow[11].innerText.trim();
+                        let addAmt = cRow[14].innerText.trim();
+                        let rReasonDiv = cRow[16].querySelector('div');
+                        let rLoseReason = rReasonDiv.innerText.trim() || loseReasonHead;
+
+                        let rNote = "";
+                        if(status === 'WIN') {
+                            rNote = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. WIN AMOUNT ${detAmt}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmt} AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                        } else if (status === 'LOSE' && rLoseReason !== "") {
+                            rNote = `${notePrefixStr}. UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${rLoseReason}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmt}. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                        }
+                        
+                        let rNoteDiv = cRow[17].querySelector('div');
+                        if(rNoteDiv.innerText !== rNote) rNoteDiv.innerText = rNote;
+                        rNoteDiv.setAttribute('title', rNote);
                     }
-                    
-                    headReasonDiv.setAttribute('title', loseReasonHead);
-                    let noteDiv = cHead[17].querySelector('div');
-                    if(noteDiv.innerText !== note) noteDiv.innerText = note;
-                    noteDiv.setAttribute('title', note);
-                    
                 } else {
-                    let totalDet = 0, totalAdd = 0, cptArr = [];
+                    // Single-Batch Multi-Row
+                    let totalDet = 0, cptArr = [];
                     groupRows.forEach(r => {
                         const c = r.querySelectorAll('td');
                         let cpt = c[5].innerText.trim();
                         let dVal = parseFloat(c[11].innerText.replace(/[^0-9.-]+/g,"")) || 0;
-                        let aVal = parseFloat(c[14].innerText.replace(/[^0-9.-]+/g,"")) || 0;
-                        totalDet += dVal; totalAdd += aVal;
-                        cptArr.push(`${cpt} FOR CPT ${dVal.toFixed(2)}`);
+                        totalDet += dVal; 
+                        cptArr.push(`$${dVal.toFixed(2)} FOR CPT ${cpt}`);
                     });
                     
-                    let cptString = cptArr.join(', ');
+                    let cptString = cptArr.join('; ');
                     let totalDetStr = "$" + totalDet.toFixed(2);
-                    let totalAddStr = "$" + totalAdd.toFixed(2);
 
                     let note1 = "";
                     if(status === 'WIN') {
-                        note1 = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. ADDITIONAL AMOUNTS OF ${cptString}. TOTAL WIN AMOUNT ${totalDetStr}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${totalAddStr} AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                        note1 = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. ADDITIONAL AMOUNTS OF ${cptString}. TOTAL WIN AMOUNT ${totalDetStr}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
                     } else if (status === 'LOSE' && loseReasonHead !== "") {
-                        note1 = `${notePrefixStr}. UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${loseReasonHead}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. ADDITIONAL AMOUNTS OF ${cptString}. TOTAL LOSE AMOUNT ${totalDetStr}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${totalAddStr}. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                        note1 = `${notePrefixStr}. UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${loseReasonHead}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. ADDITIONAL AMOUNTS OF ${cptString}. TOTAL LOSE AMOUNT ${totalDetStr}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
                     }
                     
-                    headReasonDiv.setAttribute('title', loseReasonHead);
                     let headNoteDiv = cHead[17].querySelector('div');
                     if(headNoteDiv.innerText !== note1) headNoteDiv.innerText = note1;
                     headNoteDiv.setAttribute('title', note1);
 
                     for(let i=1; i<groupRows.length; i++) {
                         const cRow = groupRows[i].querySelectorAll('td');
-                        let rDetAmt = cRow[11].innerText.trim();
-                        let rAddAmt = cRow[14].innerText.trim();
-                        let rReasonDiv = cRow[16].querySelector('div');
-                        let rLoseReason = rReasonDiv.innerText.trim() || loseReasonHead; 
-                        
-                        let rNote = "";
-                        // Subsequent lines in a batch are cleared for note, since we only need the note on the first line
                         cRow[17].querySelector('div').innerText = ""; 
                     }
                 }
@@ -441,14 +435,13 @@
             extractedResults=[]; let tf=allSelectedFiles.length;
             for(let i=0;i<tf;i++){let f=allSelectedFiles[i]; if(f&&f.name){let t=await extractTextFromPDF(f); if(t&&t.length>50)extractedResults.push({text:t});}}
             
-            // Robust Sorting Logic to prevent 'toUpperCase' undefined errors
             extractedResults.sort((a, b) => {
-                let textA = a.text ? String(a.text) : ""; 
-                let textB = b.text ? String(b.text) : "";
-                let mA = textA.match(/DISP-\d+/i); 
-                let mB = textB.match(/DISP-\d+/i);
-                let idrA = (mA && mA[0]) ? String(mA[0]).toUpperCase() : "ZZZZZZ";
-                let idrB = (mB && mB[0]) ? String(mB[0]).toUpperCase() : "ZZZZZZ";
+                let tA = a && a.text ? String(a.text) : "";
+                let tB = b && b.text ? String(b.text) : "";
+                let mA = tA.match(/DISP-\d+/i);
+                let mB = tB.match(/DISP-\d+/i);
+                let idrA = (mA && mA.length > 0 && mA[0]) ? String(mA[0]).toUpperCase() : "ZZZZZZ";
+                let idrB = (mB && mB.length > 0 && mB[0]) ? String(mB[0]).toUpperCase() : "ZZZZZZ";
                 return idrA.localeCompare(idrB, undefined, {numeric: true});
             });
 
@@ -550,7 +543,7 @@
                             <td class="hidable p-0 bg-slate-50 hover:bg-slate-100 transition-colors align-middle cursor-pointer" onclick="copyCellData(this)" title="Click to copy">
                                 <div tabindex="0" class="w-full h-full p-3 font-semibold text-slate-400 outline-none">-</div>
                             </td>
-                            <td class="p-0 bg-rose-50/50 hover:bg-rose-100 transition-colors align-top cursor-pointer" onclick="copyCellData(this)">
+                            <td class="p-0 bg-rose-50/50 hover:bg-rose-100 transition-colors align-top">
                                 <div tabindex="0" contenteditable="true" class="w-full h-full p-3 cursor-text text-rose-700 font-semibold text-xs outline-none ${isLoseClass}" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;" oninput="handleReasonInput(this)"></div>
                             </td>
                             <td class="p-0 bg-amber-50/50 hover:bg-amber-100 transition-colors align-top cursor-pointer" onclick="copyCellData(this)">
@@ -638,23 +631,14 @@
                                 
                                 if(isHead) {
                                     let mfa=getV('Mediator Fee (Administrative)'); if(mfa){c[8].innerText=mfa;c[8].classList.add('text-indigo-800');}
-                                    
-                                    // Always show Mediator Fee Processing for Head Row
                                     let mfp=getV('Mediator Fee (Processing)'); 
-                                    if(mfp){c[9].innerText=mfp;c[9].classList.add('text-indigo-800');}
-                                    else {c[9].innerText="-";}
+                                    if(mfp){c[9].innerText=mfp;c[9].classList.add('text-indigo-800');} else {c[9].innerText="-";}
                                     
                                     let mRefundDiv = c[15].querySelector('div');
-                                    // Mediator Refund only gets populated if WIN
                                     if(stat === "WIN") {
                                         mRefundDiv.innerText = mfp ? mfp : "-"; 
-                                        if(mfp) {
-                                            mRefundDiv.classList.replace('text-slate-400', 'text-indigo-800'); 
-                                            mRefundDiv.classList.add('font-bold');
-                                        }
-                                    } else { 
-                                        mRefundDiv.innerText="-"; 
-                                    }
+                                        if(mfp) {mRefundDiv.classList.replace('text-slate-400', 'text-indigo-800'); mRefundDiv.classList.add('font-bold');}
+                                    } else { mRefundDiv.innerText="-"; }
                                 } else { 
                                     c[8].innerText="-"; c[9].innerText="-"; c[15].querySelector('div').innerText="-"; 
                                 }
