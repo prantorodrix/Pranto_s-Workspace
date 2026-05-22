@@ -708,6 +708,40 @@
                 error: function(e){showToast("Connection failed!",true); mb.innerHTML=`<i class="fa-solid fa-bolt"></i> Match`;}
             });
         }
+
+        function copyTableToClipboard() {
+            const table = document.getElementById("resultTable");
+            let tsv = "";
+            
+            // Loop through each row and format as Tab-Separated Values (TSV) for Excel
+            for (let i = 0; i < table.rows.length; i++) {
+                let row = table.rows[i];
+                let rowData = [];
+                for (let j = 0; j < row.cells.length; j++) {
+                    let cell = row.cells[j];
+                    // Skip hidden columns if Compact View is active
+                    if (window.getComputedStyle(cell).display !== "none") {
+                        let text = cell.innerText.trim().replace(/\r?\n|\r/g, " "); // Clean up line breaks
+                        rowData.push(text);
+                    }
+                }
+                tsv += rowData.join("\t") + "\n";
+            }
+            
+            const ta = document.createElement("textarea");
+            ta.value = tsv;
+            document.body.appendChild(ta);
+            ta.select();
+            
+            try {
+                document.execCommand("copy");
+                showToast("Table copied to clipboard!");
+            } catch(e) {
+                showToast("Copy failed!", true);
+            }
+            
+            document.body.removeChild(ta);
+        }
     </script>
 </body>
 </html>
