@@ -314,6 +314,14 @@
             return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Dhaka', year: '2-digit', month: '2-digit', day: '2-digit' }).format(new Date());
         }
 
+        // --- Improved Number formatter for commas like $1,000.00 ---
+        function formatNumberToCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+        }
+        function parseCurrencyToNumber(cs){
+            return cs && cs !== "Check PDF" ? parseFloat(cs.replace(/[^0-9.-]+/g,"")) || 0 : 0;
+        }
+
         function generateNotes() {
             const prefix = document.getElementById('notePrefix').value.trim() || "IDR";
             const name = document.getElementById('noteName').value.trim() || "NAME";
@@ -341,7 +349,7 @@
                 const procFee = parseFloat(cHead[9].innerText.replace(/[^0-9.-]+/g,"")) || 0;
                 const totalFee = adminFee + procFee;
                 
-                const feeStr = totalFee > 0 ? `$${totalFee.toFixed(2)}` : '$0.00';
+                const feeStr = totalFee > 0 ? formatNumberToCurrency(totalFee) : '$0.00';
                 const mediatorText = mediatorRaw ? `${mediatorRaw}(${feeStr})` : `(${feeStr})`;
                 
                 const status = cHead[13].innerText.trim().toUpperCase(); 
@@ -351,6 +359,7 @@
                 let headReasonDiv = cHead[16].querySelector('div');
                 let loseReasonHead = headReasonDiv.innerText.trim();
                 
+                // If Lose but reason is empty, make note empty
                 if(status === 'LOSE' && !loseReasonHead) {
                     let noteDiv = cHead[17].querySelector('div');
                     noteDiv.innerText = "";
@@ -365,16 +374,21 @@
                 if (groupRows.length === 1 || idrType === 'BATCH') {
                     for(let i=0; i<groupRows.length; i++) {
                         const cRow = groupRows[i].querySelectorAll('td');
-                        let detAmt = cRow[11].innerText.trim();
-                        let addAmt = cRow[14].innerText.trim();
+                        
+                        let detAmtVal = parseFloat(cRow[11].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                        let addAmtVal = parseFloat(cRow[14].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                        
+                        let detAmtFormatted = formatNumberToCurrency(detAmtVal);
+                        let addAmtFormatted = formatNumberToCurrency(addAmtVal);
+                        
                         let rReasonDiv = cRow[16].querySelector('div');
                         let rLoseReason = rReasonDiv.innerText.trim() || loseReasonHead;
 
                         let rNote = "";
                         if(status === 'WIN') {
-                            rNote = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. WIN AMOUNT ${detAmt}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmt} AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                            rNote = `${notePrefixStr}, UPON REVIEW OF THE IDR DETERMINATION PROCESS, WE WERE SUCCESSFUL AND PREVAILED IN THE IDR DETERMINATION. WIN AMOUNT ${detAmtFormatted}. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmtFormatted} AND ALSO MEDIATOR FEES. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
                         } else if (status === 'LOSE' && rLoseReason !== "") {
-                            rNote = `${notePrefixStr}. UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${rLoseReason}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmt}. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
+                            rNote = `${notePrefixStr}. UPON REVIEW OF THE IDR FINAL DETERMINATION, WE DID NOT WIN THIS CASE DUE TO ${rLoseReason}. ALL RESOURCES HAVE BEEN EXHAUSTED, AND ALL DOCUMENTATION IS ON FILE AND SCANNED FOR REVIEW IN CENTRICITY. WE ARE CURRENTLY AWAITING ADDITIONAL PAYMENT OF ${addAmtFormatted}. PLEASE DO NOT CLOSE THE ACCOUNT UNTIL ALL PAYMENTS ARE RECEIVED.`;
                         }
                         
                         let rNoteDiv = cRow[17].querySelector('div');
@@ -383,17 +397,22 @@
                     }
                 } else {
                     // Single-Batch Multi-Row
-                    let totalDet = 0, cptArr = [];
+                    let totalDet = 0, totalAdd = 0, cptArr = [];
                     groupRows.forEach(r => {
                         const c = r.querySelectorAll('td');
                         let cpt = c[5].innerText.trim();
                         let dVal = parseFloat(c[11].innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                        let aVal = parseFloat(c[14].innerText.replace(/[^0-9.-]+/g,"")) || 0;
                         totalDet += dVal; 
-                        cptArr.push(`$${dVal.toFixed(2)} FOR CPT ${cpt}`);
+                        totalAdd += aVal;
+                        
+                        let formattedAddVal = formatNumberToCurrency(aVal);
+                        cptArr.push(`${formattedAddVal} FOR CPT ${cpt}`);
                     });
                     
                     let cptString = cptArr.join('; ');
-                    let totalDetStr = "$" + totalDet.toFixed(2);
+                    let totalDetStr = formatNumberToCurrency(totalDet);
+                    let totalAddStr = formatNumberToCurrency(totalAdd);
 
                     let note1 = "";
                     if(status === 'WIN') {
@@ -413,9 +432,6 @@
                 }
             });
         }
-
-        function parseCurrencyToNumber(cs){return cs&&cs!=="Check PDF"?parseFloat(cs.replace(/[^0-9.-]+/g,""))||0:0;}
-        function formatNumberToCurrency(num){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(num);}
 
         function extractTextFromPDF(file){
             return new Promise((r)=>{
@@ -543,7 +559,7 @@
                             <td class="hidable p-0 bg-slate-50 hover:bg-slate-100 transition-colors align-middle cursor-pointer" onclick="copyCellData(this)" title="Click to copy">
                                 <div tabindex="0" class="w-full h-full p-3 font-semibold text-slate-400 outline-none">-</div>
                             </td>
-                            <td class="p-0 bg-rose-50/50 hover:bg-rose-100 transition-colors align-top">
+                            <td class="p-0 bg-rose-50/50 hover:bg-rose-100 transition-colors align-top cursor-pointer" onclick="copyCellData(this)">
                                 <div tabindex="0" contenteditable="true" class="w-full h-full p-3 cursor-text text-rose-700 font-semibold text-xs outline-none ${isLoseClass}" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;" oninput="handleReasonInput(this)"></div>
                             </td>
                             <td class="p-0 bg-amber-50/50 hover:bg-amber-100 transition-colors align-top cursor-pointer" onclick="copyCellData(this)">
@@ -652,7 +668,7 @@
                                 if(calcPay < 0) calcPay = 0; 
                                 
                                 let calcDiv = c[14].querySelector('div');
-                                calcDiv.innerText="$"+calcPay.toFixed(2); 
+                                calcDiv.innerText = formatNumberToCurrency(calcPay); 
 
                                 row.classList.add('match-success');
                             } else {
@@ -691,13 +707,6 @@
                 },
                 error: function(e){showToast("Connection failed!",true); mb.innerHTML=`<i class="fa-solid fa-bolt"></i> Match`;}
             });
-        }
-
-        function copyTableToClipboard() {
-            const t=document.getElementById("resultTable"), r=document.createRange(); r.selectNode(t);
-            window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
-            try{document.execCommand("copy");showToast("Copied to clipboard!");}catch(e){showToast("Copy failed!",true);}
-            window.getSelection().removeAllRanges();
         }
     </script>
 </body>
