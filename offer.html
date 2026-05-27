@@ -432,6 +432,50 @@
             document.querySelectorAll('.output-box').forEach(box => box.classList.remove('active-copy'));
         }
 
+        // Robust Copy Functions
+        function copyAndHighlight(e) {
+            let t = e.innerText.trim(); 
+            if(t === '---' || !t) return;
+            
+            const ta = document.createElement("textarea"); 
+            ta.value = t; 
+            ta.style.position = 'fixed'; 
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta); 
+            ta.select(); 
+            
+            try {
+                document.execCommand('copy'); 
+                e.classList.add('active-copy'); 
+                showToast('Copied to Clipboard!');
+            } catch (err) {
+                console.error('Copy failed', err);
+            }
+            document.body.removeChild(ta);
+        }
+        
+        function copyCell(e, fullText = null) {
+            const textToCopy = fullText || e.innerText.trim();
+            if(!textToCopy || textToCopy === "Manual" || textToCopy === "") return;
+            
+            const ta = document.createElement("textarea"); 
+            ta.value = textToCopy; 
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta); 
+            ta.select(); 
+            
+            try {
+                document.execCommand('copy'); 
+                e.classList.add('cell-highlight');
+                setTimeout(() => e.classList.remove('cell-highlight'), 800); 
+                showToast('Copied to Clipboard!');
+            } catch (err) {
+                console.error('Copy failed', err);
+            }
+            document.body.removeChild(ta);
+        }
+
         // Core App Logic
         function filterData() {
             clearOutputHighlights();
@@ -464,22 +508,6 @@
                 
                 document.getElementById('outOfferLetter').innerText = disp !== '---' ? `${disp} OFFER LETTER` : '---';
             }
-        }
-
-        function copyAndHighlight(e) {
-            let t = e.innerText; if(t === '---') return;
-            const el = document.createElement("textarea"); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            e.classList.add('active-copy'); 
-            showToast('Copied to Clipboard!');
-        }
-        
-        function copyCell(e, fullText = null) {
-            const textToCopy = fullText || e.innerText;
-            if(!textToCopy || textToCopy === "Manual" || textToCopy === "") return;
-            const el = document.createElement("textarea"); el.value = textToCopy; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            e.classList.add('cell-highlight');
-            setTimeout(() => e.classList.remove('cell-highlight'), 800); 
-            showToast('Copied to Clipboard!');
         }
 
         function saveToTable() {
