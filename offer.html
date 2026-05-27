@@ -60,6 +60,11 @@
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: #475569; }
+
         /* Inputs & Boxes */
         .input-field { 
             width: 100%; padding: 10px 16px; font-size: 14px; border-radius: 12px; border: 1.5px solid rgba(226, 232, 240, 0.8); 
@@ -75,7 +80,7 @@
         .output-box {
             background: rgba(255, 255, 255, 0.8); border: 1.5px solid rgba(226, 232, 240, 0.8); border-radius: 12px; padding: 10px 14px;
             font-size: 13.5px; font-weight: 700; color: #334155; cursor: pointer; min-height: 42px;
-            display: flex; align-items: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            display: flex; align-items: center; white-space: normal; word-wrap: break-word; overflow: hidden;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .dark .output-box { background: rgba(15, 23, 42, 0.4); border-color: rgba(51, 65, 85, 0.6); color: #cbd5e1; }
@@ -681,7 +686,15 @@
                             <td class="font-black text-slate-400 dark:text-slate-500 text-center text-[11px]">${isF ? dailySl : ''}</td>
                             <td class="font-black text-indigo-600 dark:text-indigo-400 clickable-cell tracking-wide" onclick="copyCell(this)">${isF ? b.disp : ''}</td>
                             <td class="font-bold text-slate-700 dark:text-slate-200 clickable-cell tracking-wide" onclick="copyCell(this)">${t}</td>
-                            <td class="text-[11.5px] text-slate-500 dark:text-slate-400 italic clickable-cell leading-relaxed font-medium" onclick="copyCell(this, '${isF ? safeNote : ''}')" title="${b.note}">${isF ? (b.note.length > 50 ? b.note.substring(0,50)+'...' : b.note) : ''}</td>
+                            
+                            <td class="align-top p-1" style="white-space: normal; overflow: visible;">
+                                <div class="custom-scroll text-[11px] text-slate-500 dark:text-slate-400 italic leading-snug font-medium p-1 cursor-pointer" 
+                                     style="max-height: 52px; overflow-y: auto; word-wrap: break-word; max-width: 320px;" 
+                                     onclick="copyCell(this, '${isF ? safeNote : ''}')" title="Click to copy full note">
+                                    ${isF ? b.note : ''}
+                                </div>
+                            </td>
+
                             <td class="text-blue-600 dark:text-blue-400 font-bold clickable-cell text-xs tracking-wide" onclick="copyCell(this)">${isF ? b.disp.toUpperCase() + ' OFFER LETTER' : ''}</td>
                             <td class="text-orange-500 dark:text-orange-400 font-bold clickable-cell text-xs tracking-wide" onclick="copyCell(this)">${t} MAIL</td>
                             <td class="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">${isF ? b.time : ''}</td>
@@ -699,17 +712,39 @@
 
         // Excel Export
         function copyForExcel() {
-            if(!db.length) { showToast("No data to export!"); return; }
-            let csv = "SL\tDispute\tTicket\tFull Note\tOffer Letter\tMail Ref\tDate\tTime\n";
+            if(!db.length) { showToast("No data to export!", true); return; }
+            let tsv = "SL\tDispute\tTicket No\tAuto Note Content\tFile Attachment\tMail Reference\tDate\tEntry Time\tStatus\n";
             let sl = db.length;
+            
             db.forEach(b => {
                 b.tickets.forEach((t, ti) => { 
-                    csv += `${ti===0?sl:""}\t${ti===0?b.disp:""}\t${t}\t${ti===0?b.note:""}\t${ti===0?b.disp.toUpperCase()+" OFFER LETTER":""}\t${t} MAIL\t${b.date}\t${ti===0?b.time:""}\n`; 
+                    let isF = (ti === 0);
+                    let noteText = isF ? b.note.replace(/\r?\n|\r/g, " ") : "";
+                    let offerLetter = isF ? b.disp.toUpperCase() + " OFFER LETTER" : "";
+                    let timeText = isF ? b.time : "";
+                    let statusText = b.isDone ? "Done" : "Pending";
+                    let slNum = isF ? sl : "";
+                    let dispText = isF ? b.disp : "";
+
+                    tsv += `${slNum}\t${dispText}\t${t}\t${noteText}\t${offerLetter}\t${t} MAIL\t${b.date}\t${timeText}\t${statusText}\n`; 
                 });
                 sl--;
             });
-            let el = document.createElement("textarea"); el.value = csv; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            showToast("Master List Copied for Excel!");
+
+            const ta = document.createElement("textarea"); 
+            ta.value = tsv; 
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta); 
+            ta.select(); 
+            
+            try {
+                document.execCommand('copy'); 
+                showToast("Master List Copied for Excel!");
+            } catch(e) {
+                showToast("Copy failed!", true);
+            }
+            document.body.removeChild(ta);
         }
 
         // Initialization
