@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Email Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base & Scrollbar */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f4f7fb 0%, #eef2ff 100%); min-height: 100vh; display: flex; flex-direction: column; color: #1e293b; }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        /* Glassmorphism & Animations */
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.1); }
+        .copy-box { cursor: pointer; transition: all 0.3s ease; position: relative; border: 2px solid transparent; }
+        .copy-box:hover { transform: translateY(-2px); border-color: #818cf8; box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.2); }
+        .copy-box:active { transform: translateY(1px); }
+        .copied-state { background-color: #ecfdf5 !important; border-color: #10b981 !important; transform: scale(0.98); }
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        /* Dynamic Highlight Animations */
+        .dynamic-hl { transition: all 0.5s ease; background-color: transparent; border-radius: 4px; padding: 0 2px; }
+        .updating .dynamic-hl { background-color: #fef08a; color: #b45309; font-weight: 800; transform: scale(1.02); }
+        /* Modal Styles */
+        .modal { opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 100; backdrop-filter: blur(5px); }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content { transform: scale(0.95) translateY(10px); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal.active .modal-content { transform: scale(1) translateY(0); }
+        /* Inputs */
+        .input-base { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; font-size: 14px; outline: none; transition: all 0.3s; }
+        .input-base:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+        /* Typing Effect Cursor */
+        .typing-active::after { content: '|'; animation: blink 1s infinite; color: #6366f1; font-weight: bold; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Navbar -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-indigo-50 relative">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between relative">
+            
+            <a href="#" class="text-xl font-black text-indigo-700 flex items-center gap-2 tracking-tight hover:opacity-80 transition"><i class="fa-solid fa-bolt text-amber-500"></i> PRO EMAILER</a>
+            
+            <!-- Centered Home Button -->
+            <div class="absolute left-1/2 transform -translate-x-1/2">
+                <a href="index.html" class="flex items-center gap-2 px-5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-full transition-colors shadow-sm text-sm border border-indigo-100">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+            </div>
+
+            <div class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full"><i class="fa-solid fa-circle text-[8px] text-emerald-500 mr-1 animate-pulse"></i> Workspace Active</div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 md:px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- LEFT PANEL: Controls -->
+        <div class="lg:col-span-4 space-y-5 fade-in">
+            <!-- Controls Box -->
+            <div class="glass-panel p-6 rounded-[24px]">
+                <div class="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
+                    <h2 class="text-lg font-black text-slate-800"><i class="fa-solid fa-sliders text-indigo-500 mr-1"></i> Setup</h2>
+                    <button onclick="clearForm()" class="text-xs font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-full transition"><i class="fa-solid fa-rotate-left"></i> Clear All</button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Sender Name</label>
+                        <input type="text" id="senderName" class="input-base" placeholder="E.g. Pranto R">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Follow-up Type</label>
+                        <select id="followUpType" class="input-base cursor-pointer">
+                            <option value="">-- Select Type --</option>
+                            <option value="1st Follow-up">1st Follow-up</option><option value="2nd Follow-up">2nd Follow-up</option>
+                            <option value="3rd Follow-up">3rd Follow-up</option><option value="Final Follow-up">Final Follow-up</option>
+                        </select>
+                    </div>
+                    <!-- Facility Select -->
+                    <div>
+                        <div class="flex justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Facility</label>
+                            <button onclick="openModal('facModal')" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-pen-to-square"></i> Manage</button>
+                        </div>
+                        <select id="facSelect" class="input-base cursor-pointer"><option value="">-- Select Facility --</option></select>
+                    </div>
+                    <!-- Mediator Select -->
+                    <div>
+                        <div class="flex justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Mediator</label>
+                            <button onclick="openModal('medModal')" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-pen-to-square"></i> Manage</button>
+                        </div>
+                        <select id="medSelect" class="input-base cursor-pointer"><option value="">-- Select Mediator --</option></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: Live Preview -->
+        <div class="lg:col-span-8 fade-in" style="animation-delay: 0.1s;">
+            <div class="glass-panel p-6 rounded-[24px] sticky top-24">
+                <div class="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
+                    <h2 class="text-xl font-black text-slate-800"><i class="fa-solid fa-eye text-emerald-500 mr-1"></i> Live Preview</h2>
+                    <span class="text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-500 px-3 py-1 rounded-full"><i class="fa-solid fa-hand-pointer text-indigo-400"></i> Click to Copy</span>
+                </div>
+                <div class="space-y-4" id="previewContainer">
+                    <!-- Preview Boxes -->
+                    <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">To</label><div class="copy-box bg-slate-50 rounded-xl p-3 font-semibold text-slate-700 break-all" onclick="copyClean('outputTo', this)"><span id="uiTo">---</span></div></div>
+                    <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">CC</label><div class="copy-box bg-slate-50 rounded-xl p-3 font-semibold text-slate-700 break-all" onclick="copyClean('outputCc', this)"><span id="uiCc">---</span></div></div>
+                    <div><label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Subject</label><div class="copy-box bg-indigo-50/50 rounded-xl p-3 font-bold text-indigo-900" onclick="copyClean('outputSub', this)"><span id="uiSub">---</span></div></div>
+                    <!-- Body Box -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email Body</label>
+                        <div class="copy-box bg-white border border-slate-200 rounded-xl p-5 text-[13.5px] leading-relaxed text-slate-700 font-medium max-h-[500px] overflow-y-auto shadow-sm" onclick="copyClean('outputBody', this)">
+                            <div id="uiBody" class="pointer-events-none">Select options to generate email body...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hidden div for pure Clean HTML copying -->
+    <div id="hiddenCopyZone" class="fixed -left-[9999px] top-0 opacity-0 pointer-events-none" contenteditable="true">
+        <div id="outputTo"></div><div id="outputCc"></div><div id="outputSub"></div><div id="outputBody"></div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl opacity-0 translate-y-4 transition-all z-50 font-bold flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="toastMsg">Copied!</span></div>
+
+    <!-- MODAL: Facility Management -->
+    <div id="facModal" class="modal fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-5 bg-slate-50 border-b border-slate-100 flex justify-between items-center"><h3 class="font-black text-lg text-slate-800"><i class="fa-solid fa-building text-indigo-500 mr-2"></i> Manage Facilities</h3><button onclick="closeModal('facModal')" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-xmark text-xl"></i></button></div>
+            <div class="p-5 overflow-y-auto flex-grow bg-slate-50/50"><ul id="facList" class="space-y-3"></ul></div>
+            <div class="p-5 border-t border-slate-100 bg-white">
+                <h4 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-3" id="facFormTitle">Add New Facility</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="hidden" id="facEditId"><input type="text" id="fName" class="input-base" placeholder="Facility Name">
+                    <input type="text" id="fAcc" class="input-base" placeholder="Account No"><input type="text" id="fRoute" class="input-base" placeholder="Routing No">
+                </div>
+                <div class="mt-4 flex gap-2 justify-end"><button onclick="resetFacForm()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition">Cancel</button><button onclick="saveFac()" class="px-6 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition shadow-md">Save Facility</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Mediator Management -->
+    <div id="medModal" class="modal fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-5 bg-slate-50 border-b border-slate-100 flex justify-between items-center"><h3 class="font-black text-lg text-slate-800"><i class="fa-solid fa-users text-indigo-500 mr-2"></i> Manage Mediators</h3><button onclick="closeModal('medModal')" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-xmark text-xl"></i></button></div>
+            <div class="p-5 overflow-y-auto flex-grow bg-slate-50/50"><ul id="medList" class="space-y-3"></ul></div>
+            <div class="p-5 border-t border-slate-100 bg-white">
+                <h4 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-3" id="medFormTitle">Add New Mediator</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="hidden" id="medEditId"><input type="text" id="mName" class="input-base" placeholder="Mediator Name">
+                    <input type="email" id="mTo" class="input-base" placeholder="TO Email"><input type="email" id="mCc" class="input-base" placeholder="CC Email">
+                </div>
+                <div class="mt-4 flex gap-2 justify-end"><button onclick="resetMedForm()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition">Cancel</button><button onclick="saveMed()" class="px-6 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition shadow-md">Save Mediator</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- 1. Data Initialization & LocalStorage ---
+        const defaultFacs = [
+            { id: 1, name: "COLLEGE STATION ER LLC", acc: "817367696", route: "111000614" },
+            { id: 2, name: "DFW LEWISVILLE EMERGENCY CENTER LLC", acc: "602851989", route: "111000614" }
+        ];
+        const defaultMeds = [{ id: 1, name: "Improve Health", to: "IDREAccounting@improve.health", cc: "FederalIDRE@improve.health" }];
+        
+        let facs = JSON.parse(localStorage.getItem('pro_facs')) || defaultFacs;
+        let meds = JSON.parse(localStorage.getItem('pro_meds')) || defaultMeds;
+        const sNameInp = document.getElementById('senderName'), fTypeSel = document.getElementById('followUpType'), facSel = document.getElementById('facSelect'), medSel = document.getElementById('medSelect');
+
+        let typingController = new AbortController();
+
+        // --- 2. Core Functions ---
+        function saveData() { localStorage.setItem('pro_facs', JSON.stringify(facs)); localStorage.setItem('pro_meds', JSON.stringify(meds)); }
+        function openModal(id) { document.getElementById(id).classList.add('active'); if(id==='facModal') renderFacList(); if(id==='medModal') renderMedList(); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); resetFacForm(); resetMedForm(); }
+        
+        function showToast(msg, isError = false) { 
+            const t = document.getElementById('toast'); 
+            document.getElementById('toastMsg').innerText = msg; 
+            if(isError) {
+                t.classList.replace('bg-slate-900', 'bg-rose-600');
+                t.innerHTML = `<i class="fa-solid fa-circle-exclamation text-white"></i> <span id="toastMsg">${msg}</span>`;
+            } else {
+                t.classList.replace('bg-rose-600', 'bg-slate-900');
+                t.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="toastMsg">${msg}</span>`;
+            }
+            t.classList.remove('opacity-0', 'translate-y-4'); 
+            setTimeout(() => t.classList.add('opacity-0', 'translate-y-4'), 2500); 
+        }
+        
+        function clearForm() {
+            fTypeSel.value = ""; facSel.value = ""; medSel.value = "";
+            typingController.abort(); // Stop typing animation if running
+            document.getElementById('uiTo').innerHTML = "---"; document.getElementById('uiCc').innerHTML = "---"; document.getElementById('uiSub').innerHTML = "---"; 
+            document.getElementById('uiBody').innerHTML = "Select options to generate email body...";
+            document.getElementById('uiBody').classList.remove('typing-active');
+            document.getElementById('outputTo').innerHTML = ""; document.getElementById('outputCc').innerHTML = ""; document.getElementById('outputSub').innerHTML = ""; document.getElementById('outputBody').innerHTML = "";
+            showToast("Form Cleared!");
+        }
+
+        // --- 3. Render Dropdowns ---
+        function renderDropdowns() {
+            let fVal = facSel.value, mVal = medSel.value;
+            facSel.innerHTML = '<option value="">-- Select Facility --</option>'; 
+            medSel.innerHTML = '<option value="">-- Select Mediator --</option>'; // Fixed bug here
+            facs.forEach(f => facSel.innerHTML += `<option value="${f.id}">${f.name}</option>`);
+            meds.forEach(m => medSel.innerHTML += `<option value="${m.id}">${m.name}</option>`);
+            facSel.value = fVal; medSel.value = mVal; // Retain selection
+        }
+
+        // --- 4. Typing Animation System ---
+        async function typeHTML(element, htmlString, speed = 2) {
+            typingController.abort(); // Cancel previous typing
+            typingController = new AbortController();
+            const signal = typingController.signal;
+            
+            element.innerHTML = "";
+            element.classList.add('typing-active');
+            
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = htmlString;
+            
+            async function typeNode(node, parent) {
+                if (signal.aborted) return;
+                
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    // Type multiple characters at a time for smooth relaxed effect
+                    for (let i = 0; i < text.length; i += 3) {
+                        if (signal.aborted) return;
+                        parent.appendChild(document.createTextNode(text.substring(i, i + 3)));
+                        await new Promise(r => setTimeout(r, speed));
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const clone = node.cloneNode(false);
+                    parent.appendChild(clone);
+                    for (let child of node.childNodes) {
+                        if (signal.aborted) return;
+                        await typeNode(child, clone);
+                    }
+                }
+            }
+            
+            await typeNode(tempDiv, element);
+            
+            if (!signal.aborted) {
+                element.classList.remove('typing-active');
+            }
+        }
+
+        // --- 5. Live Preview Engine (Visual + Clean Copy) ---
+        function triggerAnimation() {
+            const container = document.getElementById('previewContainer');
+            container.classList.add('updating'); setTimeout(() => container.classList.remove('updating'), 800);
+        }
+
+        function updatePreview() {
+            const fType = fTypeSel.value, facId = facSel.value, medId = medSel.value;
+            if(!fType || !facId || !medId) return; // Wait until all main fields selected
+            
+            triggerAnimation(); // Trigger visual background flash
+            const sName = sNameInp.value || "[Your Name]";
+            const fac = facs.find(f => f.id == facId), med = meds.find(m => m.id == medId);
+            
+            // Generate Visual UI (With spans for highlight animation)
+            const hl = (txt) => `<span class="dynamic-hl font-bold text-indigo-700">${txt}</span>`;
+            document.getElementById('uiTo').innerHTML = hl(med.to); document.getElementById('uiCc').innerHTML = hl(med.cc);
+            document.getElementById('uiSub').innerHTML = hl(`Urgent: ${fType}: Mediation Fee Refund Status (${fac.name})`);
+            
+            // Generate Table format directly inside the email body
+            const bTxt = `Good morning! ${hl(med.name)} Accounting Team<br><br>
+Please issue refunds for the mediation fees for the following disputes, as we have received the <b>'Win'</b> determinations for these cases. Please note that although some determinations are marked as <b>'Not Eligible,'</b> we should process refunds for all cases in which the full mediation fee was successfully collected. For your ready reference, I have attached an Excel sheet containing the data for the <b>${hl(fac.name)}</b>.<br><br>
+We haven't received any updates or payment regarding this Mediation refund yet. <b>As we currently have no records confirming whether these refunds were issued, please provide any available formal documents or transaction receipts related to these paid disputes if payment has already been processed.</b> This will allow our accounts to reconcile accurately, maintain proper records, and streamline our reconciliation process.<br>
+If the refund has not been issued yet, please process the payment within the next 7 business days.<br><br>
+For future transactions, if the fee refund is processed via <b>ACH</b>, please provide the <b>reconciliation documents</b>.<br>
+Please include this in the email.<br>
+Thank you for your prompt attention to this matter. I have attached the <b>voided check, account number, and routing number</b> details.<br><br>
+
+<table style="width: 100%; max-width: 600px; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; font-family: sans-serif; font-size: 13px; border: 1px solid #d1d5db;">
+    <tr>
+        <th style="border: 1px solid #d1d5db; padding: 10px; background-color: #f3f4f6; text-align: left; color: #374151;">Facility Name</th>
+        <th style="border: 1px solid #d1d5db; padding: 10px; background-color: #f3f4f6; text-align: left; color: #374151;">Account number</th>
+        <th style="border: 1px solid #d1d5db; padding: 10px; background-color: #f3f4f6; text-align: left; color: #374151;">Routing Number</th>
+    </tr>
+    <tr>
+        <td style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #111827;">${hl(fac.name)}</td>
+        <td style="border: 1px solid #d1d5db; padding: 10px; font-family: monospace; font-size: 14px; color: #111827;">${hl(fac.acc)}</td>
+        <td style="border: 1px solid #d1d5db; padding: 10px; font-family: monospace; font-size: 14px; color: #111827;">${hl(fac.route)}</td>
+    </tr>
+</table>
+
+<b>For ACH Payment (preferred):</b><br><b>Account Name:</b> ${hl(fac.name)}<br><b>Bank Routing Number:</b> ${hl(fac.route)}<br><b>Account Number:</b> ${hl(fac.acc)}<br><br>
+<b>Check:</b><br>If submitting payment via check, please overnight it to:<br>${hl(fac.name)}<br>Attn: IDRE Accounting<br>11490 Westheimer Road<br>10th Floor, Houston, TX 77077<br><br>
+Thank you for your continued cooperation.<br>============================================<br>${hl(sName)}<br>Process Associate`;
+            
+            // Trigger relax mode typing animation for the visible UI
+            typeHTML(document.getElementById('uiBody'), bTxt, 2);
+
+            // Generate Clean Copy instantly (Standard HTML, no Tailwind classes) for clipboard
+            document.getElementById('outputTo').innerText = med.to; document.getElementById('outputCc').innerText = med.cc;
+            document.getElementById('outputSub').innerText = `Urgent: ${fType}: Mediation Fee Refund Status (${fac.name})`;
+            document.getElementById('outputBody').innerHTML = bTxt.replace(/<span class="[^"]+">(.*?)<\/span>/g, "$1"); // Strip animation spans immediately
+        }
+
+        // --- 6. Rich Text Copy Function ---
+        function copyClean(targetId, uiBox) {
+            const target = document.getElementById(targetId);
+            if(!target.innerText.trim() || target.innerText === "---") return;
+            
+            // Select hidden clean div content
+            const range = document.createRange(); range.selectNodeContents(target);
+            const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+            
+            try { 
+                document.execCommand('copy'); 
+                uiBox.classList.add('copied-state'); setTimeout(() => uiBox.classList.remove('copied-state'), 1500);
+                showToast('Copied Clean Format!');
+            } catch(e) { console.error('Copy failed'); }
+            sel.removeAllRanges();
+        }
+
+        // --- 7. Facility CRUD ---
+        function renderFacList() {
+            const list = document.getElementById('facList'); list.innerHTML = '';
+            facs.forEach(f => {
+                list.innerHTML += `<li class="bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
+                    <div><p class="text-sm font-bold text-slate-800">${f.name}</p><p class="text-[10px] font-bold text-slate-500">ACC: ${f.acc} | RT: ${f.route}</p></div>
+                    <div class="flex gap-2"><button onclick="editFac(${f.id})" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100"><i class="fa-solid fa-pen text-xs"></i></button><button onclick="delFac(${f.id})" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-500 hover:bg-rose-100"><i class="fa-solid fa-trash text-xs"></i></button></div>
+                </li>`;
+            });
+        }
+        function resetFacForm() { document.getElementById('facEditId').value=''; document.getElementById('fName').value=''; document.getElementById('fAcc').value=''; document.getElementById('fRoute').value=''; document.getElementById('facFormTitle').innerText="Add New Facility"; }
+        function saveFac() {
+            const id = document.getElementById('facEditId').value, n = document.getElementById('fName').value.trim(), a = document.getElementById('fAcc').value.trim(), r = document.getElementById('fRoute').value.trim();
+            if(!n || !a || !r) return alert("Fill all fields");
+            
+            // Duplicate Check
+            if(!id && facs.some(f => f.name.toLowerCase() === n.toLowerCase())) {
+                showToast("Ei Facility aage thekei ache!", true); return;
+            }
+
+            if(id) { const i = facs.findIndex(x => x.id == id); if(i > -1) facs[i] = {id: parseInt(id), name: n, acc: a, route: r}; } 
+            else facs.push({id: Date.now(), name: n, acc: a, route: r});
+            saveData(); renderFacList(); renderDropdowns(); resetFacForm(); updatePreview(); showToast("Facility Saved!");
+        }
+        function editFac(id) { const f = facs.find(x => x.id == id); if(!f) return; document.getElementById('facEditId').value = f.id; document.getElementById('fName').value = f.name; document.getElementById('fAcc').value = f.acc; document.getElementById('fRoute').value = f.route; document.getElementById('facFormTitle').innerText="Edit Facility"; }
+        function delFac(id) { if(confirm("Delete this facility?")) { facs = facs.filter(x => x.id != id); saveData(); renderFacList(); renderDropdowns(); if(facSel.value==id) clearForm(); showToast("Deleted!"); } }
+
+        // --- 8. Mediator CRUD ---
+        function renderMedList() {
+            const list = document.getElementById('medList'); list.innerHTML = '';
+            meds.forEach(m => {
+                list.innerHTML += `<li class="bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
+                    <div><p class="text-sm font-bold text-slate-800">${m.name}</p><p class="text-[10px] font-bold text-slate-500">TO: ${m.to} | CC: ${m.cc||'N/A'}</p></div>
+                    <div class="flex gap-2"><button onclick="editMed(${m.id})" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100"><i class="fa-solid fa-pen text-xs"></i></button><button onclick="delMed(${m.id})" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-500 hover:bg-rose-100"><i class="fa-solid fa-trash text-xs"></i></button></div>
+                </li>`;
+            });
+        }
+        function resetMedForm() { document.getElementById('medEditId').value=''; document.getElementById('mName').value=''; document.getElementById('mTo').value=''; document.getElementById('mCc').value=''; document.getElementById('medFormTitle').innerText="Add New Mediator"; }
+        function saveMed() {
+            const id = document.getElementById('medEditId').value, n = document.getElementById('mName').value.trim(), t = document.getElementById('mTo').value.trim(), c = document.getElementById('mCc').value.trim();
+            if(!n || !t) return alert("Fill Name and TO Email");
+            
+            // Duplicate Check
+            if(!id && meds.some(m => m.name.toLowerCase() === n.toLowerCase())) {
+                showToast("Ei Mediator aage thekei ache!", true); return;
+            }
+
+            if(id) { const i = meds.findIndex(x => x.id == id); if(i > -1) meds[i] = {id: parseInt(id), name: n, to: t, cc: c}; } 
+            else meds.push({id: Date.now(), name: n, to: t, cc: c});
+            saveData(); renderMedList(); renderDropdowns(); resetMedForm(); updatePreview(); showToast("Mediator Saved!");
+        }
+        function editMed(id) { const m = meds.find(x => x.id == id); if(!m) return; document.getElementById('medEditId').value = m.id; document.getElementById('mName').value = m.name; document.getElementById('mTo').value = m.to; document.getElementById('mCc').value = m.cc; document.getElementById('medFormTitle').innerText="Edit Mediator"; }
+        function delMed(id) { if(confirm("Delete this mediator?")) { meds = meds.filter(x => x.id != id); saveData(); renderMedList(); renderDropdowns(); if(medSel.value==id) clearForm(); showToast("Deleted!"); } }
+
+        // --- 9. Event Listeners ---
+        [sNameInp, fTypeSel, facSel, medSel].forEach(el => el.addEventListener('change', updatePreview));
+        sNameInp.addEventListener('keyup', updatePreview);
+        
+        // Initial setup
+        renderDropdowns();
+    </script>
+</body>
+</html>
