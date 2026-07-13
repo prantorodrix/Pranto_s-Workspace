@@ -272,8 +272,8 @@
             document.getElementById('uiSub').innerHTML = hl(`Urgent: ${fType}: Mediation Fee Refund Status (${fac.name})`);
             
             // Generate Table format directly inside the email body
-            const bTxt = `Good morning! ${hl(med.name)} Accounting Team<br><br>
-Please issue refunds for the mediation fees for the following disputes, as we have received the <b>'Win'</b> determinations for these cases. Please note that although some determinations are marked as <b>'Not Eligible,'</b> we should process refunds for all cases in which the full mediation fee was successfully collected. For your ready reference, I have attached an Excel sheet containing the data for the <b>${hl(fac.name)}</b>.<br><br>
+            const bTxt = `Good day! ${hl(med.name)} Accounting Team<br><br>
+Please issue refunds for the mediation fees for the following disputes, as we have successful and prevailing (<b>'Win'</b>) determinations for these cases. Please note that although some determinations are marked as <b>'Closed,'</b> we should process refunds for all cases in which the full mediation fee was successfully collected. For your ready reference, I have attached an Excel sheet containing the data for the <b>${hl(fac.name)}</b>.<br><br>
 We haven't received any updates or payment regarding this Mediation refund yet. <b>As we currently have no records confirming whether these refunds were issued, please provide any available formal documents or transaction receipts related to these paid disputes if payment has already been processed.</b> This will allow our accounts to reconcile accurately, maintain proper records, and streamline our reconciliation process.<br>
 If the refund has not been issued yet, please process the payment within the next 7 business days.<br><br>
 For future transactions, if the fee refund is processed via <b>ACH</b>, please provide the <b>reconciliation documents</b>.<br>
