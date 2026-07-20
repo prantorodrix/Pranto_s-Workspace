@@ -532,8 +532,182 @@
         document.getElementById('excel_Copy_Input').value = `${dateStr}\t${name}\t${globalData.ticket}\t${ptF}\t${ptL}\t${globalData.claimNo}\t${globalData.memberId}\t${globalVals.billed.toFixed(2)}\t${globalData.serviceDate}`;
     }
 </script>
-  <script>
-(function(){const style=document.createElement('style');style.innerHTML=`@keyframes fifaArgBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-12px) scale(1.05)}}@keyframes spinBall{100%{transform:rotate(360deg)}}@keyframes blinkFlag{0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 15px rgba(117,170,219,0.8)}50%{opacity:0.6;transform:scale(0.85);box-shadow:0 0 0 transparent}}.fifa-arg-badge{position:fixed;top:25px;right:25px;z-index:999999;display:flex;align-items:center;gap:10px;padding:8px 16px 8px 12px;background:linear-gradient(135deg,rgba(255,255,255,0.95),rgba(117,170,219,0.3));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:2px solid #fff;border-radius:50px;animation:fifaArgBounce 3s ease-in-out infinite;box-shadow:0 8px 25px rgba(117,170,219,0.4);cursor:pointer;transition:all 0.3s ease;-webkit-tap-highlight-color:transparent}.fifa-arg-badge.collapsed{padding:6px;gap:0}.fifa-arg-badge.collapsed .arg-trophy,.fifa-arg-badge.collapsed .arg-badge-gold,.fifa-arg-badge.collapsed .arg-text,.fifa-arg-badge.collapsed .arg-ball{display:none}.fifa-arg-badge.collapsed .arg-flag{animation:blinkFlag 1.2s ease-in-out infinite;width:36px;height:36px}.arg-trophy{display:flex;align-items:center;justify-content:center}.arg-badge-gold{background:linear-gradient(to right,#bf953f,#fcf6ba,#b38728,#fbf5b7,#aa771c);color:#000;font-family:sans-serif;font-weight:900;font-size:11px;padding:3px 8px;border-radius:6px;box-shadow:0 2px 4px rgba(0,0,0,0.3);letter-spacing:1px;white-space:nowrap}.arg-flag{width:28px;height:28px;border-radius:50%;border:2px solid #fff;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 6px rgba(0,0,0,0.2);transition:all 0.3s ease}.arg-blue{flex:1;background:#75AADB}.arg-white{flex:1;background:#fff;display:flex;justify-content:center;align-items:center}.arg-sun{width:7px;height:7px;background:#FDB813;border-radius:50%}.arg-text{font-family:sans-serif;font-weight:900;font-size:14px;color:#1e3a8a;letter-spacing:0.5px;text-shadow:1px 1px 2px rgba(255,255,255,0.8)}.arg-ball{font-size:20px;animation:spinBall 4s linear infinite;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2))}`;document.head.appendChild(style);const badge=document.createElement('div');badge.className='fifa-arg-badge';badge.innerHTML='<div class="arg-trophy"><svg viewBox="0 0 24 30" width="22" height="28" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,0.4))"><defs><linearGradient id="gf" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#bf953f"/><stop offset="50%" stop-color="#fcf6ba"/><stop offset="100%" stop-color="#aa771c"/></linearGradient></defs><path d="M8 26h8l1 4H7z" fill="url(#gf)"/><path d="M7.5 27h9v1h-9zM7 29h10v1H7z" fill="#004d00"/><path d="M9 26c0-10-4-14-1-18c0 0 4 7 4 12c0-5 4-12 4-12c3 4-1 8-1 18z" fill="url(#gf)"/><circle cx="12" cy="8" r="6" fill="url(#gf)"/><path d="M9 6a3 3 0 0 1 5 1a3 3 0 0 1-4 3a3 3 0 0 1-1-4" fill="#fff" opacity="0.3"/></svg></div><div class="arg-badge-gold">FIFA FINAL</div><div class="arg-flag"><div class="arg-blue"></div><div class="arg-white"><div class="arg-sun"></div></div><div class="arg-blue"></div></div><span class="arg-text">ARGENTINA</span><div class="arg-ball">⚽</div>';badge.onclick=function(){this.classList.toggle('collapsed')};document.body.appendChild(badge);})();
+ <!-- ========================================================================= -->
+<!-- ⚠️ COPY ONLY THE SCRIPT BELOW THIS LINE TO YOUR OWN WEB PAGE ⚠️ -->
+<!-- ========================================================================= -->
+
+<script>
+(function(){
+    // 1. Inject CSS Styles
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes cbBadgeBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes cbBallSpin { 100%{transform:rotate(360deg)} }
+        @keyframes cbBlinkGlow { 0%,100%{opacity:1; box-shadow:0 0 15px rgba(241, 191, 0, 0.9)} 50%{opacity:0.6; box-shadow:0 0 0 transparent} }
+        @keyframes cbFlashOverlay { 0%{opacity:1; background-color:rgba(255,255,255,0.8)} 15%{opacity:1; background-color:rgba(0,0,0,0.85)} }
+        @keyframes bgGradientPan { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+        
+        .cb-overlay { position:fixed; inset:0; background:radial-gradient(circle, rgba(241,191,0,0.3) 0%, rgba(0,0,0,0.85) 100%); z-index:9999998; transition:opacity 1s ease; animation:cbFlashOverlay 3s; }
+        
+        /* Text is now safely positioned at the top to avoid overlap */
+        .cb-big-text { position:fixed; top:15%; left:50%; transform:translateX(-50%); font-family:sans-serif; font-size:42px; font-weight:900; color:#fff; text-shadow:0 0 25px rgba(255,255,255,0.8); letter-spacing:2px; animation: cbBadgeBounce 1.5s infinite; text-align:center; z-index:9999999; width:100%; transition:all 0.5s ease; }
+        .cb-win-text { color:#F1BF00; text-shadow:0 0 35px rgba(241,191,0,1); transform:translateX(-50%) scale(1.1); }
+        
+        .cb-badge-container { position:fixed; top:25px; right:25px; z-index:9999999; display:flex; align-items:center; gap:10px; padding:8px 16px 8px 12px; border-radius:50px; 
+            /* Animated Gradient Background */
+            background: linear-gradient(270deg, rgba(255,255,255,0.95), rgba(241,191,0,0.4), rgba(117,170,219,0.3), rgba(255,255,255,0.95));
+            background-size: 300% 300%;
+            backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:2px solid #fff; box-shadow:0 8px 25px rgba(0,0,0,0.3); transition:all 1.2s cubic-bezier(0.25,1,0.5,1); cursor:pointer; overflow:hidden; -webkit-tap-highlight-color:transparent; 
+        }
+        
+        /* State 1: Center Stage (Full screen intro) */
+        .cb-badge-container.center-stage { top:50%; right:50%; transform:translate(50%, -50%) scale(3.5); background:transparent; border:none; box-shadow:none; padding:0; gap:6px; pointer-events:none; }
+        
+        /* State 3: Expanded (Fully open in corner) */
+        .cb-badge-container.expanded { animation: cbBadgeBounce 3s ease-in-out infinite, bgGradientPan 6s ease infinite; }
+        
+        /* State 4: Collapsed (Clicked mode) */
+        .cb-badge-container.collapsed { padding:6px; gap:0; animation: cbBlinkGlow 1.2s infinite ease-in-out, bgGradientPan 4s ease infinite; background:rgba(255,255,255,0.95); }
+        .cb-badge-container.collapsed .hide-collapsed { display:none !important; }
+        
+        .cb-flag-circ { width:30px; height:30px; border-radius:50%; border:2px solid #fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 2px 5px rgba(0,0,0,0.3); flex-shrink:0; transition:all 0.5s ease; }
+        
+        /* Spain & Argentina Colors */
+        .spain-red { flex:1; background:#AA151B; } .spain-yel { flex:2; background:#F1BF00; }
+        .arg-blu { flex:1; background:#75AADB; } .arg-whi { flex:1; background:#fff; display:flex; align-items:center; justify-content:center; } .arg-sun { width:6px; height:6px; background:#FDB813; border-radius:50%; }
+        
+        .cb-tag { font-family:sans-serif; font-weight:900; font-size:11px; padding:4px 8px; border-radius:6px; box-shadow:0 2px 4px rgba(0,0,0,0.3); white-space:nowrap; letter-spacing:0.5px; transition:all 0.5s ease;}
+        .tag-gold { background:linear-gradient(to right,#bf953f,#fcf6ba,#b38728,#fbf5b7,#aa771c); color:#000; }
+        .tag-silver { background:linear-gradient(to right,#b0b0b0,#e8e8e8,#969696,#f5f5f5,#b0b0b0); color:#000; }
+        
+        .cb-ball { font-size:22px; animation:cbBallSpin 4s linear infinite; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .cb-flag-group { display:flex; align-items:center; gap:8px; transition:all 0.5s ease; }
+        .cb-vs-text { font-family:sans-serif; font-weight:900; font-size:12px; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.8); margin: 0 2px; transition:opacity 0.3s; }
+        
+        @media (max-width: 600px) {
+            .cb-badge-container.center-stage { transform:translate(50%, -50%) scale(2.5); }
+            .cb-big-text { font-size: 26px; top: 12%; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 2. Create Celebration Overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'cb-overlay';
+    overlay.innerHTML = '<div class="cb-big-text" id="cbMainText">⚔️ FINAL MATCH ⚔️</div>';
+    document.body.appendChild(overlay);
+
+    // 3. Create the Main Badge (Starts with BOTH teams)
+    const badge = document.createElement('div');
+    badge.className = 'cb-badge-container center-stage';
+    badge.innerHTML = `
+        <div class="cb-trophy hide-collapsed">
+            <svg viewBox="0 0 24 30" width="24" height="30" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,0.4))">
+                <defs><linearGradient id="cbgf" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#bf953f"/><stop offset="50%" stop-color="#fcf6ba"/><stop offset="100%" stop-color="#aa771c"/></linearGradient></defs>
+                <path d="M8 26h8l1 4H7z" fill="url(#cbgf)"/><path d="M7.5 27h9v1h-9zM7 29h10v1H7z" fill="#004d00"/><path d="M9 26c0-10-4-14-1-18c0 0 4 7 4 12c0-5 4-12 4-12c3 4-1 8-1 18z" fill="url(#cbgf)"/><circle cx="12" cy="8" r="6" fill="url(#cbgf)"/><path d="M9 6a3 3 0 0 1 5 1a3 3 0 0 1-4 3a3 3 0 0 1-1-4" fill="#fff" opacity="0.3"/>
+            </svg>
+        </div>
+        
+        <!-- Spain Group -->
+        <div class="cb-flag-group cb-spain-grp">
+            <div class="cb-tag tag-gold hide-collapsed cb-spain-tag" style="display:none;">SPAIN WINNER</div>
+            <div class="cb-flag-circ"><div class="spain-red"></div><div class="spain-yel"></div><div class="spain-red"></div></div>
+        </div>
+
+        <!-- VS Text -->
+        <div class="cb-vs-text hide-collapsed">VS</div>
+
+        <!-- Argentina Group -->
+        <div class="cb-flag-group cb-arg-grp">
+            <div class="cb-tag tag-silver hide-collapsed cb-arg-tag" style="display:none;">ARG 2ND</div>
+            <div class="cb-flag-circ"><div class="arg-blu"></div><div class="arg-whi"><div class="arg-sun"></div></div><div class="arg-blu"></div></div>
+        </div>
+
+        <div class="cb-ball hide-collapsed">⚽</div>
+    `;
+    document.body.appendChild(badge);
+
+    // 4. State Variables & Logic
+    let isCollapsed = false;
+    let isSpainTurn = true;
+    let introDone = false;
+    
+    const spainGrp = badge.querySelector('.cb-spain-grp');
+    const argGrp = badge.querySelector('.cb-arg-grp');
+    const vsText = badge.querySelector('.cb-vs-text');
+    const spainTag = badge.querySelector('.cb-spain-tag');
+    const argTag = badge.querySelector('.cb-arg-tag');
+    const mainText = document.getElementById('cbMainText');
+
+    // Logic for the 1-minute toggle in the corner
+    function updateVisibility() {
+        if(!introDone) return;
+        
+        if(isCollapsed) {
+            spainGrp.style.display = isSpainTurn ? 'flex' : 'none';
+            argGrp.style.display = isSpainTurn ? 'none' : 'flex';
+        } else {
+            spainGrp.style.display = 'flex';
+            argGrp.style.display = 'flex';
+        }
+    }
+
+    setInterval(() => {
+        isSpainTurn = !isSpainTurn;
+        updateVisibility();
+    }, 60000); // 1 minute toggle
+
+    badge.onclick = function() {
+        if(!introDone) return;
+        isCollapsed = !isCollapsed;
+        this.classList.toggle('collapsed', isCollapsed);
+        this.classList.toggle('expanded', !isCollapsed);
+        updateVisibility();
+    };
+
+    // 5. Celebration Storyline Animation
+    
+    // Phase 1: At 2 seconds, declare Spain Winner
+    setTimeout(() => {
+        mainText.innerHTML = '🏆 SPAIN WINS! 🏆';
+        mainText.classList.add('cb-win-text');
+        
+        vsText.style.display = 'none'; // Hide VS
+        
+        // Make Argentina look defeated (dimmed and scaled down)
+        argGrp.style.opacity = '0.3';
+        argGrp.style.transform = 'scale(0.85)';
+        
+        // Phase 2: At 4 seconds, fly to the corner
+        setTimeout(() => {
+            overlay.style.opacity = '0'; // Fade out dark background
+            badge.classList.remove('center-stage'); // CSS transitions it to top-right
+            
+            // Phase 3: Arrived in corner. Cleanup and activate gradient mode
+            setTimeout(() => {
+                overlay.remove(); // Remove overlay completely
+                introDone = true;
+                
+                // Un-dim Argentina & show texts now that it's in the corner
+                argGrp.style.opacity = '1';
+                argGrp.style.transform = 'scale(1)';
+                spainTag.style.display = 'block';
+                argTag.style.display = 'block';
+                
+                badge.classList.add('expanded'); // Start animated gradient
+                
+                updateVisibility(); 
+            }, 1200); // Match CSS fly time
+            
+        }, 2000); 
+
+    }, 2000); 
+
+})();
 </script>
+
+<!-- ========================================================================= -->
+<!-- ⚠️ COPY ONLY THE SCRIPT ABOVE THIS LINE TO YOUR OWN WEB PAGE ⚠️ -->
+<!-- ========================================================================= -->
 </body>
 </html>
