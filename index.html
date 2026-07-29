@@ -326,9 +326,313 @@ body { font-family:var(--font-body); color:var(--text-main); min-height:100vh; b
 <!-- ========================================================================= -->
 <!-- ⚠️ COPY ONLY THE SCRIPT BELOW THIS LINE TO YOUR OWN WEB PAGE ⚠️ -->
 <!-- ========================================================================= -->
-<style>#pranto-chatbot-container{position:fixed;bottom:25px;right:25px;z-index:999999;display:flex;flex-direction:column;align-items:flex-end;font-family:'Inter',sans-serif}#pranto-chat-btn{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#8b5cf6);color:#fff;display:flex;justify-content:center;align-items:center;font-size:26px;cursor:pointer;box-shadow:0 5px 20px rgba(99,102,241,.4);border:none;outline:0;transition:transform .3s cubic-bezier(.175,.885,.32,1.275),box-shadow .3s;z-index:2}#pranto-chat-btn:hover{transform:scale(1.1);box-shadow:0 8px 25px rgba(99,102,241,.5)}#pranto-chat-window{width:350px;height:500px;max-height:calc(100vh - 100px);background:#fff;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.15);display:flex;flex-direction:column;overflow:hidden;margin-bottom:15px;opacity:0;transform:translateY(20px) scale(.95);pointer-events:none;transition:all .3s cubic-bezier(.175,.885,.32,1.275);transform-origin:bottom right;border:1px solid rgba(0,0,0,.05)}#pranto-chat-window.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all}.pcw-header{background:linear-gradient(135deg,#4f46e5,#8b5cf6);padding:15px 20px;color:#fff;display:flex;justify-content:space-between;align-items:center}.pcw-header-info{display:flex;align-items:center;gap:10px}.pcw-avatar{width:35px;height:35px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:18px}.pcw-title{margin:0;font-size:16px;font-weight:600;line-height:1.2}.pcw-subtitle{margin:0;font-size:11px;opacity:.8}.pcw-actions{display:flex;gap:10px}.pcw-action-btn{background:0 0;border:none;color:#fff;cursor:pointer;font-size:16px;opacity:.8;transition:opacity .2s,transform .2s;padding:0}.pcw-action-btn:hover{opacity:1;transform:scale(1.1)}.pcw-messages{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:15px;background:#f8fafc}.pcw-messages::-webkit-scrollbar{width:6px}.pcw-messages::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:10px}.pcw-msg{max-width:85%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.4;animation:pcwFadeIn .3s ease;position:relative;word-wrap:break-word}@keyframes pcwFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.pcw-msg-user{background:#4f46e5;color:#fff;align-self:flex-end;border-bottom-right-radius:4px;box-shadow:0 2px 10px rgba(79,70,229,.2)}.pcw-msg-bot{background:#fff;color:#334155;align-self:flex-start;border-bottom-left-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.02)}.pcw-msg-bot p{margin:0 0 8px 0}.pcw-msg-bot p:last-child{margin:0}.pcw-msg-bot strong{font-weight:700;color:#1e293b}.pcw-msg-bot ol,.pcw-msg-bot ul{margin:5px 0;padding-left:20px}.pcw-input-area{padding:15px;background:#fff;border-top:1px solid rgba(0,0,0,.05);display:flex;gap:10px;align-items:flex-end}.pcw-textarea{flex:1;background:#f1f5f9;border:1px solid rgba(0,0,0,.05);border-radius:20px;padding:12px 15px;font-family:inherit;font-size:14px;resize:none;max-height:100px;min-height:44px;outline:0;transition:border-color .2s;color:#334155}.pcw-textarea:focus{border-color:#4f46e5;background:#fff}.pcw-send-btn{width:44px;height:44px;border-radius:50%;background:#4f46e5;color:#fff;border:none;display:flex;justify-content:center;align-items:center;cursor:pointer;transition:background .2s,transform .2s;flex-shrink:0;font-size:16px}.pcw-send-btn:hover{background:#4338ca;transform:scale(1.05)}.pcw-send-btn:disabled{background:#cbd5e1;cursor:not-allowed;transform:none}.pcw-typing{display:flex;gap:4px;padding:5px 0}.pcw-dot{width:6px;height:6px;background:#94a3b8;border-radius:50%;animation:pcwBounce 1.4s infinite ease-in-out both}.pcw-dot:nth-child(1){animation-delay:-.32s}.pcw-dot:nth-child(2){animation-delay:-.16s}@keyframes pcwBounce{0%,100%,80%{transform:scale(0)}40%{transform:scale(1)}}@media (max-width:480px){#pranto-chat-window{width:calc(100vw - 40px);bottom:90px;right:20px;position:fixed}}</style>
-<div id="pranto-chatbot-container"><div id="pranto-chat-window"><div class="pcw-header"><div class="pcw-header-info"><div class="pcw-avatar">✨</div><div><h3 class="pcw-title">AI Assistant</h3><p class="pcw-subtitle">Powered by Gemini</p></div></div><div class="pcw-actions"><button class="pcw-action-btn" id="pcw-clear-btn" title="New Chat">🗑️</button><button class="pcw-action-btn" id="pcw-close-btn" title="Close">✖</button></div></div><div class="pcw-messages" id="pcw-messages"></div><div class="pcw-input-area"><textarea id="pcw-input" class="pcw-textarea" placeholder="Ask me anything..." rows="1"></textarea><button id="pcw-send" class="pcw-send-btn">➤</button></div></div><button id="pranto-chat-btn">💬</button></div>
-<script>!function(){const KEY="AQ.Ab8RN6KaB-pkX_d-xpszcof-f_dVubvbWgCeMh_Ow1XdefgZVg";const isSet=KEY!=="YOUR_API_KEY_HERE"&&KEY.trim()!=="";const btn=document.getElementById('pranto-chat-btn'),win=document.getElementById('pranto-chat-window'),cls=document.getElementById('pcw-close-btn'),clr=document.getElementById('pcw-clear-btn'),msgCnt=document.getElementById('pcw-messages'),inp=document.getElementById('pcw-input'),snd=document.getElementById('pcw-send');let open=!1,hist=[];function init(){load();0===hist.length?(addB("Hi there! 👋 I'm your AI assistant. How can I help you today?"),isSet||setTimeout(()=>addB("⚠️ **Note:** API Key not configured."),500)):render();scrl()}function tgl(){open=!open;open?(win.classList.add('open'),btn.innerHTML='✖',setTimeout(()=>inp.focus(),300)):(win.classList.remove('open'),btn.innerHTML='💬')}btn.addEventListener('click',tgl);cls.addEventListener('click',tgl);inp.addEventListener('input',function(){this.style.height='auto';this.style.height=(this.scrollHeight<100?this.scrollHeight:100)+'px';''===this.value.trim()&&(this.style.height='44px')});function send(){const t=inp.value.trim();if(!t)return;inp.value='';inp.style.height='44px';inp.focus();addU(t);hist.push({role:"user",parts:[{text:t}]});sav();if(!isSet){shwT();setTimeout(()=>{rmvT();const e="Please configure API Key.";addB(e);hist.push({role:"model",parts:[{text:e}]});sav()},1e3);return}shwT();snd.disabled=!0;cAPI()}inp.addEventListener('keypress',e=>{'Enter'!==e.key||e.shiftKey||(e.preventDefault(),send())});snd.addEventListener('click',send);clr.addEventListener('click',()=>{confirm("Clear history?")&&(hist=[],sav(),msgCnt.innerHTML='',addB("Chat cleared."))});async function cAPI(){const p={contents:hist,tools:[{googleSearch:{}}]};const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${KEY}`;try{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'API Error')}const d=await r.json();const b=d.candidates?.[0]?.content?.parts?.[0]?.text;if(b){rmvT();addB(b);hist.push({role:"model",parts:[{text:b}]});sav()}else throw new Error("No text")}catch(e){rmvT();addB("Error: "+e.message)}finally{snd.disabled=!1}}function addU(t){const d=document.createElement('div');d.className='pcw-msg pcw-msg-user';d.innerText=t;msgCnt.appendChild(d);scrl()}function addB(t){const d=document.createElement('div');d.className='pcw-msg pcw-msg-bot';d.innerHTML=prs(t);msgCnt.appendChild(d);scrl()}function shwT(){const d=document.createElement('div');d.className='pcw-msg pcw-msg-bot pcw-typing-indicator';d.innerHTML='<div class="pcw-typing"><div class="pcw-dot"></div><div class="pcw-dot"></div><div class="pcw-dot"></div></div>';d.id='pcw-typing';msgCnt.appendChild(d);scrl()}function rmvT(){const t=document.getElementById('pcw-typing');t&&t.remove()}function scrl(){msgCnt.scrollTop=msgCnt.scrollHeight}function prs(t){let h=t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`(.*?)`/g,'<code style="background:#f1f5f9;padding:2px 4px;border-radius:4px;font-family:monospace;font-size:0.9em;">$1</code>').replace(/\[(.*?)\]\((.*?)\)/g,'<a href="$2" target="_blank" style="color:#4f46e5;">$1</a>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');h=h.replace(/(?:<br>|^)- (.*?)(?=<br>- |<\/p>|$)/g,'<li>$1</li>');h.includes('<li>')&&(h=h.replace(/(<li>.*<\/li>)/s,'<ul>$1</ul>'));return`<p>${h}</p>`}function sav(){try{sessionStorage.setItem('p_chat',JSON.stringify(hist))}catch(e){}}function load(){try{const s=sessionStorage.getItem('p_chat');s&&(hist=JSON.parse(s))}catch(e){}}function render(){msgCnt.innerHTML='';hist.forEach(m=>{const t=m.parts[0].text;'user'===m.role?addU(t):addB(t)})}init()}();</script>
+
+<style>
+/* --- CHATBOT WIDGET STYLES --- */
+#pranto-chatbot-container { position: fixed; bottom: 25px; right: 25px; z-index: 999999; display: flex; flex-direction: column; align-items: flex-end; font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+#pranto-chat-btn { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #8b5cf6); color: white; display: flex; justify-content: center; align-items: center; font-size: 26px; cursor: pointer; box-shadow: 0 5px 20px rgba(99,102,241,0.4); border: none; outline: none; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; z-index: 2; }
+#pranto-chat-btn:hover { transform: scale(1.1); box-shadow: 0 8px 25px rgba(99,102,241,0.5); }
+
+#pranto-chat-window { width: 350px; height: 500px; max-height: calc(100vh - 100px); background: #ffffff; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; margin-bottom: 15px; opacity: 0; transform: translateY(20px) scale(0.95); pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: bottom right; border: 1px solid rgba(0,0,0,0.05); }
+#pranto-chat-window.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+
+.pcw-header { background: linear-gradient(135deg, #4f46e5, #8b5cf6); padding: 15px 20px; color: white; display: flex; justify-content: space-between; align-items: center; border-radius: 20px 20px 0 0; }
+.pcw-header-info { display: flex; align-items: center; gap: 10px; }
+.pcw-avatar { width: 35px; height: 35px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+.pcw-title { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.2; }
+.pcw-subtitle { margin: 0; font-size: 11px; opacity: 0.8; }
+.pcw-actions { display: flex; gap: 10px; }
+.pcw-action-btn { background: transparent; border: none; color: white; cursor: pointer; font-size: 16px; opacity: 0.8; transition: opacity 0.2s, transform 0.2s; padding: 0; }
+.pcw-action-btn:hover { opacity: 1; transform: scale(1.1); }
+
+.pcw-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #f8fafc; }
+.pcw-messages::-webkit-scrollbar { width: 6px; }
+.pcw-messages::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+.pcw-msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; animation: pcwFadeIn 0.3s ease; position: relative; word-wrap: break-word; }
+@keyframes pcwFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.pcw-msg-user { background: #4f46e5; color: white; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 2px 10px rgba(79,70,229,0.2); }
+.pcw-msg-bot { background: #ffffff; color: #334155; align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02); }
+.pcw-msg-bot p { margin: 0 0 8px 0; } .pcw-msg-bot p:last-child { margin: 0; }
+.pcw-msg-bot strong { font-weight: 700; color: #1e293b; }
+.pcw-msg-bot ul, .pcw-msg-bot ol { margin: 5px 0; padding-left: 20px; }
+
+.pcw-input-area { padding: 15px; background: white; border-top: 1px solid rgba(0,0,0,0.05); display: flex; gap: 10px; align-items: flex-end; }
+.pcw-textarea { flex: 1; background: #f1f5f9; border: 1px solid rgba(0,0,0,0.05); border-radius: 20px; padding: 12px 15px; font-family: inherit; font-size: 14px; resize: none; max-height: 100px; min-height: 44px; outline: none; transition: border-color 0.2s; color: #334155; }
+.pcw-textarea:focus { border-color: #4f46e5; background: #ffffff; }
+.pcw-send-btn { width: 44px; height: 44px; border-radius: 50%; background: #4f46e5; color: white; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: background 0.2s, transform 0.2s; flex-shrink: 0; font-size: 16px; }
+.pcw-send-btn:hover { background: #4338ca; transform: scale(1.05); }
+.pcw-send-btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+
+.pcw-typing { display: flex; gap: 4px; padding: 5px 0; }
+.pcw-dot { width: 6px; height: 6px; background: #94a3b8; border-radius: 50%; animation: pcwBounce 1.4s infinite ease-in-out both; }
+.pcw-dot:nth-child(1) { animation-delay: -0.32s; } .pcw-dot:nth-child(2) { animation-delay: -0.16s; }
+@keyframes pcwBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+@media (max-width: 480px) {
+  #pranto-chat-window { width: calc(100vw - 40px); bottom: 90px; right: 20px; position: fixed; }
+}
+</style>
+
+<!-- Widget HTML -->
+<div id="pranto-chatbot-container">
+    <div id="pranto-chat-window">
+        <div class="pcw-header">
+            <div class="pcw-header-info">
+                <div class="pcw-avatar">✨</div>
+                <div>
+                    <h3 class="pcw-title">AI Assistant</h3>
+                    <p class="pcw-subtitle">Powered by Gemini</p>
+                </div>
+            </div>
+            <div class="pcw-actions">
+                <button class="pcw-action-btn" id="pcw-clear-btn" title="New Chat">🗑️</button>
+                <button class="pcw-action-btn" id="pcw-close-btn" title="Close">✖</button>
+            </div>
+        </div>
+        <div class="pcw-messages" id="pcw-messages">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="pcw-input-area">
+            <textarea id="pcw-input" class="pcw-textarea" placeholder="Ask me anything..." rows="1"></textarea>
+            <button id="pcw-send" class="pcw-send-btn">➤</button>
+        </div>
+    </div>
+    <button id="pranto-chat-btn">💬</button>
+</div>
+
+<!-- Widget Logic -->
+<script>
+(function() {
+    // ⚠️ API KEY ⚠️
+    const API_KEY = "AQ.Ab8RN6KaB-pkX_d-xpszcof-f_dVubvbWgCeMh_Ow1XdefgZVg"; 
+    
+    const isApiConfigured = API_KEY !== "YOUR_API_KEY_HERE" && API_KEY.trim() !== "";
+
+    // DOM Elements
+    const chatBtn = document.getElementById('pranto-chat-btn');
+    const chatWindow = document.getElementById('pranto-chat-window');
+    const closeBtn = document.getElementById('pcw-close-btn');
+    const clearBtn = document.getElementById('pcw-clear-btn');
+    const msgContainer = document.getElementById('pcw-messages');
+    const inputField = document.getElementById('pcw-input');
+    const sendBtn = document.getElementById('pcw-send');
+
+    // State
+    let isChatOpen = false;
+    let chatHistory = [];
+
+    // Setup
+    function init() {
+        loadHistory();
+        if(chatHistory.length === 0) {
+            addBotMessage("Hi there! 👋 I'm your AI assistant. How can I help you today?");
+            if(!isApiConfigured) {
+                setTimeout(() => {
+                    addBotMessage("⚠️ **Note:** My API Key is not configured yet. I won't be able to answer until you add your Gemini API Key in the code.");
+                }, 500);
+            }
+        } else {
+            renderHistory();
+        }
+        scrollToBottom();
+    }
+
+    // Toggle Window
+    function toggleChat() {
+        isChatOpen = !isChatOpen;
+        if(isChatOpen) {
+            chatWindow.classList.add('open');
+            chatBtn.innerHTML = '✖';
+            setTimeout(() => inputField.focus(), 300);
+        } else {
+            chatWindow.classList.remove('open');
+            chatBtn.innerHTML = '💬';
+        }
+    }
+
+    chatBtn.addEventListener('click', toggleChat);
+    closeBtn.addEventListener('click', toggleChat);
+
+    // Auto-resize textarea
+    inputField.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight < 100 ? this.scrollHeight : 100) + 'px';
+        if(this.value.trim() === '') this.style.height = '44px';
+    });
+
+    // Send Message
+    function sendMessage() {
+        const text = inputField.value.trim();
+        if(!text) return;
+
+        // Reset input
+        inputField.value = '';
+        inputField.style.height = '44px';
+        inputField.focus();
+
+        // 1. Add User Message
+        addUserMessage(text);
+        chatHistory.push({ role: "user", parts: [{ text: text }] });
+        saveHistory();
+        
+        if(!isApiConfigured) {
+            showTyping();
+            setTimeout(() => {
+                removeTyping();
+                const errText = "Please configure your Gemini API Key in the code first.";
+                addBotMessage(errText);
+                chatHistory.push({ role: "model", parts: [{ text: errText }] });
+                saveHistory();
+            }, 1000);
+            return;
+        }
+
+        showTyping();
+        sendBtn.disabled = true;
+
+        callGeminiAPI(text);
+    }
+
+    inputField.addEventListener('keypress', (e) => {
+        if(e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    // Clear History
+    clearBtn.addEventListener('click', () => {
+        if(confirm("Are you sure you want to clear the chat history?")) {
+            chatHistory = [];
+            saveHistory();
+            msgContainer.innerHTML = '';
+            addBotMessage("Chat history cleared. How can I help you?");
+        }
+    });
+
+    // API Call (UPDATED MODEL)
+    async function callGeminiAPI(prompt) {
+        const payload = {
+            contents: chatHistory
+        };
+
+        // KEY CHANGE: gemini-3.5-flash is the currently supported model for v1beta endpoints.
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${API_KEY}`;
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if(!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || 'API Error');
+            }
+
+            const data = await response.json();
+            const botReply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if(botReply) {
+                removeTyping();
+                addBotMessage(botReply);
+                chatHistory.push({ role: "model", parts: [{ text: botReply }] });
+                saveHistory();
+            } else {
+                throw new Error("No text in response");
+            }
+
+        } catch (error) {
+            console.error("Gemini API Error:", error);
+            removeTyping();
+            const errorMsg = "Sorry, I encountered an error: " + error.message;
+            addBotMessage(errorMsg);
+        } finally {
+            sendBtn.disabled = false;
+        }
+    }
+
+    // UI Helpers
+    function addUserMessage(text) {
+        const div = document.createElement('div');
+        div.className = 'pcw-msg pcw-msg-user';
+        div.innerText = text;
+        msgContainer.appendChild(div);
+        scrollToBottom();
+    }
+
+    function addBotMessage(text) {
+        const div = document.createElement('div');
+        div.className = 'pcw-msg pcw-msg-bot';
+        div.innerHTML = parseMarkdown(text);
+        msgContainer.appendChild(div);
+        scrollToBottom();
+    }
+
+    function showTyping() {
+        const div = document.createElement('div');
+        div.className = 'pcw-msg pcw-msg-bot pcw-typing-indicator';
+        div.innerHTML = '<div class="pcw-typing"><div class="pcw-dot"></div><div class="pcw-dot"></div><div class="pcw-dot"></div></div>';
+        div.id = 'pcw-typing';
+        msgContainer.appendChild(div);
+        scrollToBottom();
+    }
+
+    function removeTyping() {
+        const typing = document.getElementById('pcw-typing');
+        if(typing) typing.remove();
+    }
+
+    function scrollToBottom() {
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+    }
+
+    // Markdown Parser
+    function parseMarkdown(text) {
+        let html = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/`(.*?)`/g, '<code style="background:#f1f5f9;padding:2px 4px;border-radius:4px;font-family:monospace;font-size:0.9em;">$1</code>')
+            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color:#4f46e5;">$1</a>')
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/\n/g, '<br>');
+            
+        html = html.replace(/(?:<br>|^)- (.*?)(?=<br>- |<\/p>|$)/g, '<li>$1</li>');
+        if(html.includes('<li>')) {
+            html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+        }
+
+        return `<p>${html}</p>`;
+    }
+
+    function saveHistory() {
+        try { sessionStorage.setItem('pranto_chat_history', JSON.stringify(chatHistory)); } catch(e) {}
+    }
+
+    function loadHistory() {
+        try {
+            const saved = sessionStorage.getItem('pranto_chat_history');
+            if(saved) chatHistory = JSON.parse(saved);
+        } catch(e) {}
+    }
+
+    function renderHistory() {
+        msgContainer.innerHTML = '';
+        chatHistory.forEach(msg => {
+            const text = msg.parts[0].text;
+            if(msg.role === 'user') addUserMessage(text);
+            else addBotMessage(text);
+        });
+    }
+
+    init();
+})();
+</script>
 <!-- ========================================================================= -->
 <!-- ⚠️ COPY ONLY THE SCRIPT ABOVE THIS LINE TO YOUR OWN WEB PAGE ⚠️ -->
 <!-- ========================================================================= -->
