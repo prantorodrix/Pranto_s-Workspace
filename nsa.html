@@ -74,11 +74,9 @@ body { font-family: var(--font-body); color: var(--text-main); min-height: 100vh
 .font-num { font-family: var(--font-num); letter-spacing: -0.5px; }
 .text-gradient { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-/* Glass Panel Styling */
-.glass-panel { background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--card-radius); transition: transform 0.3s ease, box-shadow 0.3s ease; border-bottom: 4px solid rgba(var(--primary-rgb), 0.15); }
-.glass-panel:hover { box-shadow: 0 15px 50px rgba(0,0,0,0.1); transform: translateY(-2px); border-bottom-color: var(--primary); }
+/* Glass Panel Styling (Hover animations removed for performance) */
+.glass-panel { background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--card-radius); border-bottom: 4px solid rgba(var(--primary-rgb), 0.15); }
 [data-bs-theme="dark"] .glass-panel { border-bottom-color: rgba(255,255,255,0.05); }
-[data-bs-theme="dark"] .glass-panel:hover { box-shadow: 0 15px 50px rgba(0,0,0,0.5); border-bottom-color: var(--primary); }
 
 .btn-premium { background: linear-gradient(135deg, var(--primary), #818cf8); color: white !important; border: none; border-radius: 12px; padding: 10px 24px; font-weight: 700; transition: 0.3s; box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3); border-bottom: 3px solid #3730a3; }
 .btn-premium:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.5); filter: brightness(1.1); border-bottom-width: 1px; margin-bottom: 2px; }
@@ -136,10 +134,10 @@ textarea[readonly]:hover { background-color: rgba(var(--primary-rgb), 0.02) !imp
 /* Utility */
 .section-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 10px; display: block; font-weight: 800; font-family: var(--font-head); }
 
-/* Excel Box */
-.excel-box { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); cursor: pointer; transition: 0.3s; }
-.excel-box:hover { background: rgba(16,185,129,0.1); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2); }
-.excel-box.copied-anim { background-color: rgba(16, 185, 129, 0.3) !important; transform: scale(0.98); } 
+/* Excel Box (Hover animations removed for performance) */
+.excel-box { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); cursor: pointer; transition: background-color 0.3s; }
+.excel-box:hover { background: rgba(16,185,129,0.1); }
+.excel-box.copied-anim { background-color: rgba(16, 185, 129, 0.3) !important; transform: scale(0.98); transition: transform 0.1s; } 
 #excel_Copy_Input { background: transparent; border: none; color: #10b981; font-weight: 700; font-family: var(--font-num); font-size: 0.85rem; width: 100%; cursor: pointer; outline: none; }
 [data-bs-theme="dark"] #excel_Copy_Input { color: #34d399; }
 
@@ -152,9 +150,10 @@ textarea[readonly]:hover { background-color: rgba(var(--primary-rgb), 0.02) !imp
 .hl-proc { background: var(--primary); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
 .hl-lon { background: #7e22ce; color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
 
-.time-card { background: var(--input-bg); border-radius: 16px; padding: 15px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(0,0,0,0.05); border-bottom: 3px solid rgba(0,0,0,0.1); transition: .3s; }
+/* Time card (Hover transform removed for performance) */
+.time-card { background: var(--input-bg); border-radius: 16px; padding: 15px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(0,0,0,0.05); border-bottom: 3px solid rgba(0,0,0,0.1); transition: border-color .3s; }
 [data-bs-theme="dark"] .time-card { border-color: rgba(255,255,255,0.05); border-bottom-color: rgba(0,0,0,0.3); }
-.time-card:hover { transform: translateY(-2px); border-bottom-color: var(--primary); }
+.time-card:hover { border-bottom-color: var(--primary); }
 .country-lbl { font-size: 0.7rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
 .date-disp { font-size: 0.85rem; font-weight: 600; color: var(--text-sub); }
 .time-disp { font-family: var(--font-num); font-size: 2rem; font-weight: 800; color: var(--text-main); line-height: 1; letter-spacing: -1px; }
@@ -359,6 +358,7 @@ textarea[readonly]:hover { background-color: rgba(var(--primary-rgb), 0.02) !imp
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     let globalData=null, globalVals={}, manualDate=null;
     const htmlEl=document.documentElement, themeToggle=document.getElementById('t-tog');
@@ -533,7 +533,7 @@ textarea[readonly]:hover { background-color: rgba(var(--primary-rgb), 0.02) !imp
         let n="";
         if(st==="In Review Plan") n=`${dt}>NSA NEG>${nm}>WORKING ON NSA PROJECT. CLAIM # ${globalData.claimNo}, BILLED AMOUNT ${gV('billed')}, ALLOWED AMOUNT ${gV('allowed')}, WITH MENTION THAT CLAIM PROCESSED PER NSA. SENT NSA NEGOTIATION OFFER OF ${gV('offer')}, PER FAIR HEALTH AMOUNT, THROUGH AVAILITY. DISPUTE ID: ${globalData.disputeId}.`;
         else if(st==="System Rejected") n=`${dt}>NSA NEG>${nm}>WORKING ON NSA PROJECT. CLAIM # ${globalData.claimNo}, BILLED AMOUNT ${gV('billed')}, ALLOWED AMOUNT ${gV('allowed')}, WITH MENTION THAT CLAIM PROCESSED PER NSA. SENT NSA NEGOTIATION OFFER OF ${gV('offer')}, AS PER FAIR HEALTH AMOUNT, THROUGH AVAILITY. OFFER IMMEDIATELY REJECTED BY BCBS. PUTTING TICKET ON NSA NEGO TRACKING GOOGLE SHEET TO START IDR PROCESS. DISPUTE ID: ${globalData.disputeId}.`;
-        else if(st==="Offer Rejected") n=`${dt}>NSA NEG>${nm}>WORKING ON NSA PROJECT. CLAIM # ${globalData.claimNo}, BILLED AMOUNT ${gV('billed')}, ALLOWED AMOUNT ${gV('allowed')}, WITH MENTION THAT CLAIM PROCESSED PER NSA. SENT NSA NEGOTIATION OFFER OF ${gV('offer')}, BCBS MADE COUNTER OFFER OF ${gV('counter')}. THROUGH AVAILITY. OFFER REJECTED AS IT IS BELOW FAIR HEALTH AMOUNT. WILL FOLLOW UP TO SEE IF ANOTHER COUNTER NEGOTIATION OFFER WILL BE MADE OR NEED TO START IDR PROCESS. DISPUTE ID: ${globalData.disputeId}.`;
+        else if(st==="Offer Rejected") n=`${dt}>NSA NEG>${nm}>WORKING ON NSA PROJECT. CLAIM # ${globalData.claimNo}, BILLED AMOUNT ${gV('billed')}, ALLOWED AMOUNT ${gV('allowed')}, WITH MENTION THAT CLAIM PRO শকCESSED PER NSA. SENT NSA NEGOTIATION OFFER OF ${gV('offer')}, BCBS MADE COUNTER OFFER OF ${gV('counter')}. THROUGH AVAILITY. OFFER REJECTED AS IT IS BELOW FAIR HEALTH AMOUNT. WILL FOLLOW UP TO SEE IF ANOTHER COUNTER NEGOTIATION OFFER WILL BE MADE OR NEED TO START IDR PROCESS. DISPUTE ID: ${globalData.disputeId}.`;
         else if(st==="Accepted") n=`${dt}>NSA ACCEPTED>${nm}>WORKING ON NSA PROJECT. CLAIM # ${globalData.claimNo}, BILLED AMOUNT ${gV('billed')}, ALLOWED AMOUNT ${gV('allowed')}, WITH MENTION THAT CLAIM PROCESSED PER NSA. SENT NSA NEGOTIATION OFFER OF ${gV('offer')}, AS PAR FAIR HEALTH AMOUNT. THROUGH AVAILITY. COUNTER OFFER ${gV('counter')}. WE ACCEPT IT. WILL WAIT FOR PAYMENT TO POST BEFORE SENDING FOR ADJUSTMENT. DISPUTE ID: ${globalData.disputeId}.`;
         
         const out=document.getElementById('note_Output_NSA');
