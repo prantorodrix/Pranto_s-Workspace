@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
@@ -333,7 +334,7 @@ body { font-family:var(--font-body); color:var(--text-main); min-height:100vh; b
 #pranto-chat-btn { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #8b5cf6); color: white; display: flex; justify-content: center; align-items: center; font-size: 26px; cursor: pointer; box-shadow: 0 5px 20px rgba(99,102,241,0.4); border: none; outline: none; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; z-index: 2; }
 #pranto-chat-btn:hover { transform: scale(1.1); box-shadow: 0 8px 25px rgba(99,102,241,0.5); }
 
-#pranto-chat-window { width: 450px; height: 550px; max-height: calc(100vh - 100px); background: #1e293b; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; margin-bottom: 15px; opacity: 0; transform: translateY(20px) scale(0.95); pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: bottom right; border: 1px solid rgba(255,255,255,0.05); }
+#pranto-chat-window { width: 600px; height: 550px; max-height: calc(100vh - 100px); background: #1e293b; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; margin-bottom: 15px; opacity: 0; transform: translateY(20px) scale(0.95); pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: bottom right; border: 1px solid rgba(255,255,255,0.05); }
 #pranto-chat-window.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
 
 .pcw-header { background: linear-gradient(135deg, #4f46e5, #8b5cf6); padding: 15px 20px; color: white; display: flex; justify-content: space-between; align-items: center; border-radius: 20px 20px 0 0; }
@@ -410,7 +411,7 @@ body { font-family:var(--font-body); color:var(--text-main); min-height:100vh; b
 <script>
 (function() {
     // ⚠️ API KEY ⚠️
-    const API_KEY = "AQ.Ab8RN6JmoOaL1zgz-nlgIPHYNAkth4sQkebeVYatyU9WcKiLew"; 
+    const API_KEY = "AQ.Ab8RN6LwQ2WoBArIA-YGxGsf8R9YsBEt32xR1ia41gmZszsZIg"; 
     
     const isApiConfigured = API_KEY !== "YOUR_API_KEY_HERE" && API_KEY.trim() !== "";
 
