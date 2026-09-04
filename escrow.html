@@ -5,34 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pranto's Workspace - Escrow & Tracking</title>
     
-    <!-- সিকিউরিটি চেক: শুধু index.html থেকে আসলেই ওপেন হবে -->
-    <script>
-        if (sessionStorage.getItem('auth_escrow_access') !== 'true') {
-            try {
-                if (!window.location.href.startsWith('blob:')) {
-                    window.location.replace('index.html');
-                }
-            } catch (error) {
-                console.warn("Redirect blocked in preview mode.");
-            }
-            
-            document.addEventListener('DOMContentLoaded', function() {
-                document.body.innerHTML = `
-                    <div style="height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #f8fafc; font-family: 'Inter', sans-serif;">
-                        <div style="background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); text-align: center; border: 1px solid #fee2e2; max-width: 400px;">
-                            <div style="background: #fee2e2; color: #ef4444; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; font-size: 24px;">
-                                <i class="fa-solid fa-lock"></i>
-                            </div>
-                            <h2 style="color: #1e293b; font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;">Access Denied</h2>
-                            <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 1.5rem; line-height: 1.5;">You cannot access this page directly for security reasons. Please enter through the main dashboard.</p>
-                            <a href="index.html" style="display: inline-block; background-color: #2563eb; color: white; padding: 0.5rem 1.5rem; border-radius: 6px; text-decoration: none; font-size: 0.875rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">Go to Dashboard</a>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-    </script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
