@@ -288,6 +288,9 @@
             if(!fileSingle) return alert("Please upload a base file.");
             if(tickets.length === 0) return alert("Please paste ticket numbers.");
 
+            const btn = document.getElementById('btnGenerateSingle');
+            const status = document.getElementById('statusSingle');
+
             btn.disabled = true; btn.style.opacity = '0.7';
             status.innerHTML = `<span class="text-blue-500"><i class="fa-solid fa-spinner fa-spin"></i> Processing...</span>`;
 
