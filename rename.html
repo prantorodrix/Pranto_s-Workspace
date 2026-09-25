@@ -273,13 +273,15 @@
 
         function updateCountSingle() {
             const text = document.getElementById('ticketsSingle').value;
-            const count = text.split('\n').map(t=>t.trim()).filter(t=>t!=="").length;
+            // Updated to split by newline, comma, or spaces
+            const count = text.split(/[\n,\s]+/).map(t=>t.trim()).filter(t=>t!=="").length;
             document.getElementById('countSingle').textContent = count;
         }
 
         async function processSingle() {
             const ticketsText = document.getElementById('ticketsSingle').value;
-            const tickets = ticketsText.split('\n').map(t=>t.trim()).filter(t=>t!=="");
+            // Updated to split by newline, comma, or spaces
+            const tickets = ticketsText.split(/[\n,\s]+/).map(t=>t.trim()).filter(t=>t!=="");
             const status = document.getElementById('statusSingle');
             const btn = document.getElementById('btnGenerateSingle');
 
