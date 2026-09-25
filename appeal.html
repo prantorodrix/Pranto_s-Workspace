@@ -530,7 +530,7 @@
         const outputAppeal = document.getElementById('note_Output_Appeal');
         if(appLvl) {
             const lvlTxt = appLvl === "1ST APPEAL" ? "1ST LEVEL APPEAL" : "2ND LEVEL APPEAL";
-            let note = `${dateStr}>${appLvl}>${nm}>CLAIM NO #${globalData.claimNo}; BILLED AMOUNT ${formatCurrency(globalVals.billed)}, INS PAID ${formatCurrency(globalVals.paid)}, CO-INSURANCE ${formatCurrency(globalVals.coins)}, CO-PAY/DED ${formatCurrency(globalVals.ded)}. THE CLAIM PROCESS ACCORDING TO THE MEMBERS PLAN AT THE HIGHEST IN NETWORK LEVEL. NO ADDITIONAL PAYMENT WILL BE FORTHCOMING MAILED ${lvlTxt} TO BCBS REQUESTING THE CLAIM TO BE RECONSIDERED AT A HIGHER LEVEL UTILIZING THE UCR RATE ACCORDING THE RENDERING ZIP CODE OR AT 87% OF BILLED CHARGES. LOW ALLOWABLE APPEAL SENT TO BCBS LOCAL PLAN.`;
+            let note = `${dateStr}>${appLvl}>${nm}>CLAIM NO #${globalData.claimNo}; BILLED AMOUNT ${formatCurrency(globalVals.billed)}, INS PAID ${formatCurrency(globalVals.paid)}, CO-INSURANCE ${formatCurrency(globalVals.coins)}, CO-PAY/DED ${formatCurrency(globalVals.ded)}. MAILED ${lvlTxt} TO BCBS REQUESTING THE CLAIM TO BE RECONSIDERED AT A HIGHER LEVEL UTILIZING THE UCR RATE ACCORDING THE RENDERING ZIP CODE OR AT 87% OF BILLED CHARGES. LOW ALLOWABLE APPEAL SENT TO BCBS LOCAL PLAN.`;
             outputAppeal.value = note;
         }
 
