@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pranto's Bulk IDR Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+/* --- CORE VARIABLES --- */
+:root {
+ --f:'Outfit',sans-serif; --mono:'Rajdhani',monospace; --nav-h:70px;
+ --pri:#6366f1; --sec:#0ea5e9; --txt:#334155; --txt-l:#64748b;
+ --bg-body: #f8fafc; 
+ --bg-grad: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+ --glass: rgba(255, 255, 255, 0.9); --blur: 20px; 
+ --bor: 1px solid rgba(255, 255, 255, 0.6); 
+ --sh: 0 10px 30px rgba(0,0,0,0.04);
+ --card-bg: #ffffff;
+ --nav-bg: rgba(255, 255, 255, 0.95);
+ --input-bg: #ffffff;
+ --adj-bg: #f1f5f9; --adj-txt: #334155;
+}
+[data-bs-theme="dark"] {
+ --txt:#f1f5f9; --txt-l:#94a3b8; 
+ --bg-body: #0f172a;
+ --bg-grad: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+ --glass: rgba(30, 41, 59, 0.9); 
+ --bor: 1px solid rgba(255, 255, 255, 0.1);
+ --card-bg: rgba(30, 41, 59, 0.7);
+ --nav-bg: rgba(15, 23, 42, 0.9);
+ --input-bg: rgba(0, 0, 0, 0.2);
+ --adj-bg: rgba(255,255,255,0.05); --adj-txt: #e2e8f0;
+}
+
+body {
+    font-family: var(--f); background: var(--bg-grad);
+    margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; color: var(--txt);
+    transition: background 0.3s ease;
+}
+
+/* --- NAVBAR --- */
+#nav {
+    position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
+    width: 96%; max-width: 1400px; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 1.5rem; z-index: 1100;
+    background: var(--nav-bg); backdrop-filter: blur(var(--blur));
+    border: var(--bor); border-radius: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+.brand { font-size: 1.2rem; font-weight: 700; background: linear-gradient(90deg, var(--pri), var(--sec)); -webkit-background-clip: text; color: transparent; }
+.n-rt { display: flex; align-items: center; gap: 10px; }
+.btn-nav-act { border: none; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; color: white; transition: .2s; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.btn-ext { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.btn-clr { background: linear-gradient(135deg, #ef4444, #f43f5e); }
+.btn-nav-act:hover { transform: translateY(-1px); filter: brightness(110%); }
+.t-btn { width: 34px; height: 34px; border-radius: 50%; border: var(--bor); background: transparent; color: var(--txt); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+/* LAYOUT */
+#wrap { display: flex; margin-top: 85px; height: calc(100vh - 85px); }
+#sb { width: 280px; background: var(--glass); border-right: var(--bor); backdrop-filter: blur(15px); display: flex; flex-direction: column; margin-left: 15px; border-radius: 20px 0 0 20px; margin-bottom: 15px; box-shadow: var(--sh); height: calc(100vh - 100px); }
+#sb-c { flex: 1; overflow-y: auto; padding: 1rem; }
+#main { flex: 1; padding: 0 1.5rem 1.5rem 1.5rem; overflow-y: auto; display: flex; flex-direction: column; }
+
+/* COMPONENTS */
+.card { background: var(--card-bg); border: var(--bor); border-radius: 16px; box-shadow: var(--sh); margin-bottom: 1rem; border: none; }
+.form-control, .form-select { background: var(--input-bg); border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-size: 0.85rem; color: var(--txt); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.02); transition: .2s; }
+[data-bs-theme="dark"] .form-control { border-color: rgba(255,255,255,0.1); }
+.form-control:focus { box-shadow: 0 0 0 2px var(--pri); outline: 0; border-color: transparent; }
+.form-control.is-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25) !important; background-color: rgba(239, 68, 68, 0.05) !important; }
+
+.btn-neu { display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 25px; padding: 6px 20px; border: var(--bor); font-weight: 600; font-size: 13px; background: var(--card-bg); box-shadow: var(--sh); color: var(--pri); transition: .2s; cursor: pointer; }
+.btn-neu:hover { transform: translateY(-2px); }
+
+/* CONTENT EDITABLE */
+div[contenteditable="true"] { cursor: pointer; }
+div[contenteditable="true"]:active { transform: scale(0.995); }
+
+/* IDR ITEMS */
+.idr-item { display: flex; justify-content: space-between; font-size: .8rem; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+.idr-val { font-weight: 700; text-align: right; color: var(--pri); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* BULK TABLE */
+.table-container { max-height: 250px; overflow-y: auto; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); }
+.table th { position: sticky; top: 0; background: var(--card-bg); z-index: 10; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
+.table td { font-size: 0.85rem; vertical-align: middle; }
+
+/* EOB BAR */
+#eob-bar { display: none; padding: .8rem 1.2rem; margin-bottom: 1rem; background: var(--card-bg); box-shadow: var(--sh); border-radius: 12px; font-weight: 600; white-space: nowrap; overflow-x: auto; color: var(--pri); }
+#eob-bar.visible { display: flex; gap: 20px; align-items: center; }
+
+/* ANIMATIONS & MODAL */
+@keyframes fadeRow { 0% { opacity: 0; transform: translateY(-10px); background-color: rgba(99, 102, 241, 0.1); } 100% { opacity: 1; transform: translateY(0); background-color: transparent; } }
+.new-row { animation: fadeRow 0.6s ease-out forwards; opacity: 0; }
+
+@keyframes emailGen { 0% { opacity: 0; transform: translateY(10px); filter: blur(4px); } 100% { opacity: 1; transform: translateY(0); filter: blur(0); } }
+.email-ani { animation: emailGen 2s ease-out forwards; }
+
+/* MODAL */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.modal-overlay.show { opacity: 1; visibility: visible; }
+.modal-content-box { background: var(--card-bg); width: 90%; max-width: 800px; border-radius: 20px; padding: 25px; transform: scale(0.9) translateY(20px); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 25px 50px rgba(0,0,0,0.15); border: var(--bor); max-height: 90vh; overflow-y: auto; }
+.modal-overlay.show .modal-content-box { transform: scale(1) translateY(0); }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+    <div class="brand"><i class="bi bi-stack me-2"></i>Pranto's Workspace</div>
+    <div class="d-none d-md-flex align-items-center mx-4">
+        <a href="index.html" class="text-decoration-none fw-bold" style="color: var(--txt); opacity: 0.8; transition: 0.2s;"><i class="bi bi-house-door me-1"></i> Home</a>
+    </div>
+    <div class="n-rt">
+        <button id="processBtn" class="btn-nav-act btn-ext"><i class="bi bi-magic"></i> Extract</button>
+        <button id="addBulkBtn" class="btn-nav-act bg-success"><i class="bi bi-plus-circle"></i> Add to Bulk List</button>
+        <div style="width:1px; height:20px; background:var(--txt); opacity:0.2; margin:0 5px;"></div>
+        <button id="theme-toggle" class="t-btn"><i id="theme-icon" class="bi bi-sun-fill"></i></button>
+    </div>
+</nav>
+
+<div id="wrap">
+    <!-- SIDEBAR -->
+    <div id="sb">
+        <div class="p-3 border-bottom"><h6 class="m-0 fw-bold text-primary small"><i class="bi bi-list-columns-reverse me-2"></i>Extracted Data</h6></div>
+        <div id="sb-c"><div class="text-center text-muted small mt-5">Extract data to preview</div></div>
+        <div class="mt-auto p-3 text-center border-top">
+            <span class="small fw-bold opacity-50" style="letter-spacing: 1px;">BULK IDR EMAILER</span>
+        </div>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div id="main">
+        
+        <!-- GLOBAL DETAILS -->
+        <div class="card p-3 mb-3">
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label class="small fw-bold text-primary">Date</label>
+                    <input type="date" id="gDt" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold text-primary">Initials</label>
+                    <input type="text" id="gIni" class="form-control" placeholder="e.g. PR">
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold text-primary">Name</label>
+                    <input type="text" id="gName" class="form-control" placeholder="Your Name (e.g. Pranto R)">
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold text-primary">Facility Name (Validation Target)</label>
+                    <input type="text" id="gFac" class="form-control" placeholder="e.g. STAFFORD EMERGENCY CENTER">
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold text-primary">Tax ID</label>
+                    <input type="text" id="gTax" class="form-control" placeholder="e.g. 813460167">
+                </div>
+            </div>
+        </div>
+
+        <div id="eob-bar"></div>
+
+        <!-- EOB & IDR DATA ENTRY -->
+        <div class="row g-3 mb-3">
+            <div class="col-lg-3">
+                <div class="card h-100 p-3 d-flex flex-column">
+                    <label class="small fw-bold text-primary mb-2">Updated EOB Paste</label>
+                    <textarea class="form-control flex-grow-1" id="eobUp" placeholder="Paste single EOB here..."></textarea>
+                    <small id="facAlert" class="text-danger d-none mt-1 fw-bold"><i class="bi bi-exclamation-triangle"></i> Facility name not found in EOB!</small>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="card p-3 h-100">
+                    <label class="small fw-bold text-primary mb-2">IDR Reports Paste (Row by Row)</label>
+                    <div class="row g-2 mb-2">
+                        <div class="col-4"><textarea class="form-control" id="idr1" rows="1" style="min-height:38px;" placeholder="2024+ (Dispute 1)"></textarea></div>
+                        <div class="col-4"><textarea class="form-control" id="idr2" rows="1" style="min-height:38px;" placeholder="2024+ (Dispute 2)"></textarea></div>
+                        <div class="col-4"><textarea class="form-control" id="idr3" rows="1" style="min-height:38px;" placeholder="2024+ (Dispute 3)"></textarea></div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-4"><textarea class="form-control" id="idr4" rows="1" style="min-height:38px;" placeholder="22-23 (Dispute 4)"></textarea></div>
+                        <div class="col-4"><textarea class="form-control" id="idr5" rows="1" style="min-height:38px;" placeholder="22-23 (Dispute 5)"></textarea></div>
+                        <div class="col-4"><textarea class="form-control" id="idr6" rows="1" style="min-height:38px;" placeholder="22-23 (Dispute 6)"></textarea></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BULK PENDING LIST -->
+        <div class="card p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold m-0 text-primary">Accumulated Bulk List (<span id="bulkCnt">0</span>)</h6>
+                <button class="btn btn-sm btn-outline-danger" onclick="clearBulkList()"><i class="bi bi-trash"></i> Clear All List</button>
+            </div>
+            <div class="table-container">
+                <table class="table table-hover table-borderless mb-0">
+                    <thead class="border-bottom">
+                        <tr>
+                            <th>Ticket</th><th>Dispute</th><th>Claim</th><th>W/L</th><th>CPT</th><th>Add. Need</th><th class="text-center">Tracking Note & Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bulkTb">
+                        <tr><td colspan="7" class="text-center text-muted small py-3">No disputes added yet. Extract and click "Add to Bulk List".</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EMAIL GENERATION -->
+        <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-end mb-3 pb-2 border-bottom">
+                <div style="flex:1; margin-right:20px;">
+                    <label class="small fw-bold">Subject</label>
+                    <input type="text" class="form-control" id="mSub" readonly>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn-neu text-success border-success" onclick="downloadCSV()"><i class="bi bi-file-earmark-excel"></i> Excel</button>
+                    <button class="btn-neu text-primary border-primary bg-primary text-white" onclick="genBulkEmail()"><i class="bi bi-envelope-paper"></i> Generate Bulk Email</button>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-12">
+                    <label class="small fw-bold text-primary d-flex justify-content-between">
+                        <span>Email Body (Click to copy HTML with Table)</span>
+                        <span id="copyMsg" class="text-success" style="opacity:0; transition:0.3s;"><i class="bi bi-check2-circle"></i> Copied!</span>
+                    </label>
+                    <div id="mBod" contenteditable="true" class="form-control p-3" style="height: 380px; overflow-y: auto; background-color: var(--input-bg);"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal-overlay">
+    <div class="modal-content-box">
+        <h5 class="fw-bold text-primary mb-3 border-bottom pb-2"><i class="bi bi-pencil-square me-2"></i>Edit Row Data</h5>
+        <div class="row g-2 mb-3">
+            <div class="col-md-3"><label class="small fw-bold">Ticket</label><input type="text" id="eTic" class="form-control"></div>
+            <div class="col-md-3"><label class="small fw-bold">Dispute</label><input type="text" id="eDis" class="form-control"></div>
+            <div class="col-md-3"><label class="small fw-bold">Claim</label><input type="text" id="eClm" class="form-control"></div>
+            <div class="col-md-3"><label class="small fw-bold">Win/Lose</label><input type="text" id="eWl" class="form-control"></div>
+            <div class="col-md-2"><label class="small fw-bold">CPT</label><input type="text" id="eCpt" class="form-control"></div>
+            <div class="col-md-2"><label class="small fw-bold">Add. Need</label><input type="number" id="eAdd" class="form-control"></div>
+            <div class="col-md-2"><label class="small fw-bold">Group</label><input type="text" id="eGrp" class="form-control"></div>
+            <div class="col-md-2"><label class="small fw-bold">Member</label><input type="text" id="eMem" class="form-control"></div>
+            <div class="col-md-2"><label class="small fw-bold">Tax ID</label><input type="text" id="eTax" class="form-control"></div>
+            <div class="col-md-2"><label class="small fw-bold">Det. Date</label><input type="text" id="eDt" class="form-control"></div>
+        </div>
+        <div class="mb-3">
+            <label class="small fw-bold text-primary">Tracking Note (Preview)</label>
+            <textarea id="eNote" class="form-control" rows="3" readonly style="font-size:0.8rem; background: var(--bg-body);"></textarea>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <button class="btn btn-sm btn-outline-danger px-4" onclick="delRow()"><i class="bi bi-trash me-2"></i> Delete Row</button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-light px-4 border" onclick="closeEdit()"><i class="bi bi-x-circle me-1"></i> Cancel</button>
+                <button class="btn btn-sm btn-primary px-4" onclick="saveEdit()"><i class="bi bi-check2-circle me-1"></i> Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let gD = { e: null, i: [] };
+let bulkList = JSON.parse(localStorage.getItem('bulkList')) || [];
+
+/* INIT */
+document.addEventListener('DOMContentLoaded', () => {
+    const st = localStorage.getItem('theme') || 'light'; setTheme(st);
+    
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('gDt').value = today;
+
+    try {
+        if(localStorage.getItem('gName')) document.getElementById('gName').value = localStorage.getItem('gName');
+        if(localStorage.getItem('gFac')) document.getElementById('gFac').value = localStorage.getItem('gFac');
+        if(localStorage.getItem('gTax')) document.getElementById('gTax').value = localStorage.getItem('gTax');
+        if(localStorage.getItem('gIni')) document.getElementById('gIni').value = localStorage.getItem('gIni');
+    } catch(e) {}
+    renderBulkList();
+    
+    // Save globals on typing
+    ['gName','gFac','gTax','gIni'].forEach(id => {
+        document.getElementById(id).addEventListener('input', e => {
+            localStorage.setItem(id, e.target.value);
+        });
+    });
+});
+
+/* THEME */
+document.getElementById('theme-toggle').addEventListener('click', () => {
+    const t = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+    setTheme(t);
+});
+function setTheme(t) {
+    document.documentElement.setAttribute('data-bs-theme', t);
+    localStorage.setItem('theme', t);
+    document.getElementById('theme-icon').className = t === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+}
+
+/* EVENTS */
+document.getElementById('processBtn').addEventListener('click', procAll);
+document.getElementById('addBulkBtn').addEventListener('click', addToBulk);
+
+// Click to copy the contenteditable div
+document.getElementById('mBod').addEventListener('click', function() {
+    if(this.innerHTML.trim() === '') return;
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(this);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    document.execCommand('copy');
+    selection.removeAllRanges(); // Deselect after copy
+    
+    const m = document.getElementById('copyMsg');
+    m.style.opacity = 1; setTimeout(() => m.style.opacity = 0, 2000);
+});
+
+/* PARSERS */
+function procAll() {
+    const eobText = document.getElementById('eobUp').value;
+    const facName = document.getElementById('gFac').value.trim();
+    const alertMsg = document.getElementById('facAlert');
+    const eobBox = document.getElementById('eobUp');
+    
+    eobBox.classList.remove('is-invalid');
+    alertMsg.classList.add('d-none');
+
+    // Validation
+    if(eobText && facName) {
+        if(!eobText.toLowerCase().includes(facName.toLowerCase())) {
+            eobBox.classList.add('is-invalid');
+            alertMsg.classList.remove('d-none');
+            return; // Abort if facility doesn't match
+        }
+    }
+
+    gD.e = pEOB(eobText);
+    const i = []; for(let j=1; j<=6; j++) i.push(document.getElementById('idr'+j).value);
+    gD.i = pIDR(i); 
+    
+    dIDR(gD.i); // Render Sidebar
+}
+
+function pEOB(t) {
+    if(!t) return null; 
+    const ex = r => { const m = t.match(r); if(!m) return '$0.00'; return t.substring(m.index+m[0].length).split('\n').find(l=>l.trim()&&!l.match(/^[a-zA-Z\s\.\/()-]+:/))?.trim()||'$0.00'; }, 
+          pc = s => parseFloat(s.replace(/[$,\s]/g,''))||0, 
+          gv = r => t.match(r)?.[2].trim()||'--';
+    
+    return {
+        tic: gv(/(Patient Account Number|Pt Acct No)\s*:?[\s\r\n]+([^\r\n]+)/i),
+        clm: gv(/(Claim I?D|Claim No|Claim Number)\s*:?[\s\r\n]+([^\r\n]+)/i),
+        grp: gv(/(Group Number|Group No|Group ID|Group)\s*:?[\s\r\n]+([a-zA-Z0-9]+)/i),
+        mem: gv(/(Member I?D|Subscriber I?D|Identification Number|ID Number|Member No)\s*:?[\s\r\n]+([a-zA-Z0-9]+)/i)
+    };
+}
+
+function pIDR(inp) {
+    let r = [];
+    inp.forEach((t,x) => {
+        if(!t.trim()) return;
+        const c = t.split(/\t/); 
+        // Index 0, 1, 2 = 2024+ format
+        if(x < 3) {
+            r.push({ 
+                id: c[1]?.trim()||'--', 
+                cl: c[3]?.trim()||'--', 
+                cp: c[5]?.trim()||'--', 
+                md: c[8]?.trim()||'--',
+                dt: c[16]?.trim()||'--',
+                wl: c[17]?.trim()||'WIN', 
+                ad: parseFloat((c[18]||'0').replace(/[$,\s]/g,''))
+            });
+        } 
+        // Index 3, 4, 5 = 22-23 format
+        else {
+            r.push({ 
+                id: c[5]?.trim()||'--', 
+                cl: c[2]?.trim()||'--', 
+                cp: c[3]?.trim()||'--', 
+                md: c[8]?.trim()||'--',
+                dt: c[18]?.trim()||'--',
+                wl: c[19]?.trim()||'WIN', 
+                ad: parseFloat((c[20]||'0').replace(/[$,\s]/g,''))
+            });
+        }
+    });
+    return r;
+}
+
+function dIDR(d) {
+    const s = document.getElementById('sb-c'); s.innerHTML = '';
+    if(d.length === 0) { s.innerHTML = '<div class="text-center text-muted small mt-5">Extract data to preview</div>'; return; }
+    
+    d.forEach((r,i) => {
+        s.innerHTML += `<div class="card sidebar-card shadow-sm border-0 mb-2 p-2">
+            <div class="fw-bold text-primary border-bottom pb-1 mb-1 d-flex justify-content-between"><span>Row ${i+1}</span><span class="badge bg-light text-dark border">${r.id}</span></div>
+            <div class="idr-item"><span>Claim</span><span class="idr-val">${r.cl}</span></div>
+            <div class="idr-item"><span>W/L</span><span class="idr-val">${r.wl}</span></div>
+            <div class="idr-item"><span>Add. Need</span><span class="idr-val">$${(r.ad||0).toFixed(2)}</span></div>
+        </div>`;
+    });
+}
+
+/* BULK LIST LOGIC */
+function addToBulk() {
+    if(!gD.e || !gD.i.length) return alert("Please paste EOB and IDR data, then click Extract first.");
+    
+    // Validation Check
+    let isValid = true;
+    ['gDt', 'gIni', 'gName', 'gFac', 'gTax'].forEach(id => {
+        const el = document.getElementById(id);
+        if(!el.value.trim()) { el.classList.add('is-invalid'); isValid = false; }
+        else { el.classList.remove('is-invalid'); }
+    });
+    if(!isValid) return alert("Please fill in all Required Global Details (Date, Initials, Name, Facility Name, Tax ID) before adding to Bulk List.");
+
+    const tax = document.getElementById('gTax').value.trim();
+
+    gD.i.forEach(idr => {
+        if(!idr.id || idr.id === '--') return; 
+        bulkList.push({
+            ticket: gD.e.tic || '--',
+            dispute: idr.id,
+            claim: gD.e.clm || idr.cl || '--',
+            wl: idr.wl || 'WIN',
+            cpt: idr.cp || '--',
+            addNeed: idr.ad || 0,
+            group: gD.e.grp || '--',
+            member: gD.e.mem || '--',
+            taxId: tax || '--',
+            med: idr.md || '--',
+            dt: idr.dt || '--'
+        });
+    });
+
+    localStorage.setItem('bulkList', JSON.stringify(bulkList));
+    renderBulkList();
+    
+    // Clear Fields for next
+    document.getElementById('eobUp').value = '';
+    for(let j=1; j<=6; j++) document.getElementById('idr'+j).value = '';
+    gD = {e:null, i:[]};
+    document.getElementById('sb-c').innerHTML = '<div class="text-center text-muted small mt-5">Data Added! Paste next data...</div>';
+}
+
+const fmt = n => '$' + (n||0).toLocaleString('en-US',{minimumFractionDigits:2});
+
+function renderBulkList() {
+    const tb = document.getElementById('bulkTb');
+    document.getElementById('bulkCnt').innerText = bulkList.length;
+    tb.innerHTML = '';
+    
+    if(bulkList.length === 0) {
+        tb.innerHTML = '<tr><td colspan="7" class="text-center text-muted small py-3">No disputes added yet.</td></tr>';
+        return;
+    }
+
+    bulkList.forEach((b, idx) => {
+        tb.innerHTML += `<tr class="new-row" style="animation-delay: ${idx * 0.05}s">
+            <td class="fw-bold">${b.ticket}</td>
+            <td>${b.dispute}</td>
+            <td>${b.claim}</td>
+            <td><span class="badge bg-success bg-opacity-10 text-success border border-success">${b.wl}</span></td>
+            <td>${b.cpt}</td>
+            <td class="text-primary fw-bold">${fmt(b.addNeed)}</td>
+            <td class="text-center d-flex justify-content-center gap-1">
+                <button class="btn btn-sm btn-outline-primary" style="font-size: 0.75rem; border-radius: 8px; transition: 0.3s;" onclick="copyRowNote(${idx}, this)"><i class="bi bi-clipboard"></i> Note</button>
+                <button class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem; border-radius: 8px;" onclick="openEdit(${idx})"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" style="font-size: 0.75rem; border-radius: 8px;" onclick="delRow(${idx})"><i class="bi bi-trash"></i></button>
+            </td>
+        </tr>`;
+    });
+}
+
+function getNoteText(idx) {
+    const b = bulkList[idx];
+    let dtStr = 'MM/DD/YY';
+    const rawDt = document.getElementById('gDt').value;
+    if(rawDt) {
+        const parts = rawDt.split('-');
+        dtStr = `${parts[1]}/${parts[2]}/${parts[0].substring(2)}`;
+    }
+    const ini = (document.getElementById('gIni').value || document.getElementById('gName').value || 'INI').toUpperCase();
+    return `${dtStr}>IDR FOLLOW UP>${ini}>WORKING ON IDR TRACKING SHEET. ${b.dispute}; NEGOTIATION AND IDR DONE. ACCORDING TO OUR RECORDS, FOR ${b.claim}; WE HAVE NOT RECEIVED THE ADDITIONAL PAYMENT AMOUNT OF ${fmt(b.addNeed)}, AS PER THE DETERMINATION, ${b.wl.toUpperCase()} THE DISPUTE BY ${b.med.toUpperCase()} DATED ${b.dt}. FOR BCBS ATTENTION, WE SENT BULK FOLLOW UP EMAIL TO BCBS FOR THE IDR ADDITIONAL PAYMENT.`;
+}
+
+// Function to generate and copy the tracking note
+window.copyRowNote = function(idx, btn) {
+    const note = getNoteText(idx);
+
+    // Copy to clipboard
+    const el = document.createElement('textarea');
+    el.value = note;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+
+    // Change button appearance
+    btn.classList.remove('btn-outline-primary');
+    btn.classList.add('btn-success', 'text-white', 'border-success');
+    btn.innerHTML = '<i class="bi bi-check2-all"></i> Copied';
+}
+
+/* EDIT & DELETE MODAL LOGIC */
+let curEditIdx = -1;
+window.openEdit = function(idx) {
+    curEditIdx = idx;
+    const b = bulkList[idx];
+    document.getElementById('eTic').value = b.ticket;
+    document.getElementById('eDis').value = b.dispute;
+    document.getElementById('eClm').value = b.claim;
+    document.getElementById('eWl').value = b.wl;
+    document.getElementById('eCpt').value = b.cpt;
+    document.getElementById('eAdd').value = b.addNeed;
+    document.getElementById('eGrp').value = b.group;
+    document.getElementById('eMem').value = b.member;
+    document.getElementById('eTax').value = b.taxId;
+    document.getElementById('eDt').value = b.dt;
+    
+    document.getElementById('eNote').value = getNoteText(idx);
+    document.getElementById('editModal').classList.add('show');
+}
+
+window.closeEdit = function() {
+    document.getElementById('editModal').classList.remove('show');
+    curEditIdx = -1;
+}
+
+window.saveEdit = function() {
+    if(curEditIdx === -1) return;
+    const b = bulkList[curEditIdx];
+    b.ticket = document.getElementById('eTic').value;
+    b.dispute = document.getElementById('eDis').value;
+    b.claim = document.getElementById('eClm').value;
+    b.wl = document.getElementById('eWl').value;
+    b.cpt = document.getElementById('eCpt').value;
+    b.addNeed = parseFloat(document.getElementById('eAdd').value) || 0;
+    b.group = document.getElementById('eGrp').value;
+    b.member = document.getElementById('eMem').value;
+    b.taxId = document.getElementById('eTax').value;
+    b.dt = document.getElementById('eDt').value;
+    
+    localStorage.setItem('bulkList', JSON.stringify(bulkList));
+    renderBulkList();
+    closeEdit();
+}
+
+window.delRow = function(idx = curEditIdx) {
+    if(idx === -1) return;
+    if(!confirm("Are you sure you want to delete this row?")) return;
+    bulkList.splice(idx, 1);
+    localStorage.setItem('bulkList', JSON.stringify(bulkList));
+    renderBulkList();
+    closeEdit();
+}
+
+function clearBulkList() {
+    if(!confirm("Are you sure you want to clear all accumulated data for this facility?")) return;
+    bulkList = [];
+    localStorage.removeItem('bulkList');
+    renderBulkList();
+    document.getElementById('mBod').innerHTML = '';
+    document.getElementById('mSub').value = '';
+}
+
+/* EMAIL GENERATOR */
+function genBulkEmail() {
+    if(bulkList.length === 0) return alert("Bulk list is empty! Please add some data first.");
+    const fac = document.getElementById('gFac').value.trim().toUpperCase() || "[FACILITY NAME]";
+    const nm = document.getElementById('gName').value.trim() || "[Your Name]";
+    
+    // Subject
+    document.getElementById('mSub').value = `Urgent Request for Claim Reprocessing as per IDR Determination - ${fac}`;
+
+    // Table Generation
+    let tbody = '';
+    bulkList.forEach(b => {
+        tbody += `<tr>
+            <td style="border:1px solid #ccc; padding:6px;">${b.ticket}</td>
+            <td style="border:1px solid #ccc; padding:6px;">${b.dispute}</td>
+            <td style="border:1px solid #ccc; padding:6px;">${b.claim}</td>
+            <td style="border:1px solid #ccc; padding:6px;">${b.wl}</td>
+            <td style="border:1px solid #ccc; padding:6px;">${b.cpt}</td>
+            <td style="border:1px solid #ccc; padding:6px;">${fmt(b.addNeed)}</td>
+            <td style="border:1px solid #ccc; padding:6px;">${b.group}</td>
+            <td style="border:1px solid #ccc; padding:6px;">${b.member}</td>
+            <td style="border:1px solid #ccc; padding:6px;">${b.taxId}</td>
+        </tr>`;
+    });
+
+    const tableHtml = `
+    <table style="border-collapse: collapse; width: 100%; font-size: 13px; font-family: 'Segoe UI', Arial, sans-serif; margin: 15px 0;">
+        <thead>
+            <tr style="background-color: #00fa9a; color: #000; text-align: left;">
+                <th style="border:1px solid #ccc; padding:6px;">Ticket</th>
+                <th style="border:1px solid #ccc; padding:6px;">Dispute</th>
+                <th style="border:1px solid #ccc; padding:6px;">Claim</th>
+                <th style="border:1px solid #ccc; padding:6px;">Win/Lose</th>
+                <th style="border:1px solid #ccc; padding:6px;">CPT</th>
+                <th style="border:1px solid #ccc; padding:6px;">Add. Need</th>
+                <th style="border:1px solid #ccc; padding:6px;">Group Number</th>
+                <th style="border:1px solid #ccc; padding:6px;">Member ID</th>
+                <th style="border:1px solid #ccc; padding:6px;">Tax ID</th>
+            </tr>
+        </thead>
+        <tbody>${tbody}</tbody>
+    </table>`;
+
+    const emailHtml = `
+    <div style="font-family: Calibri, Arial, sans-serif; font-size: 14.5px; color: #000; line-height: 1.5;">
+        <p>Dear BCBS Representative,</p>
+        <p>I am writing on behalf of <strong>${fac}</strong> to formally escalate and demand the immediate remittance of outstanding reimbursement balances mandated by final, legally binding determinations issued under the Federal Independent Dispute Resolution (IDR) process of the No Surprises Act (NSA).</p>
+        <p>As specified under 45 CFR 149.510(c)(4)(vii), a group health plan or insurance issuer must pay the balance of the total plan or coverage amount selected by the certified IDR entity—less any initial payment already made and applicable patient cost-sharing—within thirty (30) calendar days of the final determination notification. The statutory 30-day payment windows for the referenced disputes have expired, and full payments remain significantly overdue.</p>
+        <p>To facilitate an immediate resolution, I have attached the following supporting documents: - <em>IDR Payment Determination Document, Explanation of Benefits (EOB)</em><br>
+        * <strong>Detailed Claims Sheet (Excel):</strong> A comprehensive breakdown including claim numbers, patient account information, and the payment determination summary.</p>
+        
+        ${tableHtml}
+        
+        <p>We request that BCBS immediately reprocess these claims in accordance with the IDR ruling and issue the outstanding payments. Continued non-compliance will result in further regulatory escalation.<br>
+        Please confirm receipt of this email and provide a status update on the reprocessing. Should you require any additional information, don't hesitate to get in touch with me directly.</p>
+        
+        <p>Thank you for your prompt attention to this matter.</p>
+        
+        <p>Best regards,<br><br>${nm}</p>
+    </div>`;
+    
+    const mBod = document.getElementById('mBod');
+    mBod.innerHTML = emailHtml;
+    
+    // Trigger Animation
+    mBod.classList.remove('email-ani');
+    void mBod.offsetWidth; // trigger reflow
+    mBod.classList.add('email-ani');
+}
+
+/* EXCEL EXPORT */
+function downloadCSV() {
+    if(bulkList.length === 0) return alert("Nothing to download.");
+    let csv = "Ticket,Dispute,Claim,Win/Lose,CPT,Add. Need,Group Number,Member ID,Tax ID\n";
+    
+    bulkList.forEach(b => {
+        csv += `"${b.ticket}","${b.dispute}","${b.claim}","${b.wl}","${b.cpt}","${b.addNeed}","${b.group}","${b.member}","${b.taxId}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Detailed_Claims_Sheet_${new Date().getTime()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+</body>
+</html>
