@@ -11,31 +11,44 @@
  --f:'Outfit',sans-serif; --mono:'Rajdhani',monospace; --nav-h:70px;
  --pri:#6366f1; --sec:#0ea5e9; --txt:#334155; --txt-l:#64748b;
  --bg-body: #f8fafc; 
- --bg-grad: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
- --glass: rgba(255, 255, 255, 0.9); --blur: 20px; 
- --bor: 1px solid rgba(255, 255, 255, 0.6); 
- --sh: 0 10px 30px rgba(0,0,0,0.04);
- --card-bg: #ffffff;
- --nav-bg: rgba(255, 255, 255, 0.95);
- --input-bg: #ffffff;
+ --bg-grad: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+ --glass: rgba(255, 255, 255, 0.65); --blur: 20px; 
+ --bor: 1px solid rgba(255, 255, 255, 0.5); 
+ --sh: 0 10px 40px rgba(0,0,0,0.06);
+ --card-bg: rgba(255, 255, 255, 0.65);
+ --nav-bg: rgba(255, 255, 255, 0.75);
+ --input-bg: rgba(255, 255, 255, 0.8);
  --adj-bg: #f1f5f9; --adj-txt: #334155;
 }
 [data-bs-theme="dark"] {
  --txt:#f1f5f9; --txt-l:#94a3b8; 
  --bg-body: #0f172a;
- --bg-grad: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
- --glass: rgba(30, 41, 59, 0.9); 
- --bor: 1px solid rgba(255, 255, 255, 0.1);
- --card-bg: rgba(30, 41, 59, 0.7);
- --nav-bg: rgba(15, 23, 42, 0.9);
- --input-bg: rgba(0, 0, 0, 0.2);
+ --bg-grad: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+ --glass: rgba(15, 23, 42, 0.65); 
+ --bor: 1px solid rgba(255, 255, 255, 0.08);
+ --card-bg: rgba(15, 23, 42, 0.55);
+ --nav-bg: rgba(15, 23, 42, 0.8);
+ --input-bg: rgba(0, 0, 0, 0.25);
  --adj-bg: rgba(255,255,255,0.05); --adj-txt: #e2e8f0;
 }
 
 body {
-    font-family: var(--f); background: var(--bg-grad);
+    font-family: var(--f); background: transparent;
     margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; color: var(--txt);
-    transition: background 0.3s ease;
+}
+
+/* PREMIUM MESH BACKGROUND */
+.mesh-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: var(--bg-grad); overflow: hidden; transition: background 0.3s ease; }
+.mesh-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.6; animation: blobMove 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); }
+.mesh-1 { background: var(--pri); width: 450px; height: 450px; top: -100px; left: -100px; }
+.mesh-2 { background: var(--sec); width: 550px; height: 550px; bottom: -150px; right: -100px; animation-delay: -5s; }
+.mesh-3 { background: #c084fc; width: 350px; height: 350px; top: 35%; left: 35%; animation-delay: -10s; }
+[data-bs-theme="dark"] .mesh-blob { opacity: 0.25; }
+
+@keyframes blobMove {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(60px, 80px) scale(1.1); }
+    100% { transform: translate(-40px, 60px) scale(0.9); }
 }
 
 /* --- NAVBAR --- */
@@ -63,7 +76,7 @@ body {
 #main { flex: 1; padding: 0 1.5rem 1.5rem 1.5rem; overflow-y: auto; display: flex; flex-direction: column; }
 
 /* COMPONENTS */
-.card { background: var(--card-bg); border: var(--bor); border-radius: 16px; box-shadow: var(--sh); margin-bottom: 1rem; border: none; }
+.card { background: var(--card-bg); border: var(--bor); border-radius: 16px; box-shadow: var(--sh); margin-bottom: 1rem; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
 .form-control, .form-select { background: var(--input-bg); border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-size: 0.85rem; color: var(--txt); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.02); transition: .2s; }
 [data-bs-theme="dark"] .form-control { border-color: rgba(255,255,255,0.1); }
 .form-control:focus { box-shadow: 0 0 0 2px var(--pri); outline: 0; border-color: transparent; }
@@ -104,6 +117,13 @@ div[contenteditable="true"]:active { transform: scale(0.995); }
 </style>
 </head>
 <body>
+
+<!-- PREMIUM ANIMATED BACKGROUND -->
+<div class="mesh-bg">
+    <div class="mesh-blob mesh-1"></div>
+    <div class="mesh-blob mesh-2"></div>
+    <div class="mesh-blob mesh-3"></div>
+</div>
 
 <nav id="nav">
     <div class="brand"><i class="bi bi-stack me-2"></i>Pranto's Workspace</div>
@@ -158,6 +178,7 @@ div[contenteditable="true"]:active { transform: scale(0.995); }
         </div>
 
         <div id="eob-bar"></div>
+        <div id="alertsContainer"></div>
 
         <!-- EOB & IDR DATA ENTRY -->
         <div class="row g-3 mb-3">
@@ -343,6 +364,15 @@ function procAll() {
     const i = []; for(let j=1; j<=6; j++) i.push(document.getElementById('idr'+j).value);
     gD.i = pIDR(i); 
     
+    // Payment Received Alert Logic
+    let alertsHtml = '';
+    gD.i.forEach(idr => {
+        if(idr.pm && idr.pm.match(/\d/)) {
+            alertsHtml += `<div class="alert alert-danger py-2 mb-3 shadow-sm border-danger" style="animation: fadeRow 0.5s ease-out;"><i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>Alert!</strong> Additional Payment for dispute <strong>${idr.id}</strong> was already received on <strong>${idr.pm}</strong>. Please DO NOT include this in the email!</div>`;
+        }
+    });
+    document.getElementById('alertsContainer').innerHTML = alertsHtml;
+
     dIDR(gD.i); // Render Sidebar
 }
 
@@ -373,8 +403,9 @@ function pIDR(inp) {
                 cp: c[5]?.trim()||'--', 
                 md: c[8]?.trim()||'--',
                 dt: c[16]?.trim()||'--',
-                wl: c[17]?.trim()||'WIN', 
-                ad: parseFloat((c[18]||'0').replace(/[$,\s]/g,''))
+                wl: c[17]?.trim()||'', 
+                ad: parseFloat((c[18]||'0').replace(/[$,\s]/g,'')),
+                pm: c[19]?.trim()||''
             });
         } 
         // Index 3, 4, 5 = 22-23 format
@@ -385,8 +416,9 @@ function pIDR(inp) {
                 cp: c[3]?.trim()||'--', 
                 md: c[8]?.trim()||'--',
                 dt: c[18]?.trim()||'--',
-                wl: c[19]?.trim()||'WIN', 
-                ad: parseFloat((c[20]||'0').replace(/[$,\s]/g,''))
+                wl: c[19]?.trim()||'', 
+                ad: parseFloat((c[20]||'0').replace(/[$,\s]/g,'')),
+                pm: c[21]?.trim()||''
             });
         }
     });
@@ -398,13 +430,24 @@ function dIDR(d) {
     if(d.length === 0) { s.innerHTML = '<div class="text-center text-muted small mt-5">Extract data to preview</div>'; return; }
     
     d.forEach((r,i) => {
+        let wlDisplay = '';
+        if(r.wl) {
+            wlDisplay = `<span class="idr-val">${r.wl}</span>`;
+        } else {
+            wlDisplay = `<input type="text" class="form-control form-control-sm border-danger bg-danger-subtle text-danger fw-bold px-2 py-0" style="width: 75px; height: 24px; font-size: 0.75rem;" placeholder="W/L?" onchange="updateWl(${i}, this.value)">`;
+        }
+
         s.innerHTML += `<div class="card sidebar-card shadow-sm border-0 mb-2 p-2">
             <div class="fw-bold text-primary border-bottom pb-1 mb-1 d-flex justify-content-between"><span>Row ${i+1}</span><span class="badge bg-light text-dark border">${r.id}</span></div>
             <div class="idr-item"><span>Claim</span><span class="idr-val">${r.cl}</span></div>
-            <div class="idr-item"><span>W/L</span><span class="idr-val">${r.wl}</span></div>
+            <div class="idr-item"><span>W/L</span>${wlDisplay}</div>
             <div class="idr-item"><span>Add. Need</span><span class="idr-val">$${(r.ad||0).toFixed(2)}</span></div>
         </div>`;
     });
+}
+
+function updateWl(idx, val) {
+    gD.i[idx].wl = val.trim().toUpperCase();
 }
 
 /* BULK LIST LOGIC */
@@ -419,6 +462,17 @@ function addToBulk() {
         else { el.classList.remove('is-invalid'); }
     });
     if(!isValid) return alert("Please fill in all Required Global Details (Date, Initials, Name, Facility Name, Tax ID) before adding to Bulk List.");
+
+    // Check for missing W/L
+    let missingWl = false;
+    gD.i.forEach(idr => {
+        if(idr.id && idr.id !== '--' && !idr.wl) {
+            missingWl = true;
+        }
+    });
+    if(missingWl) {
+        return alert("Please fill in the missing W/L status (marked in RED) in the extracted data sidebar before adding to the Bulk List.");
+    }
 
     const tax = document.getElementById('gTax').value.trim();
 
