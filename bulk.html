@@ -109,6 +109,10 @@ div[contenteditable="true"]:active { transform: scale(0.995); }
 @keyframes emailGen { 0% { opacity: 0; transform: translateY(10px); filter: blur(4px); } 100% { opacity: 1; transform: translateY(0); filter: blur(0); } }
 .email-ani { animation: emailGen 2s ease-out forwards; }
 
+@keyframes pulseClock { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+.clock-icon { animation: pulseClock 1.5s infinite; }
+.paste-box { resize: none; overflow: hidden; }
+
 /* MODAL */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
 .modal-overlay.show { opacity: 1; visibility: visible; }
@@ -131,6 +135,9 @@ div[contenteditable="true"]:active { transform: scale(0.995); }
         <a href="index.html" class="text-decoration-none fw-bold" style="color: var(--txt); opacity: 0.8; transition: 0.2s;"><i class="bi bi-house-door me-1"></i> Home</a>
     </div>
     <div class="n-rt">
+        <div id="liveClock" class="d-none d-lg-flex align-items-center me-3 fw-bold text-primary" style="font-family: var(--mono); font-size: 1.05rem; letter-spacing: 0.5px;">
+            <i class="bi bi-clock-fill clock-icon me-2"></i><span id="timeStr">00:00:00 AM</span>
+        </div>
         <button id="processBtn" class="btn-nav-act btn-ext"><i class="bi bi-magic"></i> Extract</button>
         <button id="addBulkBtn" class="btn-nav-act bg-success"><i class="bi bi-plus-circle"></i> Add to Bulk List</button>
         <div style="width:1px; height:20px; background:var(--txt); opacity:0.2; margin:0 5px;"></div>
@@ -151,60 +158,63 @@ div[contenteditable="true"]:active { transform: scale(0.995); }
     <!-- MAIN AREA -->
     <div id="main">
         
-        <!-- GLOBAL DETAILS -->
-        <div class="card p-3 mb-3">
-            <div class="row g-3">
+        <!-- ULTRA-COMPACT GLOBAL & PASTE SECTION -->
+        <div class="card p-2 mb-3 shadow-sm border-0">
+            <!-- Row 1: Paste Boxes -->
+            <div class="row g-2 mb-2">
+                <!-- Col 1: EOB -->
+                <div class="col-md-4">
+                    <label class="small fw-bold text-primary mb-1" style="font-size: 0.75rem;"><i class="bi bi-file-earmark-medical me-1"></i>Updated EOB Paste</label>
+                    <textarea class="form-control paste-box" id="eobUp" rows="2" placeholder="Paste single EOB here..."></textarea>
+                    <small id="facAlert" class="text-danger d-none mt-1 fw-bold" style="font-size: 0.7rem;"><i class="bi bi-exclamation-triangle"></i> Facility name not found in EOB!</small>
+                </div>
+                <!-- Col 2: 2024+ -->
+                <div class="col-md-4">
+                    <label class="small fw-bold text-primary mb-1" style="font-size: 0.75rem;"><i class="bi bi-table me-1"></i>2024+ (Paste Row Data)</label>
+                    <textarea class="form-control paste-box" id="idr1" rows="2" placeholder="Paste 2024+ format..."></textarea>
+                </div>
+                <!-- Col 3: 22-23 -->
+                <div class="col-md-4">
+                    <label class="small fw-bold text-primary mb-1" style="font-size: 0.75rem;"><i class="bi bi-table me-1"></i>22-23 (Paste Row Data)</label>
+                    <textarea class="form-control paste-box" id="idr2" rows="2" placeholder="Paste 22-23 format..."></textarea>
+                </div>
+            </div>
+            
+            <hr class="m-0 mb-2" style="border-color: var(--txt); opacity: 0.1;">
+            
+            <!-- Row 2: Globals -->
+            <div class="row g-2">
                 <div class="col-md-2">
-                    <label class="small fw-bold text-primary">Date</label>
-                    <input type="date" id="gDt" class="form-control">
+                    <label class="small fw-bold text-primary mb-1" style="font-size: 0.75rem;"><i class="bi bi-calendar-event me-1"></i>Date</label>
+                    <div class="input-group input-group-sm">
+                        <input type="date" id="gDt" class="form-control" style="font-size: 0.75rem;">
+                        <select id="gShift" class="form-select bg-light text-primary fw-bold px-1" style="max-width: 65px; cursor: pointer; font-size: 0.75rem;">
+                            <option value="day">Day</option>
+                            <option value="night">Night</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="col-md-2">
-                    <label class="small fw-bold text-primary">Initials</label>
-                    <input type="text" id="gIni" class="form-control" placeholder="e.g. PR">
-                </div>
-                <div class="col-md-3">
-                    <label class="small fw-bold text-primary">Name</label>
-                    <input type="text" id="gName" class="form-control" placeholder="Your Name (e.g. Pranto R)">
-                </div>
-                <div class="col-md-3">
-                    <label class="small fw-bold text-primary">Facility Name (Validation Target)</label>
-                    <input type="text" id="gFac" class="form-control" placeholder="e.g. STAFFORD EMERGENCY CENTER">
+                    <label class="small fw-bold text-primary mb-1" style="font-size: 0.75rem;"><i class="bi bi-person-badge me-1"></i>Note Initial</label>
+                    <input type="text" id="gIni" class="form-control form-control-sm" placeholder="e.g. PR">
                 </div>
                 <div class="col-md-2">
-                    <label class="small fw-bold text-primary">Tax ID</label>
-                    <input type="text" id="gTax" class="form-control" placeholder="e.g. 813460167">
+                    <label class="small fw-bold text-primary mb-1" style="font-size: 0.75rem;"><i class="bi bi-person me-1"></i>Email Name</label>
+                    <input type="text" id="gName" class="form-control form-control-sm" placeholder="Your Name">
+                </div>
+                <div class="col-md-4">
+                    <label class="small fw-bold text-primary mb-1" style="font-size: 0.75rem;"><i class="bi bi-building me-1"></i>Facility Name (Validation Target)</label>
+                    <input type="text" id="gFac" class="form-control form-control-sm" placeholder="e.g. STAFFORD EMERGENCY CENTER">
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold text-primary mb-1" style="font-size: 0.75rem;"><i class="bi bi-hash me-1"></i>Tax ID</label>
+                    <input type="text" id="gTax" class="form-control form-control-sm" placeholder="e.g. 813460167">
                 </div>
             </div>
         </div>
 
         <div id="eob-bar"></div>
         <div id="alertsContainer"></div>
-
-        <!-- EOB & IDR DATA ENTRY -->
-        <div class="row g-3 mb-3">
-            <div class="col-lg-3">
-                <div class="card h-100 p-3 d-flex flex-column">
-                    <label class="small fw-bold text-primary mb-2">Updated EOB Paste</label>
-                    <textarea class="form-control flex-grow-1" id="eobUp" placeholder="Paste single EOB here..."></textarea>
-                    <small id="facAlert" class="text-danger d-none mt-1 fw-bold"><i class="bi bi-exclamation-triangle"></i> Facility name not found in EOB!</small>
-                </div>
-            </div>
-            <div class="col-lg-9">
-                <div class="card p-3 h-100">
-                    <label class="small fw-bold text-primary mb-2">IDR Reports Paste (Row by Row)</label>
-                    <div class="row g-2 mb-2">
-                        <div class="col-4"><textarea class="form-control" id="idr1" rows="1" style="min-height:38px;" placeholder="2024+ (Dispute 1)"></textarea></div>
-                        <div class="col-4"><textarea class="form-control" id="idr2" rows="1" style="min-height:38px;" placeholder="2024+ (Dispute 2)"></textarea></div>
-                        <div class="col-4"><textarea class="form-control" id="idr3" rows="1" style="min-height:38px;" placeholder="2024+ (Dispute 3)"></textarea></div>
-                    </div>
-                    <div class="row g-2">
-                        <div class="col-4"><textarea class="form-control" id="idr4" rows="1" style="min-height:38px;" placeholder="22-23 (Dispute 4)"></textarea></div>
-                        <div class="col-4"><textarea class="form-control" id="idr5" rows="1" style="min-height:38px;" placeholder="22-23 (Dispute 5)"></textarea></div>
-                        <div class="col-4"><textarea class="form-control" id="idr6" rows="1" style="min-height:38px;" placeholder="22-23 (Dispute 6)"></textarea></div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- BULK PENDING LIST -->
         <div class="card p-3 mb-3">
@@ -287,13 +297,40 @@ div[contenteditable="true"]:active { transform: scale(0.995); }
 let gD = { e: null, i: [] };
 let bulkList = JSON.parse(localStorage.getItem('bulkList')) || [];
 
+/* CLOCK LOGIC */
+function updateClock() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: '2-digit', second: '2-digit' });
+    document.getElementById('timeStr').innerText = timeString;
+}
+setInterval(updateClock, 1000);
+
+/* DATE SHIFT LOGIC */
+function setShiftDate() {
+    const shift = document.getElementById('gShift').value;
+    const tz = shift === 'day' ? 'Asia/Dhaka' : 'America/Chicago';
+    const dateStr = new Date().toLocaleString("en-US", {timeZone: tz});
+    const d = new Date(dateStr);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    document.getElementById('gDt').value = `${yyyy}-${mm}-${dd}`;
+}
+
 /* INIT */
 document.addEventListener('DOMContentLoaded', () => {
+    updateClock();
     const st = localStorage.getItem('theme') || 'light'; setTheme(st);
     
-    // Set default date to today
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('gDt').value = today;
+    // Setup Date Shift
+    const savedShift = localStorage.getItem('gShift') || 'day';
+    document.getElementById('gShift').value = savedShift;
+    setShiftDate();
+
+    document.getElementById('gShift').addEventListener('change', (e) => {
+        setShiftDate();
+        localStorage.setItem('gShift', e.target.value);
+    });
 
     try {
         if(localStorage.getItem('gName')) document.getElementById('gName').value = localStorage.getItem('gName');
@@ -361,7 +398,13 @@ function procAll() {
     }
 
     gD.e = pEOB(eobText);
-    const i = []; for(let j=1; j<=6; j++) i.push(document.getElementById('idr'+j).value);
+    
+    // Fetch only the 2 available IDR input boxes now
+    const i = []; 
+    for(let j=1; j<=2; j++) {
+        i.push(document.getElementById('idr'+j).value);
+    }
+    
     gD.i = pIDR(i); 
     
     // Payment Received Alert Logic
@@ -395,12 +438,13 @@ function pIDR(inp) {
     inp.forEach((t,x) => {
         if(!t.trim()) return;
         const c = t.split(/\t/); 
-        // Index 0, 1, 2 = 2024+ format
-        if(x < 3) {
+        
+        // Index 0 = 2024+ format
+        if(x === 0) {
             r.push({ 
                 id: c[1]?.trim()||'--', 
                 cl: c[3]?.trim()||'--', 
-                cp: c[5]?.trim()||'--', 
+                cp: c[4]?.trim()||'--', // FIXED: Changed from c[5] to c[4] to pick CPT instead of submission date
                 md: c[8]?.trim()||'--',
                 dt: c[16]?.trim()||'--',
                 wl: c[17]?.trim()||'', 
@@ -408,8 +452,8 @@ function pIDR(inp) {
                 pm: c[19]?.trim()||''
             });
         } 
-        // Index 3, 4, 5 = 22-23 format
-        else {
+        // Index 1 = 22-23 format
+        else if(x === 1) {
             r.push({ 
                 id: c[5]?.trim()||'--', 
                 cl: c[2]?.trim()||'--', 
@@ -427,8 +471,20 @@ function pIDR(inp) {
 
 function dIDR(d) {
     const s = document.getElementById('sb-c'); s.innerHTML = '';
-    if(d.length === 0) { s.innerHTML = '<div class="text-center text-muted small mt-5">Extract data to preview</div>'; return; }
+    if(d.length === 0 && !gD.e) { s.innerHTML = '<div class="text-center text-muted small mt-5">Extract data to preview</div>'; return; }
     
+    // Show EOB Extracted Data
+    if(gD.e) {
+        s.innerHTML += `<div class="card sidebar-card shadow-sm border-0 mb-3 p-2" style="background: rgba(99, 102, 241, 0.08);">
+            <div class="fw-bold text-primary border-bottom pb-1 mb-1"><i class="bi bi-file-earmark-text me-1"></i>EOB Extracted</div>
+            <div class="idr-item"><span>Ticket</span><span class="idr-val">${gD.e.tic||'--'}</span></div>
+            <div class="idr-item"><span>Claim</span><span class="idr-val">${gD.e.clm||'--'}</span></div>
+            <div class="idr-item"><span>Group</span><span class="idr-val">${gD.e.grp||'--'}</span></div>
+            <div class="idr-item"><span>Member</span><span class="idr-val">${gD.e.mem||'--'}</span></div>
+        </div>`;
+    }
+
+    // Show IDR Extracted Data
     d.forEach((r,i) => {
         let wlDisplay = '';
         if(r.wl) {
@@ -438,10 +494,12 @@ function dIDR(d) {
         }
 
         s.innerHTML += `<div class="card sidebar-card shadow-sm border-0 mb-2 p-2">
-            <div class="fw-bold text-primary border-bottom pb-1 mb-1 d-flex justify-content-between"><span>Row ${i+1}</span><span class="badge bg-light text-dark border">${r.id}</span></div>
+            <div class="fw-bold text-primary border-bottom pb-1 mb-1 d-flex justify-content-between"><span><i class="bi bi-table me-1"></i>IDR Row ${i+1}</span><span class="badge bg-light text-dark border">${r.id}</span></div>
             <div class="idr-item"><span>Claim</span><span class="idr-val">${r.cl}</span></div>
+            <div class="idr-item"><span>CPT</span><span class="idr-val">${r.cp}</span></div>
             <div class="idr-item"><span>W/L</span>${wlDisplay}</div>
             <div class="idr-item"><span>Add. Need</span><span class="idr-val">$${(r.ad||0).toFixed(2)}</span></div>
+            <div class="idr-item text-muted" style="font-size: 0.7rem;"><span>Det. Date</span><span>${r.dt}</span></div>
         </div>`;
     });
 }
@@ -475,10 +533,11 @@ function addToBulk() {
     }
 
     const tax = document.getElementById('gTax').value.trim();
+    const newItems = [];
 
     gD.i.forEach(idr => {
         if(!idr.id || idr.id === '--') return; 
-        bulkList.push({
+        newItems.push({
             ticket: gD.e.tic || '--',
             dispute: idr.id,
             claim: gD.e.clm || idr.cl || '--',
@@ -489,16 +548,20 @@ function addToBulk() {
             member: gD.e.mem || '--',
             taxId: tax || '--',
             med: idr.md || '--',
-            dt: idr.dt || '--'
+            dt: idr.dt || '--',
+            noteCopied: false
         });
     });
 
+    bulkList = [...newItems, ...bulkList]; // Add new items to the top!
     localStorage.setItem('bulkList', JSON.stringify(bulkList));
     renderBulkList();
     
     // Clear Fields for next
     document.getElementById('eobUp').value = '';
-    for(let j=1; j<=6; j++) document.getElementById('idr'+j).value = '';
+    // Clear only the 2 boxes
+    for(let j=1; j<=2; j++) document.getElementById('idr'+j).value = '';
+    
     gD = {e:null, i:[]};
     document.getElementById('sb-c').innerHTML = '<div class="text-center text-muted small mt-5">Data Added! Paste next data...</div>';
 }
@@ -516,6 +579,9 @@ function renderBulkList() {
     }
 
     bulkList.forEach((b, idx) => {
+        const btnClass = b.noteCopied ? 'btn-success text-white border-success' : 'btn-outline-primary';
+        const btnText = b.noteCopied ? '<i class="bi bi-check2-all"></i> Copied' : '<i class="bi bi-clipboard"></i> Note';
+
         tb.innerHTML += `<tr class="new-row" style="animation-delay: ${idx * 0.05}s">
             <td class="fw-bold">${b.ticket}</td>
             <td>${b.dispute}</td>
@@ -524,7 +590,7 @@ function renderBulkList() {
             <td>${b.cpt}</td>
             <td class="text-primary fw-bold">${fmt(b.addNeed)}</td>
             <td class="text-center d-flex justify-content-center gap-1">
-                <button class="btn btn-sm btn-outline-primary" style="font-size: 0.75rem; border-radius: 8px; transition: 0.3s;" onclick="copyRowNote(${idx}, this)"><i class="bi bi-clipboard"></i> Note</button>
+                <button class="btn btn-sm ${btnClass}" style="font-size: 0.75rem; border-radius: 8px; transition: 0.3s;" onclick="copyRowNote(${idx}, this)">${btnText}</button>
                 <button class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem; border-radius: 8px;" onclick="openEdit(${idx})"><i class="bi bi-pencil"></i></button>
                 <button class="btn btn-sm btn-outline-danger" style="font-size: 0.75rem; border-radius: 8px;" onclick="delRow(${idx})"><i class="bi bi-trash"></i></button>
             </td>
@@ -555,6 +621,10 @@ window.copyRowNote = function(idx, btn) {
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
+
+    // Save copied state so it stays green
+    bulkList[idx].noteCopied = true;
+    localStorage.setItem('bulkList', JSON.stringify(bulkList));
 
     // Change button appearance
     btn.classList.remove('btn-outline-primary');
