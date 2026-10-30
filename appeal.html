@@ -1,598 +1,176 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pranto's Workspace - Appeal Tool</title>
-    <link rel="icon" type="image/png" href="index.png">
+    <title>Workspace Moved</title>
     
-    <!-- Fonts & CSS -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+
+    <!-- Auto Redirect (10 seconds) with NEW LINK -->
+    <meta http-equiv="refresh" content="10;url=https://script.google.com/macros/s/AKfycbw_h5AwpnpuzaAlNzIHQ96AwlPFSLNivtQgPJLUlLOuXjcLzfPnrJUTlBmKi3EsDb1N/exec">
+
     <style>
-        /* --- CORE VARIABLES --- */
         :root {
-            --font-head: 'Outfit', sans-serif; --font-body: 'Inter', sans-serif; --font-num: 'Space Grotesk', monospace;
-            --primary: #4f46e5; --primary-rgb: 79, 70, 229; --secondary: #0ea5e9; --accent: #e11d48;
-            --glass-bg: rgba(255, 255, 255, 0.75); --glass-border: 1px solid rgba(255, 255, 255, 0.9);
-            --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.05); --card-radius: 20px;
-            --text-main: #0f172a; --text-sub: #475569; --input-bg: rgba(255,255,255,0.85); --bg-color: #f0f4f8;
-            --header-bg-start: #3b82f6; --header-bg-end: #1d4ed8;
-        }
-        [data-bs-theme="dark"] {
-            --primary: #6366f1; --glass-bg: rgba(20, 27, 45, 0.7); --glass-border: 1px solid rgba(255, 255, 255, 0.07);
-            --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); --text-main: #f8fafc; --text-sub: #94a3b8;
-            --input-bg: rgba(15, 23, 42, 0.7); --bg-color: #060b14;
-            --header-bg-start: #1e3a8a; --header-bg-end: #0f172a;
+            --primary: #4f46e5;
+            --secondary: #0ea5e9;
+            /* Light Theme Variables */
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #0f172a;
+            --text-sub: #475569;
         }
 
-        body { font-family: var(--font-body); color: var(--text-main); min-height: 100vh; background-color: var(--bg-color); transition: 0.5s ease; overflow: hidden; margin: 0; padding: 0; display: flex; flex-direction: column; }
-        .font-head { font-family: var(--font-head); } .font-num { font-family: var(--font-num); letter-spacing: -0.5px; }
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.08) 0px, transparent 50%);
+            color: var(--text-main);
+            overflow: hidden;
+        }
 
-        /* Curved Backgrounds */
-        .curved-header-bg { position: fixed; top: 0; left: 0; width: 100%; height: 600px; background: linear-gradient(135deg, var(--header-bg-start), var(--header-bg-end)); z-index: -2; overflow: hidden; }
-        .curved-header-bg::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 250px; background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23f0f4f8" fill-opacity="1" d="M0,160L80,149.3C160,139,320,117,480,128C640,139,800,181,960,186.7C1120,192,1280,155,1360,133.3L1440,112L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>'); background-size: cover; background-position: center bottom; transition: 0.5s ease; }
-        [data-bs-theme="dark"] .curved-header-bg::after { background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23060b14" fill-opacity="1" d="M0,160L80,149.3C160,139,320,117,480,128C640,139,800,181,960,186.7C1120,192,1280,155,1360,133.3L1440,112L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>'); }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            padding: 40px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            animation: floatUp 0.6s ease-out;
+        }
 
-        /* Glass Panels */
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--card-radius); border-bottom: 4px solid rgba(var(--primary-rgb), 0.15); transition: 0.3s ease; }
-        .glass-panel:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.08); transform: translateY(-2px); border-bottom-color: var(--primary); }
-        [data-bs-theme="dark"] .glass-panel { border-bottom-color: rgba(255,255,255,0.05); }
-        [data-bs-theme="dark"] .glass-panel:hover { border-bottom-color: var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* Navbar */
-        #nav-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1050; background: var(--glass-bg); backdrop-filter: blur(30px); border-bottom: var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 12px 20px; transition: 0.5s ease; }
-        .nav-pill { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
-        .nav-brand { font-family: var(--font-head); font-size: 1.5rem; display: flex; align-items: center; gap: 8px; text-decoration: none; letter-spacing: -0.5px; }
-        .logo-icon { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.8rem; }
-        .logo-text { color: var(--text-main); font-weight: 800; }
-        .logo-highlight { color: var(--primary); font-weight: 400; margin-left: 2px; }
-        .nav-links { display: flex; gap: 25px; align-items: center; }
-        .nav-item { text-decoration: none; color: var(--text-main); font-weight: 600; font-size: 0.85rem; transition: 0.3s; position: relative; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; cursor: pointer; }
-        .nav-item:hover, .nav-item.active { color: var(--primary); opacity: 1; }
-        .theme-tog { width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; transition: 0.3s; font-size: 1.1rem; }
-        .theme-tog:hover { background: var(--primary); color: #fff; transform: rotate(15deg) scale(1.1); }
-        .btn-premium { background: linear-gradient(135deg, var(--primary), #818cf8); color: white !important; border: none; border-radius: 12px; padding: 8px 20px; font-weight: 700; transition: 0.3s; box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3); border-bottom: 3px solid #3730a3; }
-        .btn-premium:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.5); filter: brightness(1.1); border-bottom-width: 1px; margin-bottom: 2px; }
-        .btn-premium:active { transform: translateY(1px); border-bottom-width: 0; margin-bottom: 3px; }
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(79,70,229,0.1), rgba(14,165,233,0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--secondary);
+            font-size: 2.5rem;
+            border: 1px solid rgba(14,165,233,0.2);
+            animation: pulse 2s infinite;
+        }
 
-        /* Layout Grid */
-        #main-wrapper { margin-top: 85px; flex-grow: 1; max-width: 1400px; width: 100%; margin-left: auto; margin-right: auto; padding-left: 20px; padding-right: 20px; position: relative; z-index: 10; display: flex; gap: 20px; height: calc(100vh - 95px); }
-        #sidebar { width: 320px; flex-shrink: 0; height: 100%; overflow-y: auto; padding: 1.2rem; transition: width 0.3s; }
-        #content-area { flex-grow: 1; overflow-y: auto; padding: 0.5rem 0.5rem 3rem 0.5rem; display: flex; flex-direction: column; gap: 15px; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(14,165,233, 0.2); }
+            70% { box-shadow: 0 0 0 15px rgba(14,165,233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14,165,233, 0); }
+        }
 
-        /* Custom Scrollbar */
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(var(--primary-rgb), 0.3); border-radius: 10px; }
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0 10px;
+            background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-        /* Form Controls */
-        .form-control, .form-select, .input-group-text { background: var(--input-bg); border: 1px solid rgba(0,0,0,0.05); border-bottom: 2px solid rgba(0,0,0,0.1); border-radius: 10px; color: var(--text-main); font-size: 0.85rem; transition: 0.3s; padding: 8px 12px; font-weight: 600; }
-        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select, [data-bs-theme="dark"] .input-group-text { border-color: rgba(255,255,255,0.05); border-bottom-color: rgba(0,0,0,0.3); }
-        .form-control:focus, .form-select:focus { background: var(--glass-bg); border-color: rgba(var(--primary-rgb), 0.5) !important; box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15); color: var(--text-main); outline: none; }
-        .input-group-text { background: rgba(var(--primary-rgb), 0.05); color: var(--text-sub); border-right: none; border-radius: 10px 0 0 10px; font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; font-weight: 800; }
-        .input-group > .form-control, .input-group > .form-select { border-radius: 0 10px 10px 0; }
-        textarea.form-control { resize: none; overflow-y: auto; line-height: 1.5; }
-        textarea[readonly] { background-color: rgba(128,128,128,0.02) !important; border-left: 4px solid var(--primary) !important; cursor: pointer; }
-        .form-control.is-invalid { border-color: #dc3545 !important; box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important; }
+        p {
+            font-size: 1rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
 
-        /* Results & Highlights */
-        .result-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed rgba(128,128,128,0.15); font-size: 0.85rem; }
-        .result-item:last-child { border-bottom: none; }
-        .result-item span:first-child { font-weight: 700; color: var(--text-sub); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
-        .result-item span:last-child { font-weight: 800; font-family: var(--font-num); color: var(--text-main); }
-        .text-pri { color: var(--primary) !important; } .text-suc { color: #10b981 !important; } .text-wrn { color: #f59e0b !important; } .text-dng { color: #ef4444 !important; }
-        
-        .hl-adj-pt { background: rgba(239, 68, 68, 0.1); color: #ef4444 !important; padding: 2px 6px; border-radius: 6px; }
-        .hl-adj-wo { background: rgba(249, 115, 22, 0.1); color: #f97316 !important; padding: 2px 6px; border-radius: 6px; }
+        .highlight {
+            color: #0f172a;
+            font-weight: 700;
+            background: rgba(79, 70, 229, 0.1);
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
 
-        /* Tabs */
-        .nav-tabs { border-bottom: 2px solid rgba(0,0,0,0.05); }
-        [data-bs-theme="dark"] .nav-tabs { border-bottom-color: rgba(255,255,255,0.05); }
-        .nav-tabs .nav-link { border: none; color: var(--text-sub); font-weight: 700; font-family: var(--font-head); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; padding: 10px 15px; transition: 0.3s; opacity: 0.7; }
-        .nav-tabs .nav-link.active { color: var(--primary); opacity: 1; background: transparent; border-bottom: 3px solid var(--primary); }
+        .btn-premium {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            border-bottom: 3px solid #3730a3;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-        /* Excel Box */
-        .excel-box { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); cursor: pointer; transition: 0.3s; }
-        .excel-box:hover { background: rgba(16,185,129,0.1); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2); }
-        #excel_Copy_Input { background: transparent; border: none; color: #10b981; font-weight: 700; font-family: var(--font-num); font-size: 0.8rem; width: 100%; cursor: pointer; outline: none; }
-        [data-bs-theme="dark"] #excel_Copy_Input { color: #34d399; }
-        .section-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 8px; display: block; font-weight: 800; font-family: var(--font-head); }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+            filter: brightness(1.1);
+            border-bottom-width: 1px;
+            margin-bottom: 2px;
+            color: white;
+        }
+
+        .btn-premium:active {
+            transform: translateY(1px);
+            border-bottom-width: 0;
+            margin-bottom: 3px;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: rgba(71, 85, 105, 0.7);
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
 
-<!-- Background -->
-<div class="curved-header-bg"></div>
-
-<div id="nav-container">
-    <div class="nav-pill">
-        <a href="#" class="nav-brand">
-            <i class="bi bi-hexagon-fill logo-icon"></i>
-            <span class="logo-text">Pranto's<span class="logo-highlight">Workspace</span></span>
-        </a>
-        <div class="nav-links d-none d-lg-flex">
-            <a href="index.html" class="nav-item">Home</a>
-            <a href="#" class="nav-item active">Appeal Tool</a>
-            <a href="nsa.html" class="nav-item">NSA</a>
-            <a href="idr.html" class="nav-item">IDR</a>
-            <a href="#" class="nav-item">Contact</a>
+    <div class="container">
+        <div class="icon-box">
+            <i class="bi bi-rocket-takeoff-fill"></i>
         </div>
-        <div class="d-flex align-items-center gap-3">
-            <button id="extractBtn" class="btn btn-premium btn-sm d-flex align-items-center gap-2"><i class="bi bi-magic"></i> Extract</button>
-            <button id="clearBtn" class="btn btn-outline-danger btn-sm fw-bold shadow-sm d-flex align-items-center gap-2 bg-transparent text-danger border-0" style="border-bottom: 3px solid #ef4444; border-radius: 12px; padding: 8px 15px;"><i class="bi bi-trash3-fill"></i> Clear</button>
-            <button id="themeToggle" class="theme-tog"><i class="bi bi-moon-stars-fill"></i></button>
+        
+        <h1>We Have Moved!</h1>
+        
+        <p>This legacy workspace has been <span class="highlight">closed and relocated</span> to a new, faster, and more secure cloud server. Please save the new page link for future access.</p>
+        
+        <!-- Redirect Button to NEW Apps Script Web App -->
+        <a href="https://script.google.com/macros/s/AKfycbw_h5AwpnpuzaAlNzIHQ96AwlPFSLNivtQgPJLUlLOuXjcLzfPnrJUTlBmKi3EsDb1N/exec" class="btn-premium">
+            Access New Workspace <i class="bi bi-arrow-right-circle-fill"></i>
+        </a>
+        
+        <div class="footer-note">
+            * You will be redirected automatically in 10 seconds.
         </div>
     </div>
-</div>
 
-<div id="main-wrapper">
-    
-    <!-- SIDEBAR: Claim Details -->
-    <aside id="sidebar" class="glass-panel custom-scroll">
-        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
-            <span class="font-head fw-bolder text-primary fs-6"><i class="bi bi-person-vcard me-2"></i>Claim Details</span>
-        </div>
-        <div id="sidebar-content">
-            <div class="text-center text-muted p-5 small fw-bold opacity-50 font-num">Paste EOB and click Extract to see details.</div>
-        </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main id="content-area" class="custom-scroll">
-        
-        <!-- Top Row: Input & Analysis -->
-        <div class="row g-3">
-            <div class="col-lg-4">
-                <div class="glass-panel p-3 h-100 d-flex flex-column">
-                    <span class="section-label text-primary"><i class="bi bi-clipboard-data me-1"></i> Paste EOB Text</span>
-                    <textarea id="eobInput" class="form-control custom-scroll flex-grow-1" style="border: 2px dashed rgba(128,128,128,0.3); font-size: 0.8rem;" placeholder="Paste EOB content here..."></textarea>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="glass-panel p-3 h-100">
-                    <span class="section-label text-success"><i class="bi bi-cash-coin me-1"></i> Financial Breakdown</span>
-                    <div class="d-flex flex-column gap-1 mt-2">
-                        <div class="result-item"><span>Total Bill</span><span id="res_billed" class="text-pri">$0.00</span></div>
-                        <div class="result-item"><span>Paid Amount</span><span id="res_paid" class="text-suc">$0.00</span></div>
-                        <div class="result-item"><span>Coinsurance</span><span id="res_coins">$0.00</span></div>
-                        <div class="result-item"><span>Copay/Ded</span><span id="res_ded">$0.00</span></div>
-                        <div class="result-item"><span>Additional</span><span id="res_addl" class="text-pri">$0.00</span></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="glass-panel p-3 h-100">
-                    <span class="section-label text-warning"><i class="bi bi-search me-1"></i> Analysis & Info</span>
-                    <div class="d-flex flex-column gap-1 mt-2">
-                        <div class="result-item" id="row_oon_coins"><span>OON Coins</span><span id="res_oon_coins">$0.00</span></div>
-                        <div class="result-item" id="row_oon_ded"><span>OON Ded</span><span id="res_oon_ded">$0.00</span></div>
-                        <div class="result-item" id="row_prior_coins"><span>Prior Coins</span><span id="res_prior_coins">$0.00</span></div>
-                        <div class="result-item" id="row_medicare"><span>Medicare</span><span id="res_medicare">$0.00</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Middle Row: Notes Panel -->
-        <!-- FIX: Set flex: none to prevent vertical stretching -->
-        <div class="glass-panel p-0 overflow-hidden" style="flex: none;">
-            <div class="bg-secondary bg-opacity-10">
-                <ul class="nav nav-tabs px-3 pt-2 border-0">
-                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#appeal-pane">Appeal</button></li>
-                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#cr-pane">CR</button></li>
-                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#final-pane">Final Review</button></li>
-                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#accepted-pane">Accepted</button></li>
-                </ul>
-            </div>
-            
-            <div class="p-3">
-                <!-- SINGLE ROW CONTROLS -->
-                <div class="d-flex flex-wrap gap-2 mb-2 align-items-center">
-                    <!-- Global Shared Inputs -->
-                    <div class="input-group" style="width: auto; flex: 1 1 150px;">
-                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-                        <input type="text" class="form-control" id="note_Name" placeholder="Name">
-                    </div>
-                    <div class="input-group" style="width: auto; flex: 1 1 130px;">
-                        <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
-                        <input type="date" class="form-control font-num" id="note_Date">
-                    </div>
-
-                    <!-- Dynamic 3rd Input: Appeal -->
-                    <div id="ctrl-appeal-pane" class="tab-ctrl d-flex flex-wrap gap-2" style="flex: 2 1 180px;">
-                        <div class="input-group">
-                            <span class="input-group-text">Initial</span>
-                            <select class="form-select" id="note_Initial_Appeal">
-                                <option value="" selected disabled>Select Level...</option>
-                                <option value="1ST APPEAL">1st Appeal</option>
-                                <option value="2ND APPEAL">2nd Appeal</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Dynamic 3rd Input: CR -->
-                    <div id="ctrl-cr-pane" class="tab-ctrl d-none flex-wrap gap-2" style="flex: 3 1 300px;">
-                        <div class="input-group" style="flex: 1 1 150px;">
-                            <span class="input-group-text">Type</span>
-                            <select class="form-select" id="note_Status_CR">
-                                <option value="" selected disabled>Select...</option>
-                                <option value="Dispute Claim">Dispute Claim</option>
-                                <option value="Message This Payer">Msg This Payer</option>
-                            </select>
-                        </div>
-                        <div class="input-group" style="flex: 1 1 120px;">
-                            <span class="input-group-text">Ref #</span>
-                            <input type="text" class="form-control font-num" id="input_CR_Number" placeholder="Ref #">
-                        </div>
-                    </div>
-                    
-                    <!-- Dynamic 3rd Input: Final -->
-                    <div id="ctrl-final-pane" class="tab-ctrl d-none flex-wrap gap-2" style="flex: 2 1 180px;">
-                         <div class="input-group">
-                            <span class="input-group-text">Status</span>
-                            <select class="form-select" id="note_Status_Final">
-                                <option value="" selected disabled>Select Status...</option>
-                                <option value="In Network FR">In Network FR</option>
-                                <option value="Process Correctly">Process Correctly</option>
-                                <option value="ALL ACTION DONE">ALL ACTION DONE</option>
-                                <option value="SUTURE REMOVAL">SUTURE REMOVAL</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Dynamic 3rd Input: Accepted -->
-                    <div id="ctrl-accepted-pane" class="tab-ctrl d-none flex-wrap gap-2" style="flex: 3 1 300px;">
-                         <div class="input-group" style="flex: 1 1 150px;">
-                            <span class="input-group-text">Status</span>
-                            <select class="form-select" id="note_Status_Accepted">
-                                <option value="" selected disabled>Select...</option>
-                                <option value="Got Payment">Got Payment</option>
-                                <option value="Neg Done">Neg Done (No IDR)</option>
-                                <option value="Pre Neg Accepted">Pre Neg Accepted</option>
-                            </select>
-                        </div>
-                        <div class="input-group" id="div_Additional" style="display:none; flex: 1 1 120px;">
-                            <span class="input-group-text">Addl</span>
-                            <input type="text" class="form-control font-num text-success" id="input_Additional" placeholder="$0.00">
-                        </div>
-                        <div class="input-group" id="div_PriceOffer" style="display:none; flex: 1 1 120px;">
-                            <span class="input-group-text">Offer</span>
-                            <input type="text" class="form-control font-num text-warning" id="input_PriceOffer" placeholder="$0.00">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TEXTAREAS -->
-                <div class="tab-content position-relative">
-                    <div class="tab-pane fade show active" id="appeal-pane">
-                        <textarea id="note_Output_Appeal" class="form-control custom-scroll" rows="5" readonly placeholder="Note will appear here... Click to copy"></textarea>
-                    </div>
-                    <div class="tab-pane fade" id="cr-pane">
-                        <textarea id="note_Output_CR" class="form-control custom-scroll" rows="5" readonly placeholder="Select Type to generate note... Click to copy"></textarea>
-                    </div>
-                    <div class="tab-pane fade" id="final-pane">
-                        <textarea id="note_Output_Final" class="form-control custom-scroll" rows="5" readonly placeholder="Select Status to generate note... Click to copy"></textarea>
-                    </div>
-                    <div class="tab-pane fade" id="accepted-pane">
-                        <textarea id="note_Output_Accepted" class="form-control custom-scroll" rows="5" readonly placeholder="Select Status to generate note... Click to copy"></textarea>
-                    </div>
-                    
-                    <div id="copyMsg" class="position-absolute bottom-0 end-0 m-2 text-success fw-bold small bg-success bg-opacity-10 px-2 py-1 rounded" style="opacity:0; transition:0.3s; z-index: 10;"><i class="bi bi-check-circle-fill me-1"></i> Copied!</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom Row: Excel & Summary -->
-        <div class="row g-3 mt-auto">
-            <div class="col-md-6">
-                <div class="glass-panel p-3 h-100 excel-box d-flex flex-column justify-content-center" id="excel-box-call" title="Click to copy">
-                    <div class="d-flex justify-content-between align-items-center px-1">
-                        <span class="font-head fw-bold text-success fs-6"><i class="bi bi-file-earmark-spreadsheet-fill me-2"></i>Call Log Export</span>
-                        <i class="bi bi-clipboard2-check text-success fs-5"></i>
-                    </div>
-                    <input type="text" id="excel_Copy_Input" class="form-control mt-2 bg-transparent border-0 px-1 font-num text-success" readonly value="Date | Name | Ticket | PT First | PT Last | Claim | Ins ID | Bill | DOS">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="glass-panel p-3 h-100" style="cursor:pointer; position:relative;" id="summary-box" title="Click to Copy Summary">
-                    <span class="section-label text-secondary mb-2"><i class="bi bi-card-text me-1"></i> Word Summary</span>
-                    <div style="font-family: var(--font-body); font-size: 0.8rem; line-height: 1.5; font-weight: 500;">
-                        <div class="d-flex justify-content-between border-bottom border-secondary border-opacity-10 pb-1 mb-1"><span>RE: <b id="sum_patient" class="text-main">PATIENT</b></span><span>NPI: <b id="sum_npi" class="font-num">000</b></span></div>
-                        <div class="d-flex justify-content-between border-bottom border-secondary border-opacity-10 pb-1 mb-1"><span>Plan ID: <b id="sum_member" class="font-num">ID</b></span><span>Group: <b id="sum_group" class="font-num">GRP</b></span></div>
-                        <div class="d-flex justify-content-between border-bottom border-secondary border-opacity-10 pb-1 mb-1"><span>Claim #: <b id="sum_claim" class="font-num">CLM</b></span><span>DOS: <b id="sum_dos" class="font-num">DOS</b></span></div>
-                        <div class="d-flex justify-content-between border-bottom border-secondary border-opacity-10 pb-1 mb-1"><span>Charges: <b id="sum_billed" class="font-num">$0</b></span><span>Paid: <b id="sum_paid" class="font-num text-success">$0</b></span></div>
-                        <div class="d-flex justify-content-between"><span>TICKET: <b id="sum_ticket" class="font-num text-primary">TCK</b></span><span>Expected: <b id="sum_expected" class="font-num text-warning">$0</b></span></div>
-                    </div>
-                    <div id="copyMsgSummary" class="position-absolute top-0 end-0 m-2 text-success fw-bold small bg-success bg-opacity-10 px-2 py-1 rounded" style="opacity:0; transition:0.3s;"><i class="bi bi-check-circle-fill me-1"></i> Copied!</div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    let globalData=null, globalVals={};
-    const htmlEl=document.documentElement, themeToggle=document.getElementById('themeToggle');
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const st=localStorage.getItem('theme')||'light'; setTheme(st);
-        const sn=localStorage.getItem('appeal_name'); if(sn)document.getElementById('note_Name').value=sn;
-        const now=new Date().toLocaleString("en-US",{timeZone:"Asia/Dhaka"}), d=new Date(now);
-        document.getElementById('note_Date').value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-
-        // Tab Toggling Logic for the compact 1-serial inputs
-        document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(btn => {
-            btn.addEventListener('shown.bs.tab', event => {
-                const targetPaneId = event.target.getAttribute('data-bs-target').replace('#', '');
-                document.querySelectorAll('.tab-ctrl').forEach(el => {
-                    el.classList.remove('d-flex');
-                    el.classList.add('d-none');
-                });
-                const targetCtrl = document.getElementById('ctrl-' + targetPaneId);
-                if(targetCtrl) {
-                    targetCtrl.classList.remove('d-none');
-                    targetCtrl.classList.add('d-flex');
-                }
-            });
-        });
-    });
-
-    themeToggle.addEventListener('click', () => {
-        setTheme(htmlEl.getAttribute('data-bs-theme')==='dark'?'light':'dark');
-    });
-
-    function setTheme(t) {
-        htmlEl.setAttribute('data-bs-theme',t);
-        localStorage.setItem('theme',t);
-        themeToggle.innerHTML = t==='dark' ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-stars-fill"></i>';
-    }
-
-    // Input Listeners
-    document.getElementById('note_Name').addEventListener('input', e => {
-        localStorage.setItem('appeal_name',e.target.value);
-        if(globalData){generateAllNotes();updateExcelString()}
-    });
-    document.getElementById('note_Date').addEventListener('change',()=>{if(globalData){generateAllNotes();updateExcelString()}});
-    ['note_Initial_Appeal','note_Status_CR','input_CR_Number','note_Status_Final','note_Status_Accepted'].forEach(id=>{
-        const el=document.getElementById(id);
-        if(el){ el.addEventListener('change',generateAllNotes); el.addEventListener('input',generateAllNotes); }
-    });
-    document.getElementById('note_Status_Accepted').addEventListener('change',function(){
-        const v=this.value;
-        document.getElementById('div_Additional').style.display=(v==='Got Payment')?'flex':'none';
-        document.getElementById('div_PriceOffer').style.display=(v==='Pre Neg Accepted')?'flex':'none';
-    });
-
-    // Buttons
-    document.getElementById('extractBtn').addEventListener('click',function(){
-        const b=this; const oldHtml = b.innerHTML; 
-        b.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Extracting...';
-        setTimeout(()=>{processData(); b.innerHTML=oldHtml;},300);
-    });
-
-    document.getElementById('clearBtn').addEventListener('click',()=>{
-        document.getElementById('eobInput').value=''; 
-        document.querySelectorAll('textarea[readonly]').forEach(t=>t.value=''); 
-        document.querySelectorAll('select').forEach(s=>s.value="");
-        globalData=null; globalVals={};
-        document.getElementById('sidebar-content').innerHTML='<div class="text-center text-muted p-5 small fw-bold opacity-50 font-num">Paste EOB and click Extract to see details.</div>';
-        ['res_billed','res_paid','res_coins','res_ded','res_addl','res_oon_coins','res_oon_ded','res_prior_coins','res_medicare'].forEach(id=>document.getElementById(id).textContent='$0.00');
-        ['sum_patient','sum_npi','sum_member','sum_group','sum_claim','sum_dos','sum_billed','sum_paid','sum_ticket','sum_expected'].forEach(id=>document.getElementById(id).innerText='--');
-        document.querySelectorAll('.is-invalid').forEach(el=>el.classList.remove('is-invalid'));
-    });
-
-    // Copy Handlers
-    function copyTxt(id,msgId){
-        const el=document.getElementById(id); if(!el.value)return;
-        el.select(); document.execCommand('copy');
-        const m=document.getElementById(msgId); m.style.opacity=1; setTimeout(()=>m.style.opacity=0,1500);
-    }
-    ['note_Output_Appeal','note_Output_CR','note_Output_Final','note_Output_Accepted'].forEach(id=>document.getElementById(id).addEventListener('click',()=>copyTxt(id,'copyMsg')));
-    
-    document.getElementById('excel-box-call').addEventListener('click',function(){
-        document.getElementById('excel_Copy_Input').select(); document.execCommand('copy');
-        this.style.backgroundColor="rgba(16, 185, 129, 0.2)"; setTimeout(()=>this.style.backgroundColor="", 300);
-    });
-
-    document.getElementById('summary-box').addEventListener('click',function(){
-        const r=document.createRange(); r.selectNode(this.querySelector('div')); 
-        window.getSelection().removeAllRanges(); window.getSelection().addRange(r); document.execCommand('copy'); window.getSelection().removeAllRanges();
-        const m=document.getElementById('copyMsgSummary'); m.style.opacity=1; setTimeout(()=>m.style.opacity=0,1500);
-    });
-
-    // Helpers
-    function formatCurrency(n){return '$'+(parseFloat(n)||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
-    function parseCurrency(s){return parseFloat(s?.replace(/[$,\s]/g,''))||0}
-    function extractVal(t,r){const m=t.match(r);return(m&&m[2])?m[2].trim():null}
-    function extractLine(t,r){
-        const m=t.match(r); if(!m)return null;
-        const sub=t.substring(m.index+m[0].length).split(/[\r\n]+/);
-        for(const l of sub){const tl=l.trim();if(tl.length>0){if(tl.match(/^[a-zA-Z\s\.\/()-]+:/)&&!tl.match(/[\$0-9]/))return null;return tl}}
-        return null;
-    }
-
-    // --- STREAMING_CHUNK: Core Parsing Logic ---
-    function processData(){
-        const t=document.getElementById('eobInput').value; if(!t.trim())return;
-        
-        let sd = '--'; 
-        let sdRaw = extractLine(t, /(?:^|[\r\n]+)\s*(?:Service Dates?|Date of Service|DOS)\s*:?/i) || t.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/)?.[1];
-        if(sdRaw) {
-             let dates = sdRaw.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/g);
-             if(dates && dates.length > 0) sd = dates[0]; 
-        }
-
-        let mem=extractVal(t,/(Member ID|Identification No|ID Number)\s*[:#]?\s*([^\r\n]+)/i)||'--';
-        if(mem.length>3)mem=mem.substring(0,3)+mem.substring(3).replace(/^0+/,'');
-
-        globalData={
-            ticket:extractVal(t,/(Patient Account Number|Pt Acct No|Ticket Number)\s*[:#]?\s*([^\r\n]+)/i)||'--',
-            serviceDate:sd,
-            receivedDate:extractVal(t,/(Received Date|Date Received)\s*[:]?\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i)||'--',
-            finalizedDate:extractVal(t,/(Finalized Date|Processed Date)\s*[:]?\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i)||'--',
-            claimNo:extractVal(t,/(Claim I?D|Claim No|Claim Number|Control Number)\s*[:#]?\s*([^\r\n]+)/i)||'--',
-            memberId:mem,
-            groupNo:extractVal(t,/(Group Number|Group No|Group ID)\s*[:#]?\s*([^\r\n]+)/i)||'--',
-            npi:extractVal(t,/(Billing NPI|NPI)\s*[:#]?\s*(\d+)/i)||'--',
-            provider:extractLine(t,/(?:^|[\r\n]+)\s*(?:Billing Provider Name|Billing Provider|Provider Name)\s*:?/i)||'--',
-            patient:extractLine(t,/(?:^|[\r\n]+)\s*(?:Patient Name|Patient Name)\s*:?/i)||'--'
-        };
-
-        // NEW FIX: Regex to grab the value *immediately following* the label
-        function getAmtAfterLabel(text, regex) {
-            const match = text.match(regex);
-            if(match && match[1]) {
-                return parseCurrency(match[1]);
-            }
-            return 0;
-        }
-
-        globalVals={
-            billed:parseCurrency(extractLine(t,/(?:^|[\r\n]+)\s*(?:Total Bill|Billed Amount|Total Charges|Amount Billed)\s*:?/i)),
-            paid:parseCurrency(extractLine(t,/(?:^|[\r\n])\s*(?:Total\s+Paid|Plan\s+Paid|Paid\s+Amount|Total\s+Payment|Net\s+Payment)\s*:?/i)),
-            
-            // Fixed precise matches based on request
-            coins: getAmtAfterLabel(t, /Coinsurance(?:\s+Amount)?\s*:?\s*[\r\n]*\s*\$?([\d,]+\.\d{2})/i),
-            ded: getAmtAfterLabel(t, /Deductible(?:\s+Amount)?\s*:?\s*[\r\n]*\s*\$?([\d,]+\.\d{2})/i),
-            addl: getAmtAfterLabel(t, /(?:Insurance\s+Current\s+Paid(?:\s+Amount)?|Additional\s+Paid)\s*:?\s*[\r\n]*\s*\$?([\d,]+\.\d{2})/i),
-            oonCoins: getAmtAfterLabel(t, /Out\s+of\s+Network\s+Coinsurance(?:\s+Amount)?\s*:?\s*[\r\n]*\s*\$?([\d,]+\.\d{2})/i),
-            oonDed: getAmtAfterLabel(t, /Out\s+of\s+Network\s+Deductible(?:\s+Amount)?\s*:?\s*[\r\n]*\s*\$?([\d,]+\.\d{2})/i),
-            
-            priorCoins:parseCurrency(extractLine(t,/(?:^|[\r\n]+)\s*(?:Prior Notification Coinsurance)\s*:?/i)),
-            medicare:parseCurrency(extractLine(t,/(?:^|[\r\n]+)\s*(?:Medicare Paid Amount)\s*:?/i))
-        };
-        
-        updateUI(); generateAllNotes(); updateExcelString();
-    }
-
-    function updateUI(){
-        const sb=document.getElementById('sidebar-content');
-        let mD=globalData.memberId; if(mD.length>3) mD=`<span style="color:#d946ef;font-weight:900">${mD.substring(0,3)}</span>${mD.substring(3)}`;
-        
-        const totAllowed = globalVals.paid + globalVals.coins + globalVals.ded;
-        // Total PT Logic: Coins + Ded + OON Coins + OON Ded
-        const totPT = globalVals.coins + globalVals.ded + globalVals.oonCoins + globalVals.oonDed;
-        const adjPT = globalVals.billed - totAllowed;
-        const adjWO = globalVals.billed - globalVals.paid;
-        
-        sb.innerHTML=`
-            <div class="d-flex flex-column gap-2">
-                <div class="result-item"><span>Ticket</span><span class="font-num text-primary">${globalData.ticket}</span></div>
-                <div class="result-item"><span>Patient</span><span class="text-end" style="max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${globalData.patient}">${globalData.patient}</span></div>
-                <div class="result-item"><span>DOS</span><span class="font-num">${globalData.serviceDate}</span></div>
-                <div class="result-item"><span>Received</span><span class="font-num">${globalData.receivedDate}</span></div>
-                <div class="result-item"><span>Finalized</span><span class="font-num">${globalData.finalizedDate}</span></div>
-                <div class="result-item"><span>Claim #</span><span class="font-num">${globalData.claimNo}</span></div>
-                <div class="result-item"><span>Member ID</span><span class="font-num">${mD}</span></div>
-                <div class="result-item"><span>Group #</span><span class="font-num">${globalData.groupNo}</span></div>
-                <div class="result-item"><span>NPI</span><span class="font-num">${globalData.npi}</span></div>
-                
-                <div class="mt-3 pt-2 border-top border-secondary border-opacity-10">
-                    <div class="result-item"><span class="text-primary">Total Allowed</span><span class="font-num text-primary">${formatCurrency(totAllowed)}</span></div>
-                    <div class="result-item"><span class="text-danger">Total PT</span><span class="font-num text-danger">${formatCurrency(totPT)}</span></div>
-                    <div class="result-item"><span>Adj (with PT)</span><span class="font-num hl-adj-pt">${formatCurrency(adjPT)}</span></div>
-                    <div class="result-item"><span>Adj (w/o PT)</span><span class="font-num hl-adj-wo">${formatCurrency(adjWO)}</span></div>
-                </div>
-
-                <div class="mt-2 p-2 bg-secondary bg-opacity-10 rounded text-center small text-muted font-monospace" style="font-size: 0.7rem;">${globalData.provider}</div>
-            </div>
-        `;
-        
-        ['billed','paid','coins','ded','addl','oonCoins','oonDed','priorCoins','medicare'].forEach(k=>{
-            const elId = k.replace(/([A-Z])/g, "_$1").toLowerCase();
-            const el = document.getElementById(`res_${elId}`);
-            if(el) {
-                el.textContent = formatCurrency(globalVals[k]);
-                if(globalVals[k] > 0 && k.includes('oon')) el.classList.add('text-dng');
-            }
-        });
-
-        document.getElementById('sum_patient').innerText=globalData.patient; document.getElementById('sum_npi').innerText=globalData.npi; document.getElementById('sum_member').innerText=globalData.memberId; document.getElementById('sum_group').innerText=globalData.groupNo; document.getElementById('sum_claim').innerText=globalData.claimNo; document.getElementById('sum_dos').innerText=globalData.serviceDate; document.getElementById('sum_billed').innerText=formatCurrency(globalVals.billed); document.getElementById('sum_paid').innerText=formatCurrency(globalVals.paid); document.getElementById('sum_ticket').innerText=globalData.ticket; document.getElementById('sum_expected').innerText=formatCurrency(globalVals.billed*0.9);
-    }
-
-    // --- STREAMING_CHUNK: Note Generation ---
-    function generateAllNotes(){
-        if(!globalData)return;
-        const nmIn=document.getElementById('note_Name'); nmIn.classList.remove('is-invalid');
-        const nm=nmIn.value.toUpperCase(); 
-        if(!nm) { nmIn.classList.add('is-invalid'); return; }
-
-        const dVal=document.getElementById('note_Date').value.split('-');
-        const dateStr=dVal.length===3?`${dVal[1]}/${dVal[2]}/${dVal[0].slice(-2)}`:'--';
-        const fmt=n=>'$'+(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,','), gV=k=>fmt(globalVals[k]);
-
-        // Appeal
-        const appLvl = document.getElementById('note_Initial_Appeal').value;
-        const outputAppeal = document.getElementById('note_Output_Appeal');
-        if(appLvl) {
-            const lvlTxt = appLvl === "1ST APPEAL" ? "1ST LEVEL APPEAL" : "2ND LEVEL APPEAL";
-            let note = `${dateStr}>${appLvl}>${nm}>CLAIM NO #${globalData.claimNo}; BILLED AMOUNT ${formatCurrency(globalVals.billed)}, INS PAID ${formatCurrency(globalVals.paid)}, CO-INSURANCE ${formatCurrency(globalVals.coins)}, CO-PAY/DED ${formatCurrency(globalVals.ded)}. MAILED ${lvlTxt} TO BCBS REQUESTING THE CLAIM TO BE RECONSIDERED AT A HIGHER LEVEL UTILIZING THE UCR RATE ACCORDING THE RENDERING ZIP CODE OR AT 87% OF BILLED CHARGES. LOW ALLOWABLE APPEAL SENT TO BCBS LOCAL PLAN.`;
-            outputAppeal.value = note;
-        }
-
-        // CR
-        const crSt = document.getElementById('note_Status_CR').value;
-        const crRef = document.getElementById('input_CR_Number').value;
-        const outputCR = document.getElementById('note_Output_CR');
-        if(crSt) {
-            const pct = (globalVals.billed > 0) ? ((globalVals.paid+globalVals.coins+globalVals.ded)/globalVals.billed*100).toFixed(0) : 0;
-            let note = `${dateStr}>CLAIM REVIEW>${nm}>CLAIM NO. # ${globalData.claimNo}; RECONSIDERATION: RETRIEVED CLAIM STATUS VIA AVAILITY. CLAIM BILLED ${formatCurrency(globalVals.billed)}, PAID ${formatCurrency(globalVals.paid)} AND APPLIED ${formatCurrency(globalVals.coins)} CO-INS AND ${formatCurrency(globalVals.ded)} TO DED ON ${globalData.finalizedDate}. CLAIM ALLOWED ${formatCurrency(globalVals.paid+globalVals.coins+globalVals.ded)} AND PROCESSED AT ${pct}% OF BILLED CHARGES. `;
-            note += crSt === "Dispute Claim" ? `SENT RECONSIDERATION VIA DISPUTE CLAIM REQUESTING THE CLAIM TO BE REPROCESSED AT A HIGHER ALLOWABLE.${crRef}` : `SENT MESSAGE USING MESSAGE THIS PAYER VIA AVAILITY REQUESTING THE CLAIM TO BE REPROCESSED AT A HIGHER ALLOWABLE. INTERACTION REFERENCE NUMBER IS # ${crRef}`;
-            outputCR.value = note;
-        }
-
-        // Final
-        const finSt = document.getElementById('note_Status_Final').value;
-        const outputFinal = document.getElementById('note_Output_Final');
-        if(finSt) {
-            let note = "";
-            if(finSt === "In Network FR") {
-                note = `${dateStr}>FINAL REVIEW>${nm}>WORKING ON PHYSICIANS IN-NETWORK PROJECT. CLAIM NO. # ${globalData.claimNo}; BILLED ${formatCurrency(globalVals.billed)}, INS PAID ${formatCurrency(globalVals.paid)}, CO INS ${formatCurrency(globalVals.coins)}, CO-PAY/DED ${formatCurrency(globalVals.ded)}. DATE OF SERVICE FOR THIS ACCOUNT 11/15/2024 . ACCORDING TO THE PHYSICIANS IN-NETWORK RULES, EFFECTIVE 11/15/2024, ALL PHYSICIAN ACCOUNTS WILL BE WORKED FOLLOWING THE PHYSICIANS IN-NETWORK RULES. THIS CLAIM WAS REVIEWED AND PROCESSED AT THE HIGHEST IN-NETWORK LEVEL BASED ON THE FEE SCHEDULE RATE. NO FURTHER ACTION IS REQUIRED AT THIS TIME, AND THE REMAINING BALANCE WILL BE ADJUSTED ACCORDINGLY.`;
-            } else {
-                note = `${dateStr}>FINAL REVIEW>${nm}>CLAIM# ${globalData.claimNo}; `;
-                if(finSt === "SUTURE REMOVAL") note += `BILLED ${gV('billed')}, INS PD ${gV('paid')}, CO INS ${gV('coins')}, CO-PAY/DED ${gV('ded')}. THIS WAS A SUTURE REMOVAL. WE DO NOT APPEAL FOR THIS. BILL ADJUSTED AS MISC ADJ.`;
-                else {
-                    note += `${finSt === "Process Correctly" ? "CLAIM DOES MEET" : "CLAIM DOES NOT MEET"} THE CRITERIA OF BEING PROCESSED AT OR ABOVE 80% OF ALLOWABLE CHARGES. CLAIM STATUS IS AS FOLLOWS: TOTAL CHARGE ${formatCurrency(globalVals.billed)}, PAID ${formatCurrency(globalVals.paid)}, CO-INS ${formatCurrency(globalVals.coins)}, DEDUCTIBLE ${formatCurrency(globalVals.ded)}. `;
-                    if(finSt === "ALL ACTION DONE") note += "ALL ACTION DONE. ";
-                    note += "BALANCE TO BE ADJUSTED ACCORDINGLY.";
-                }
-            }
-            outputFinal.value = note;
-        }
-
-        // Accepted
-        const accSt = document.getElementById('note_Status_Accepted').value;
-        const outputAccepted = document.getElementById('note_Output_Accepted');
-        if(accSt) {
-            let note = "";
-            if(accSt === "Got Payment") {
-                let addl = document.getElementById('input_Additional').value;
-                note = `${dateStr}>FINAL REVIEW>${nm}>WORKING ON COLLECTOR WORKLIST. NSA NEGOTIATION SUBMITTED FOR THIS ACCOUNT. WE GOT PAYMENT AFTER NEGOTIATION. CLAIM# ${globalData.claimNo}; TOTAL CHARGE ${formatCurrency(globalVals.billed)}, INS PAID ${formatCurrency(globalVals.paid)}, CO-INS ${formatCurrency(globalVals.coins)}, DEDUCTIBLE ${formatCurrency(globalVals.ded)}, ADDITIONAL PAID $${addl}. NO FURTHER ACTION NEEDED. BALANCE TO BE ADJUSTED ACCORDINGLY.`;
-            } else if(accSt === "Neg Done") {
-                note = `${dateStr}>FINAL REVIEW>${nm}>WORKING ON COLLECTOR WORKLIST, CLAIM# ${globalData.claimNo}, TOTAL CHARGE ${gV('billed')}, INS PAID ${gV('paid')}, CO-INS ${gV('coins')}, DEDUCTIBLE ${gV('ded')}, NSA NEGOTIATION DONE AND NOT ACCEPTED, INELIGIBLE FOR IDR, NO FURTHER ACTION NEEDED. BALANCE TO BE ADJUSTED ACCORDINGLY.`;
-            } else {
-                let offer = document.getElementById('input_PriceOffer').value;
-                let pct = (globalVals.billed > 0) ? (parseCurrency(offer)/globalVals.billed*100).toFixed(0) : 0;
-                note = `${dateStr}>FINAL REVIEW>${nm}>CLAIM# ${globalData.claimNo}, BILLED AMOUNT ${formatCurrency(globalVals.billed)} INS PAID ${formatCurrency(globalVals.paid)}, CO-INS ${formatCurrency(globalVals.coins)}, COPAY/DEDUCTIBLE ${formatCurrency(globalVals.ded)}. PRICE OFFER WAS $${offer} @${pct}%. PROCESSED CORRECTLY AS PRE-NEG OFFER ACCEPTED. NO FURTHER ACTION NEEDED. BALANCE TO BE ADJUSTED ACCORDINGLY.`;
-            }
-            outputAccepted.value = note;
-        }
-    }
-
-    function updateExcelString() {
-        if(!globalData) return;
-        const name = document.getElementById('note_Name').value.toUpperCase();
-        const dVal = document.getElementById('note_Date').value.split('-');
-        const dateStr = dVal.length===3 ? `${dVal[1]}/${dVal[2]}/${dVal[0].slice(-2)}` : '--';
-        const pt = globalData.patient.split(',');
-        const ptF = pt[1] ? pt[1].trim() : globalData.patient.split(' ')[0];
-        const ptL = pt[0] ? pt[0].trim() : (globalData.patient.split(' ')[1] || '');
-        document.getElementById('excel_Copy_Input').value = `${dateStr}\t${name}\t${globalData.ticket}\t${ptF}\t${ptL}\t${globalData.claimNo}\t${globalData.memberId}\t${globalVals.billed.toFixed(2)}\t${globalData.serviceDate}`;
-    }
-</script>
 </body>
 </html>
