@@ -1,600 +1,176 @@
-
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Accepted Email - NSA Tool</title>
-<link rel="icon" type="image/png" href="index.png">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<style>
-/* --- CORE VARIABLES --- */
-:root {
- --f:'Outfit',sans-serif; --mono:'Rajdhani',monospace; --nav-h:70px;
- --pri:#6366f1; --sec:#0ea5e9; --txt:#334155; --txt-l:#64748b;
- --bg-body: #f8fafc; 
- --bg-grad: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
- --glass: rgba(255, 255, 255, 0.9); --blur: 20px; 
- --bor: 1px solid rgba(255, 255, 255, 0.6); 
- --sh: 0 10px 30px rgba(0,0,0,0.04);
- --card-bg: #ffffff;
- --nav-bg: rgba(255, 255, 255, 0.95);
- --input-bg: #ffffff;
- /* Watch Vars */
- --w-bg: rgba(255, 255, 255, 0.85);
- --w-txt: #1e293b;
- --w-acc: #6366f1;
-}
-[data-bs-theme="dark"] {
- --txt:#f1f5f9; --txt-l:#94a3b8; 
- --bg-body: #0f172a;
- --bg-grad: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
- --glass: rgba(30, 41, 59, 0.9); 
- --bor: 1px solid rgba(255, 255, 255, 0.1);
- --card-bg: rgba(30, 41, 59, 0.7);
- --nav-bg: rgba(15, 23, 42, 0.9);
- --input-bg: rgba(0, 0, 0, 0.2);
- --w-bg: rgba(15, 23, 42, 0.85);
- --w-txt: #f8fafc;
- --w-acc: #818cf8;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace Moved</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-body {
-    font-family: var(--f); background: var(--bg-grad);
-    margin: 0; display: flex; flex-direction: column; min-height: 100vh; 
-    color: var(--txt); transition: background 0.3s ease;
-    overflow-y: auto; padding-bottom: 80px; /* Space for watch */
-}
+    <!-- Auto Redirect (10 seconds) with NEW LINK -->
+    <meta http-equiv="refresh" content="10;url=https://script.google.com/macros/s/AKfycbw_h5AwpnpuzaAlNzIHQ96AwlPFSLNivtQgPJLUlLOuXjcLzfPnrJUTlBmKi3EsDb1N/exec">
 
-/* --- NAVIGATION --- */
-#nav {
-    position: sticky; top: 20px; margin: 0 auto 20px auto;
-    width: 95%; max-width: 1250px; height: 65px;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 1.5rem; z-index: 1100;
-    background: var(--nav-bg); backdrop-filter: blur(var(--blur));
-    border: var(--bor); border-radius: 50px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-}
-.brand { font-size: 1.3rem; font-weight: 700; background: linear-gradient(90deg, var(--pri), var(--sec)); -webkit-background-clip: text; color: transparent; white-space: nowrap; }
-.menu { display: flex; gap: 1.5rem; align-items: center; }
-.n-lnk { text-decoration: none; color: var(--txt); font-weight: 600; font-size: 0.9rem; opacity: 0.7; transition: .3s; position: relative; white-space: nowrap; }
-.n-lnk:hover, .n-lnk.active { opacity: 1; color: var(--pri); }
-.n-lnk.active::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 2px; background: var(--pri); border-radius: 2px; }
-.drop-box { position: relative; cursor: pointer; display: flex; align-items: center; }
-.drop-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%) translateY(15px); background: var(--nav-bg); border: var(--bor); border-radius: 16px; padding: 8px; min-width: 170px; opacity: 0; visibility: hidden; transition: .3s; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 4px; z-index: 1200; }
-.drop-box:hover .drop-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(5px); }
-.d-item { text-decoration: none; color: var(--txt); font-size: 0.85rem; padding: 8px 12px; border-radius: 10px; transition: .2s; font-weight: 500; display: flex; align-items: center; gap: 8px; }
-.d-item:hover { background: rgba(99, 102, 241, 0.1); color: var(--pri); }
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #0ea5e9;
+            /* Light Theme Variables */
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #0f172a;
+            --text-sub: #475569;
+        }
 
-.n-rt { display: flex; align-items: center; gap: 10px; }
-.btn-nav-act { border: none; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; color: white; transition: .2s; display: flex; align-items: center; gap: 5px; cursor: pointer; }
-.btn-clr { background: linear-gradient(135deg, #ef4444, #f43f5e); }
-.btn-ext { background: linear-gradient(135deg, #22c55e, #10b981); margin-right: 8px; }
-.btn-nav-act:hover { transform: translateY(-1px); filter: brightness(110%); }
-.t-btn { width: 34px; height: 34px; border-radius: 50%; border: var(--bor); background: transparent; color: var(--txt); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: .3s; }
-.t-btn:hover { background: var(--pri); color: #fff; transform: rotate(20deg); }
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.08) 0px, transparent 50%);
+            color: var(--text-main);
+            overflow: hidden;
+        }
 
-/* --- LAYOUT --- */
-#wrap { 
-    width: 95%; max-width: 1250px; margin: 0 auto; 
-    display: flex; gap: 20px; padding-bottom: 40px; 
-    flex-wrap: wrap; 
-}
+        .container {
+            width: 90%;
+            max-width: 500px;
+            padding: 40px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            animation: floatUp 0.6s ease-out;
+        }
 
-/* Sidebar */
-#sb { 
-    width: 260px; background: var(--glass); border: var(--bor); 
-    backdrop-filter: blur(15px); display: flex; flex-direction: column; 
-    border-radius: 20px; margin-bottom: 20px; 
-    box-shadow: var(--sh); height: fit-content;
-}
-#sb-c { padding: 1.5rem; display: flex; flex-direction: column; gap: 8px; }
-.res-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-.res-lbl { font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: var(--txt-l); }
-.res-val { font-size: 0.85rem; font-weight: 600; color: var(--pri); word-break: break-all; text-align: right; }
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-/* Main Content */
-#main { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(79,70,229,0.1), rgba(14,165,233,0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--secondary);
+            font-size: 2.5rem;
+            border: 1px solid rgba(14,165,233,0.2);
+            animation: pulse 2s infinite;
+        }
 
-/* Components */
-.card { background: var(--card-bg); border: var(--bor); border-radius: 16px; box-shadow: var(--sh); padding: 1.5rem; }
-.form-control, .form-select { background: var(--input-bg); border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-size: 0.9rem; color: var(--txt); transition: .2s; }
-.form-control:focus { box-shadow: 0 0 0 2px var(--pri); border-color: transparent; outline: 0; }
-.section-title { font-size: 0.85rem; font-weight: 700; color: var(--pri); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: block; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(14,165,233, 0.2); }
+            70% { box-shadow: 0 0 0 15px rgba(14,165,233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14,165,233, 0); }
+        }
 
-/* Textarea No Scrollbar */
-textarea.form-control { resize: none; overflow: hidden; }
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0 10px;
+            background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-/* Generate Button */
-.btn-gen { background: linear-gradient(135deg, var(--pri), var(--sec)); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; width: 100%; transition: .2s; box-shadow: 0 4px 15px rgba(99,102,241,0.3); font-size: 1rem; margin-top: 10px; }
-.btn-gen:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+        p {
+            font-size: 1rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
 
-/* Email Output Styling */
-.email-field-row { display: flex; margin-bottom: 8px; align-items: center; }
-.email-lbl { width: 60px; font-size: 0.8rem; font-weight: 600; color: var(--txt-l); }
-.email-val { flex: 1; font-size: 0.85rem; font-weight: 500; cursor: pointer; background: rgba(0,0,0,0.02); padding: 6px 10px; border-radius: 6px; border: 1px solid transparent; transition: .2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.email-val:hover { border-color: var(--pri); color: var(--pri); background: rgba(99,102,241,0.05); }
+        .highlight {
+            color: #0f172a;
+            font-weight: 700;
+            background: rgba(79, 70, 229, 0.1);
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
 
-/* --- WATCH WIDGET --- */
-#smart-watch {
-    position: fixed; bottom: 20px; left: 20px; z-index: 1000;
-    width: 140px; background: var(--w-bg); backdrop-filter: blur(15px);
-    border: var(--bor); border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-    padding: 15px; display: flex; flex-direction: column; align-items: center;
-    font-family: var(--mono); color: var(--w-txt); transition: .3s;
-}
-#smart-watch:hover { transform: translateY(-5px); }
-.w-main { display: flex; align-items: flex-end; gap: 6px; margin-bottom: 5px; height: 32px; overflow: hidden; }
-.w-time { font-size: 1.8rem; font-weight: 700; line-height: 1; }
-.w-sec-wrap { height: 26px; overflow: hidden; position: relative; width: 24px; }
-.w-sec-strip { position: absolute; top: 0; left: 0; display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.w-sec-num { height: 26px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; color: var(--w-acc); }
-.w-date { font-size: 0.7rem; font-weight: 600; opacity: 0.7; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
-.w-bar-bg { width: 100%; height: 6px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden; }
-[data-bs-theme="dark"] .w-bar-bg { background: rgba(255,255,255,0.1); }
-.w-bar-fill { height: 100%; background: linear-gradient(90deg, var(--pri), var(--sec)); width: 0%; border-radius: 10px; transition: width 1s linear; }
+        .btn-premium {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            border-bottom: 3px solid #3730a3;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-/* Toast */
-#copyMsg { position:fixed; bottom:30px; right:30px; background:var(--card-bg); color: #10b981; padding:10px 20px; border-radius:10px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); font-weight:600; font-size:0.9rem; border: var(--bor); opacity:0; pointer-events:none; transition: .3s; z-index: 1200; display:flex; align-items:center; gap:8px; }
-</style>
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+            filter: brightness(1.1);
+            border-bottom-width: 1px;
+            margin-bottom: 2px;
+            color: white;
+        }
+
+        .btn-premium:active {
+            transform: translateY(1px);
+            border-bottom-width: 0;
+            margin-bottom: 3px;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: rgba(71, 85, 105, 0.7);
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
 
-<!-- Navigation -->
-<nav id="nav">
-    <div class="brand">Pranto's Workspace</div>
-    <div class="menu d-none d-lg-flex">
-        <a href="index.html" class="n-lnk">Home</a>
-        <!-- Dropdown -->
-        <div class="drop-box">
-            <span class="n-link">BCBS <i class="bi bi-chevron-down small"></i></span>
-            <div class="drop-menu">
-                <a href="idr.html" class="d-item"><i class="bi bi-file-text"></i> IDR</a>
-                <a href="nsa.html" class="d-item"><i class="bi bi-shield"></i> NSA</a>
-                <a href="appeal.html" class="d-item"><i class="bi bi-arrow-repeat"></i> Appeal</a>
-             <a href="email.html" class="d-item"><i class="bi bi-envelope-check-fill"></i>  IDR Email</a>
-             <a href="#" class="d-item"><i class="bi bi-envelope-paper"></i> Accepted Email</a>
-            </div>
+    <div class="container">
+        <div class="icon-box">
+            <i class="bi bi-rocket-takeoff-fill"></i>
         </div>
-        <div class="drop-box">
-            <span class="n-link">Others <i class="bi bi-chevron-down small"></i></span>
-            <div class="drop-menu">
-                <a href="typing.html" class="d-item"><i class="bi bi-keyboard"></i> Typing</a>
-                <a href="game1.html" class="d-item"><i class="bi bi-stars"></i> 3D Runner</a>
-             <a href="#" class="d-item"><i class="bi bi-stars"></i> New</a>
-            </div>
-        </div>
-        <a href="#" class="d-link">Contact Us</a>
-    </div>
-    <div class="n-rt">
-        <button id="extractBtn" class="btn-nav-act btn-ext" onclick="extractData()"><i class="bi bi-funnel-fill"></i> Extract</button>
-        <button id="clearBtn" class="btn-nav-act btn-clr"><i class="bi bi-trash"></i> Clear</button>
-        <button id="theme-toggle" class="t-btn ms-2"><i id="theme-icon" class="bi bi-sun-fill"></i></button>
-    </div>
-</nav>
-
-<div id="wrap">
-    <!-- Left Sidebar: Extracted Data -->
-    <div id="sb">
-        <div class="p-4 border-bottom"><h6 class="m-0 fw-bold text-primary small"><i class="bi bi-list-columns-reverse me-2"></i>Extracted Data</h6></div>
-        <div id="sb-c">
-            <div class="res-item"><div class="res-lbl">Ticket #</div><div class="res-val" id="res_tic">--</div></div>
-            <div class="res-item"><div class="res-lbl">Claim #</div><div class="res-val" id="res_clm">--</div></div>
-            <div class="res-item"><div class="res-lbl">Group #</div><div class="res-val" id="res_grp">--</div></div>
-            <div class="res-item"><div class="res-lbl">Member ID</div><div class="res-val" id="res_mem">--</div></div>
-            <div class="res-item"><div class="res-lbl">Acc. Date</div><div class="res-val" id="res_dat">--</div></div>
-            <div class="res-item"><div class="res-lbl">Amount</div><div class="res-val" id="res_amt">--</div></div>
+        
+        <h1>We Have Moved!</h1>
+        
+        <p>This legacy workspace has been <span class="highlight">closed and relocated</span> to a new, faster, and more secure cloud server. Please save the new page link for future access.</p>
+        
+        <!-- Redirect Button to NEW Apps Script Web App -->
+        <a href="https://script.google.com/macros/s/AKfycbw_h5AwpnpuzaAlNzIHQ96AwlPFSLNivtQgPJLUlLOuXjcLzfPnrJUTlBmKi3EsDb1N/exec" class="btn-premium">
+            Access New Workspace <i class="bi bi-arrow-right-circle-fill"></i>
+        </a>
+        
+        <div class="footer-note">
+            * You will be redirected automatically in 10 seconds.
         </div>
     </div>
 
-    <!-- Main Workspace -->
-    <div id="main">
-        
-        <!-- SERIAL ORDER: EOB -> NEG -> INPUTS -> GENERATE -->
-        <div class="row">
-          <!-- 1. EOB Data -->
-        <div class="card col-3">
-            <span class="section-title">EOB</span>
-            <textarea id="pasteEOB" class="form-control small" rows="6" placeholder="Paste EOB content here..."></textarea>
-        </div>
-        <!-- 2. Negotiation Data -->
-        <div class="card col-3">
-            <span class="section-title">Negotiation</span>
-            <textarea id="pasteNeg" class="form-control small" rows="6" placeholder="Paste Negotiation content here..."></textarea>
-        </div>
-         <!-- 3. Input Details & Generate -->
-        <div class="col-6">
-          <div class="row g-3 align-items-end">
-                <div class="col-6">
-                    <label class="small fw-bold mb-1">Email Name</label>
-                    <input type="text" id="inpName" class="form-control persist-inp" placeholder="Your Name">
-                </div>
-                <div class="col-6 ">
-                    <label class="small fw-bold mb-1">Initials</label>
-                    <input type="text" id="inpInit" class="form-control persist-inp" placeholder="XY">
-                </div>
-                <div class="col-6">
-                    <label class="small fw-bold mb-1 text-danger">Dispute Num *</label>
-                    <input type="text" id="inpDisp" class="form-control" placeholder="10000...">
-                </div>
-                <div class="col-6">
-                    <label class="small fw-bold mb-1">Email Type</label>
-                    <select id="inpType" class="form-select">
-                        <option value="1">1st Email</option>
-                        <option value="2">2nd Email</option>
-                    </select>
-                </div>
-                <div class="col-6">
-                    <label class="small fw-bold mb-1">Custom Date</label>
-                    <input type="date" id="inpDate" class="form-control" title="Leave empty for Today (BDT)">
-                </div>
-                <div class="col-6">
-                  <button class="btn-gen" onclick="generate()"><i class="bi bi-lightning-charge-fill me-2"></i>Genarate</button>
-                </div>
-            </div>
-        </div>
-        </div>
-        
-        <!-- 4. Outputs (Bottom) -->
-        <div class="row g-3">
-            <!-- Email Column -->
-            <div class="col-lg-8">
-                <div class="card h-100">
-                    <span class="section-title">Generated Email (Click fields to Copy)</span>
-                    
-                    <!-- Email Headers -->
-                    <div class="email-field-row">
-                        <div class="email-lbl">To:</div>
-                        <input type="text" class="email-val form-control border-0 p-1" value="nsa.disputes@bcbstx.com" readonly onclick="copyField(this)">
-                    </div>
-                    <div class="email-field-row">
-                        <div class="email-lbl">CC:</div>
-                        <input type="text" class="email-val form-control border-0 p-1" value="Sharmin Islam <sislam@roundtmc.com>, Tiffany Thomas <tthomas@roundtmc.com>, Razo Siddique <razo@leverngear.com>, sufia@leverngear.com" readonly onclick="copyField(this)">
-                    </div>
-                    <div class="email-field-row">
-                        <div class="email-lbl">Subject:</div>
-                        <input type="text" id="outSub" class="email-val form-control border-0 p-1 fw-bold text-dark" placeholder="Subject line..." readonly onclick="copyField(this)">
-                    </div>
-                    <hr class="my-2 opacity-10">
-                    
-                    <!-- Email Body -->
-                    <textarea id="outBody" class="form-control border-0 bg-transparent ps-0" rows="12" readonly placeholder="Email body will type here..." style="font-size:0.95rem; line-height:1.6; cursor:pointer;" onclick="copyField(this)"></textarea>
-                </div>
-            </div>
-
-            <!-- Note Column -->
-            <div class="col-lg-4">
-                <div class="card h-100">
-                    <span class="section-title">Correspondence Note <i class="bi bi-cursor small ms-1 text-muted"></i></span>
-                    <textarea id="outNote" class="form-control" rows="15" readonly placeholder="Note..." style="font-size:0.85rem;" onclick="copyField(this)"></textarea>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<!-- Smart Watch Widget -->
-<div id="smart-watch">
-    <div class="w-main">
-        <div class="w-time" id="wTime">00:00</div>
-        <!-- Scrolling Seconds -->
-        <div class="w-sec-wrap">
-            <div class="w-sec-strip" id="wSecStrip">
-                <!-- JS will populate -->
-            </div>
-        </div>
-    </div>
-    <div class="w-date" id="wDate">--</div>
-    <div class="w-bar-bg"><div class="w-bar-fill" id="wBar"></div></div>
-</div>
-
-<!-- Copy Toast -->
-<div id="copyMsg"><i class="bi bi-clipboard-check-fill"></i> <span>Copied!</span></div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-/* --- INIT & THEME --- */
-document.addEventListener('DOMContentLoaded', ()=>{
-    const t = localStorage.getItem('theme')||'light'; 
-    setTheme(t);
-    loadPersist();
-    initClock();
-    
-    // Build Watch Seconds
-    const strip = document.getElementById('wSecStrip');
-    for(let i=0; i<60; i++) {
-        const div = document.createElement('div');
-        div.className = 'w-sec-num';
-        div.innerText = String(i).padStart(2,'0');
-        strip.appendChild(div);
-    }
-});
-
-function setTheme(t){
-    document.documentElement.setAttribute('data-bs-theme',t);
-    localStorage.setItem('theme',t);
-    document.getElementById('theme-icon').className = t==='dark'?'bi bi-moon-fill':'bi bi-sun-fill';
-}
-document.getElementById('theme-toggle').addEventListener('click',()=>{
-    const c=document.documentElement.getAttribute('data-bs-theme');
-    setTheme(c==='light'?'dark':'light');
-});
-
-/* --- CLOCK LOGIC --- */
-function initClock(){
-    const timeEl=document.getElementById('wTime');
-    const dateEl=document.getElementById('wDate');
-    const barEl=document.getElementById('wBar');
-    const strip=document.getElementById('wSecStrip');
-
-    setInterval(()=>{
-        const now=new Date();
-        const h=now.getHours();
-        const m=String(now.getMinutes()).padStart(2,'0');
-        const s=now.getSeconds();
-        
-        let h12=h%12; if(h12===0)h12=12;
-        timeEl.innerText=`${String(h12).padStart(2,'0')}:${m}`;
-        dateEl.innerText=now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
-        barEl.style.width=`${(s/60)*100}%`;
-        strip.style.transform = `translateY(-${s * 26}px)`;
-    },1000);
-}
-
-/* --- PERSISTENCE --- */
-function loadPersist(){
-    document.getElementById('inpName').value = localStorage.getItem('acc_name')||'';
-    document.getElementById('inpInit').value = localStorage.getItem('acc_init')||'';
-    
-    document.querySelectorAll('.persist-inp').forEach(i=>{
-        i.addEventListener('input', e=>{
-            if(e.target.id==='inpName') localStorage.setItem('acc_name', e.target.value);
-            if(e.target.id==='inpInit') localStorage.setItem('acc_init', e.target.value);
-        });
-    });
-}
-
-/* --- DATA EXTRACTION --- */
-let extractedData = { ticket: '--', claim: '--', group: '--', mem: '--', dat: '--', amt: '--' };
-
-function extractData(){
-    const eob = document.getElementById('pasteEOB').value;
-    const neg = document.getElementById('pasteNeg').value;
-    
-    if(!eob && !neg) { alertCopy('Paste data first!', '#dc3545'); return; }
-
-    // 1. EOB Extraction
-    const ticket = extract(eob, /(?:Patient Account Number|Pt Acct No)\s*[\r\n]+([^\r\n]+)/i, 'N/A');
-    const claim = extract(eob, /(?:Claim Number|Claim ID)\s*[\r\n]+([^\r\n]+)/i, 'N/A');
-    const group = extract(eob, /(?:Subscriber Group Number|Group ID)\s*[\r\n]+([^\r\n]+)/i, 'N/A');
-    
-    let rawMem = extract(eob, /(?:Subscriber Member ID|Member ID)\s*[\r\n]+([^\r\n]+)/i, '');
-    let finalMem = 'N/A';
-    if(rawMem && rawMem !== 'N/A') {
-        const prefix = rawMem.substring(0,3);
-        const suffix = rawMem.substring(3).replace(/^0+/, '');
-        finalMem = prefix + suffix;
-    }
-
-    // 2. Negotiation Extraction
-    let accDate = 'N/A';
-    let accAmt = 'N/A';
-    
-    if(neg) {
-        // A. Extract Date (First valid date at the top)
-        // Matches mm/dd/yyyy or Month dd yyyy
-        const dateMatch = neg.match(/(\d{1,2}\/\d{1,2}\/\d{4})|([A-Za-z]+\s+\d{1,2},?\s+\d{4})/);
-        if(dateMatch) {
-            const dObj = new Date(dateMatch[0]);
-            if(!isNaN(dObj.getTime())){
-                accDate = dObj.toLocaleDateString('en-US', { month:'2-digit', day:'2-digit', year:'2-digit' });
-            }
-        }
-        
-        // B. Extract Amount (Agreed Adjusted Total Allowed Amount)
-        // Logic: Find lines with table-like structure and multiple dollar amounts.
-        // Table Pattern: Date, ID, $Bill, $Prev, $Agreed
-        const lines = neg.split('\n');
-        const moneyRegex = /\$[\d,]+\.\d{2}/g;
-        
-        for(let l of lines){
-            // If line contains multiple $ and potentially starts with a date or ID
-            const moneys = l.match(moneyRegex);
-            if(moneys && moneys.length >= 2) {
-                // The Agreed Amount is usually the LAST money value in that row
-                accAmt = moneys[moneys.length - 1]; 
-            }
-        }
-    }
-
-    // Update Global & UI
-    extractedData = { ticket, claim, group, mem: finalMem, dat: accDate, amt: accAmt };
-    
-    document.getElementById('res_tic').innerText = ticket;
-    document.getElementById('res_clm').innerText = claim;
-    document.getElementById('res_grp').innerText = group;
-    document.getElementById('res_mem').innerText = finalMem;
-    document.getElementById('res_dat').innerText = accDate;
-    document.getElementById('res_amt').innerText = accAmt;
-    
-    alertCopy('Data Extracted!', '#10b981');
-}
-
-function extract(text, regex, fallback){
-    const m = text.match(regex);
-    return (m && m[1]) ? m[1].trim() : fallback;
-}
-
-/* --- GENERATION & ANIMATION --- */
-function generate(){
-    // 1. Validate
-    const disp = document.getElementById('inpDisp').value;
-    if(!disp) { alertCopy('Dispute Number required!', '#dc3545'); return; }
-    if(extractedData.ticket === '--') { alertCopy('Extract data first!', '#dc3545'); return; }
-
-    // 2. Gather Inputs
-    const name = document.getElementById('inpName').value || '[Your Name]';
-    const init = (document.getElementById('inpInit').value || 'NA').toUpperCase();
-    const type = document.getElementById('inpType').value;
-    const manualDate = document.getElementById('inpDate').value;
-
-    // 3. Determine Date (BDT or Manual)
-    let finalDateStr = '';
-    if(manualDate) {
-        const [y, m, d] = manualDate.split('-');
-        finalDateStr = `${m}/${d}/${y}`;
-    } else {
-        // BDT Timezone
-        finalDateStr = new Date().toLocaleDateString('en-US', {
-            timeZone: 'Asia/Dhaka',
-            month: '2-digit', day: '2-digit', year: '2-digit'
-        });
-    }
-
-    const { ticket, claim, group, mem, dat, amt } = extractedData;
-
-    // 4. Construct Content
-    let subject = '', body = '', note = '';
-
-    if(type === '1'){
-        // EMAIL 1
-        subject = `Urgent Request for Claim Reprocessing (NSA) - Dispute Number ${disp}`;
-        body = `Dear BCBS Representative,
-
-I am writing to bring your attention to the following claim details:
-
-• Ticket number: ${ticket}
-• Claim number: ${claim}
-• Member group number: ${group}
-• Member identification number: ${mem}
-• Dispute Number: ${disp}
-
-Attached to this email, you will find documentation indicating our acceptance of your NSA Negotiation Counter Offer of ${amt} on ${dat}. Despite this acceptance, we have noticed that the claim in question has not yet been reprocessed accordingly.
-
-According to the NSA and its implementing regulations (including 45 CFR 149.510(c)(4)(vii)), the plan or issuer must pay the balance of the total plan or coverage amount selected by the certified IDR entity, less any initial payment already made and any applicable patient cost-sharing, within 30 calendar days of the determination notification. As of today, this payment is outstanding.
-
-We kindly request that you thoroughly review all attached documents and proceed with the reprocessing of the claim at the agreed-upon negotiated amount without any further delay. It is imperative that the agreed-upon amount be provided or paid to us within 30 days.
-
-We appreciate your prompt attention to this matter and trust that you will take the necessary steps to ensure the claim is reprocessed accurately and promptly. Should you require any further information or clarification, please do not hesitate to reach out to me directly.
-
-Thank you for your cooperation and assistance.
-
-------------
-${name}
-Collection & Project, BCBS.`;
-
-        note = `${finalDateStr}>NSA FOLLOW UP>${init}>WORKING ON NSA ACCEPTED ACCOUNTS. WE ACCEPTED BCBS COUNTEROFFER OF ${amt} ON ${dat}. TWO MONTHS CROSSED BUT WE DID NOT GET THE EXPECTED AMOUNT AFTER THAT. WE SENT MAIL TO: <nsa.disputes@bcbstx.com> ON ${finalDateStr} FOR BCBS ATTENTION.`;
-
-    } else {
-        // EMAIL 2
-        subject = `Urgent Second-Level Appeal for Claim Reprocessing (NSA) - Dispute Number ${disp}`;
-        body = `Dear BCBS Representative,
-
-I am writing to escalate and formally request the immediate reprocessing of the following claim, which remains unresolved despite our acceptance of your NSA Negotiation Counter Offer:
-
-• Ticket Number: ${ticket}
-• Claim Number: ${claim}
-• Member Group Number: ${group}
-• Member Identification Number: ${mem}
-• Dispute Number: ${disp}
-
-On ${dat}, we accepted your counter offer of ${amt} as part of the NSA negotiation. Attached to this email are all supporting documents confirming this agreement. Despite this clear resolution, the claim has yet to be reprocessed at the agreed-upon amount.
-
-According to the NSA and its implementing regulations (including 45 CFR 149.510(c)(4)(vii)), the plan or issuer must pay the balance of the total plan or coverage amount selected by the certified IDR entity, less any initial payment already made and any applicable patient cost-sharing, within 30 calendar days of the determination notification. As of today, this payment is outstanding.
-
-This delay is unacceptable and inconsistent with the No Surprises Act guidelines. I request that BCBS immediately take action to:
-
-1. Reprocess the claim in alignment with the agreed amount of ${amt}.
-2. Confirm in writing that the reprocessing has been completed successfully.
-3. Ensure payment of the agreed amount within 30 days to prevent any further escalation or regulatory intervention.
-
-Failure to address this matter promptly may result in further action, as compliance with the NSA terms and timely claim resolution is mandatory.
-
-Please confirm receipt of this email and provide an update on the status of the reprocessing at your earliest convenience. Should you require additional information or documentation, I am available to assist promptly.
-
-Thank you for your cooperation.
--------------------------------
-${name}
-Collection & Project, BCBS`;
-
-        note = `${finalDateStr}>NSA FOLLOW UP>${init}>WORKING ON NSA ACCEPTED ACCOUNTS. WE ACCEPTED BCBS COUNTER OFFER OF ${amt} On ${dat}. AFTER SENDING THE FIRST EMAIL, WE DID NOT GET THE EXPECTED AMOUNT. SECOND FOLLOW-UP EMAIL SENT TO: <nsa.disputes@bcbstx.com> ON ${finalDateStr} FOR BCBS ATTENTION.`;
-    }
-
-    // 5. Output with Animation
-    document.getElementById('outSub').value = subject;
-    
-    // Typewriter effect
-    typeWriter('outBody', body);
-    typeWriter('outNote', note);
-
-    alertCopy('Generated Successfully!', '#6366f1');
-}
-
-function typeWriter(elementId, text) {
-    const el = document.getElementById(elementId);
-    el.value = ''; // Clear first
-    let i = 0;
-    el.style.height = 'auto'; // Reset height
-    el.style.height = (el.scrollHeight) + 'px'; // Expand
-
-    const interval = setInterval(() => {
-        el.value += text.charAt(i);
-        el.scrollTop = el.scrollHeight; 
-        i++;
-        if (i >= text.length) clearInterval(interval);
-    }, 2); // 2ms speed
-}
-
-/* --- UTILS --- */
-function copyField(el){
-    if(!el.value) return;
-    el.select();
-    el.setSelectionRange(0, 99999); /* For mobile devices */
-    
-    // Fallback attempt
-    try {
-        navigator.clipboard.writeText(el.value).then(() => {
-            alertCopy('Copied!', '#10b981');
-        }, () => {
-             document.execCommand('copy'); // Fallback
-             alertCopy('Copied!', '#10b981');
-        });
-    } catch (err) {
-        document.execCommand('copy');
-        alertCopy('Copied!', '#10b981');
-    }
-}
-
-function alertCopy(msg, color){
-    const t = document.getElementById('copyMsg');
-    t.innerHTML = `<i class="bi bi-check-circle-fill"></i> <span>${msg}</span>`;
-    t.style.background = color;
-    t.style.opacity = '1';
-    t.style.color = 'white';
-    setTimeout(()=>t.style.opacity='0', 2500);
-}
-
-document.getElementById('clearBtn').addEventListener('click', ()=>{
-    // Clear Paste Boxes
-    document.getElementById('pasteEOB').value = '';
-    document.getElementById('pasteNeg').value = '';
-    // Clear Inputs (Except Name/Init)
-    document.getElementById('inpDisp').value = '';
-    document.getElementById('inpDate').value = '';
-    document.getElementById('inpType').value = '1';
-    // Clear Outputs
-    document.getElementById('outSub').value = '';
-    document.getElementById('outBody').value = '';
-    document.getElementById('outNote').value = '';
-    // Reset Data
-    extractedData = { ticket: '--', claim: '--', group: '--', mem: '--', dat: '--', amt: '--' };
-    ['tic','clm','grp','mem','dat','amt'].forEach(k => document.getElementById(`res_${k}`).innerText = '--');
-    
-    alertCopy('Cleared! (Name saved)', '#ef4444');
-});
-</script>
 </body>
 </html>
