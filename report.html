@@ -1,473 +1,176 @@
-
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pranto's Workspace - Report Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Workspace Moved</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Auto Redirect (10 seconds) with NEW LINK -->
+    <meta http-equiv="refresh" content="10;url=https://script.google.com/macros/s/AKfycbw_h5AwpnpuzaAlNzIHQ96AwlPFSLNivtQgPJLUlLOuXjcLzfPnrJUTlBmKi3EsDb1N/exec">
+
     <style>
-        /* =========================================
-           PURE DARK PREMIUM VARIABLES & FONTS
-           ========================================= */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-        
         :root {
-            --font-head: 'Outfit', sans-serif;
-            --font-body: 'Inter', sans-serif;
-            --font-num: 'Space Grotesk', monospace;
-/* Primary Colors - Original tone but slightly more vibrant */
-    --primary: #6366f1;       
-    --primary-rgb: 99, 102, 241;
-    --secondary: #0ea5e9;     
-    --accent: #f43f5e;        
-    
-    /* Soft Dark Background (Not pure black) */
-    --bg-color: #121218; /* Halka navy-gray mixed deep dark */
-    --glass-bg: rgba(30, 30, 40, 0.6); /* Card gulo ekhon ektu light hobe */
-    --glass-border: 1px solid rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-    --input-bg: rgba(40, 40, 50, 0.7); /* Input field gulo background theke arektu light */
-    
-    /* Text Colors */
-    --text-main: #e2e8f0; /* Pure white na, soft white */
-    --text-sub: #94a3b8;
+            --primary: #4f46e5;
+            --secondary: #0ea5e9;
+            /* Light Theme Variables */
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #0f172a;
+            --text-sub: #475569;
         }
 
-        body { 
-            font-family: var(--font-body); 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow-x: hidden; 
-        }
-
-        /* Ambient Background */
-        .bg-mesh { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-        .blob { position: absolute; filter: blur(100px); opacity: 0.3; border-radius: 50%; animation: floatBlob 20s infinite alternate ease-in-out; }
-        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: rgba(99, 102, 241, 0.15); }
-        .blob-2 { bottom: -20%; right: -10%; width: 600px; height: 600px; background: rgba(244, 63, 94, 0.1); }
-        .blob-3 { top: 40%; left: 40%; width: 400px; height: 400px; background: rgba(14, 165, 233, 0.1); }
-        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
-
-        .font-head { font-family: var(--font-head); }
-        .font-num { font-family: var(--font-num); letter-spacing: -0.5px; }
-        .text-gradient { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* Glass Panel */
-        .glass-panel { 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px); 
-            border: var(--glass-border); 
-            box-shadow: var(--glass-shadow); 
-            border-radius: 16px; 
-            transition: all 0.3s ease; 
-        }
-        
-        /* Navbar */
-        .nav-wrapper { position: fixed; top: 15px; left: 0; width: 100%; z-index: 50; display: flex; justify-content: center; padding: 0 20px; }
-        .nav-pill { width: 100%; max-width: 1400px; height: 55px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-radius: 100px; background: var(--glass-bg); backdrop-filter: blur(30px); border: var(--glass-border); box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
-        .nav-item { text-decoration: none; color: var(--text-sub); font-weight: 700; font-size: 0.85rem; transition: 0.3s; position: relative; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-item:hover, .nav-item.active { color: var(--primary); }
-        .nav-item.active::after { content:''; position:absolute; bottom:-6px; left:0; width:100%; height:3px; background:var(--primary); border-radius:10px; }
-
-        /* Clock */
-        .live-clock { font-family: var(--font-num); font-weight: 700; font-size: 0.9rem; color: var(--secondary); background: rgba(14, 165, 233, 0.1); padding: 5px 16px; border-radius: 20px; border: 1px solid rgba(14, 165, 233, 0.2); letter-spacing: 1px; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.4); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.8); }
-
-        /* Input area */
-        .custom-input {
-            background: rgb(0 0 0 / 80%);
-            border: 1px solid rgba(255,255,255,0.1);
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.08) 0px, transparent 50%);
             color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            padding: 40px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            animation: floatUp 0.6s ease-out;
+        }
+
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(79,70,229,0.1), rgba(14,165,233,0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--secondary);
+            font-size: 2.5rem;
+            border: 1px solid rgba(14,165,233,0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(14,165,233, 0.2); }
+            70% { box-shadow: 0 0 0 15px rgba(14,165,233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14,165,233, 0); }
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0 10px;
+            background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 1rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .highlight {
+            color: #0f172a;
+            font-weight: 700;
+            background: rgba(79, 70, 229, 0.1);
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        .btn-premium {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: 700;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            border-bottom: 3px solid #3730a3;
+            width: 100%;
+            box-sizing: border-box;
         }
-        .custom-input:focus {
-            border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-            outline: none;
-        }
-        
-        .tag-btn {
-            transition: all 0.2s ease;
-            opacity: 0.4;
-            cursor: not-allowed;
-            filter: grayscale(0.8);
-            flex-shrink: 0;
-        }
-        .tag-btn.enabled {
-            opacity: 1;
-            cursor: pointer;
-            filter: grayscale(0);
-        }
-        .tag-btn.enabled:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
-        .tag-btn:active { transform: scale(0.95); }
 
-        /* Accordion Header */
-        .date-header {
-            cursor: pointer;
-            transition: all 0.2s;
-            background: rgba(15, 15, 20, 0.6);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .date-header:hover { background: rgba(25, 25, 30, 0.9); }
-        .date-icon { transition: transform 0.3s ease; }
-        .date-collapsed .date-icon { transform: rotate(-90deg); }
-        .date-content { transition: max-height 0.3s ease-out; overflow: hidden; }
-        .date-collapsed + .date-content { max-height: 0 !important; }
-
-        /* Grid Data Items */
-        .data-item {
-            background: rgba(15, 15, 20, 0.5);
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.2s;
-        }
-        .data-item:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.1);
+        .btn-premium:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+            filter: brightness(1.1);
+            border-bottom-width: 1px;
+            margin-bottom: 2px;
+            color: white;
         }
-        
-        .btn-action { transition: all 0.2s; }
-        .btn-action:hover { transform: scale(1.15); color: var(--accent); }
+
+        .btn-premium:active {
+            transform: translateY(1px);
+            border-bottom-width: 0;
+            margin-bottom: 3px;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: rgba(71, 85, 105, 0.7);
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Ambient Background -->
-    <div class="bg-mesh">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
+    <div class="container">
+        <div class="icon-box">
+            <i class="bi bi-rocket-takeoff-fill"></i>
+        </div>
+        
+        <h1>We Have Moved!</h1>
+        
+        <p>This legacy workspace has been <span class="highlight">closed and relocated</span> to a new, faster, and more secure cloud server. Please save the new page link for future access.</p>
+        
+        <!-- Redirect Button to NEW Apps Script Web App -->
+        <a href="https://script.google.com/macros/s/AKfycbw_h5AwpnpuzaAlNzIHQ96AwlPFSLNivtQgPJLUlLOuXjcLzfPnrJUTlBmKi3EsDb1N/exec" class="btn-premium">
+            Access New Workspace <i class="bi bi-arrow-right-circle-fill"></i>
+        </a>
+        
+        <div class="footer-note">
+            * You will be redirected automatically in 10 seconds.
+        </div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="nav-wrapper">
-        <div class="nav-pill">
-            <div class="font-head fw-bold text-xl text-gradient tracking-tight">Pranto's Workspace</div>
-            
-            <div class="flex gap-6 items-center">
-                <a href="index.html" class="nav-item"><i class="fas fa-home mr-1"></i> Home</a>
-                <a href="#" class="nav-item active"><i class="fas fa-chart-bar mr-1"></i> Report Pro</a>
-            </div>
-            
-            <div class="flex items-center gap-4">
-                <!-- Shift Toggle -->
-                <div class="flex bg-[rgba(15,15,20,0.8)] p-1 rounded-full border border-[rgba(255,255,255,0.1)]">
-                    <button id="dayBtn" onclick="setShift('Day')" class="px-3 py-1 rounded-full text-[10px] font-bold transition-all bg-[#6366f1] text-white shadow-md">
-                        <i class="fas fa-sun mr-1"></i> Day
-                    </button>
-                    <button id="nightBtn" onclick="setShift('Night')" class="px-3 py-1 rounded-full text-[10px] font-bold transition-all text-[var(--text-sub)] hover:text-white">
-                        <i class="fas fa-moon mr-1"></i> Night
-                    </button>
-                </div>
-                <!-- Live Clock -->
-                <div id="liveClock" class="live-clock shadow-lg">00:00:00</div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="w-full max-w-[1400px] mx-auto mt-[90px] mb-8 px-4 flex-grow flex flex-col gap-4">
-        
-        <!-- TOP SECTION: Expanded Input, Visible Tags & Summary Grid -->
-        <div class="glass-panel p-5 flex flex-col lg:flex-row gap-6 items-start">
-            
-            <!-- 1. Compact Input Box (Larger Width) -->
-            <div class="w-full lg:w-[25%]">
-                <div class="text-[11px] font-bold text-[var(--text-sub)] uppercase tracking-widest mb-2 ml-1"><i class="fas fa-keyboard mr-1 text-[#6366f1]"></i> Paste IDs</div>
-                <input type="text" id="ticketInput" oninput="handleInput()" placeholder="Space or comma separated..." class="custom-input w-full rounded-xl px-4 py-3 text-[13px] font-num shadow-inner min-h-[150px]">
-            </div>
-
-            <!-- 2. Fully Visible Tags (Flex Wrap) -->
-            <div class="w-full lg:w-[35%]">
-                <div class="text-[11px] font-bold text-[var(--text-sub)] uppercase tracking-widest mb-2 ml-1"><i class="fas fa-tags mr-1 text-[#0ea5e9]"></i> Select Category</div>
-                <div id="tagContainer" class="flex flex-wrap gap-2 w-full">
-                    <!-- Tags generated by JS -->
-                </div>
-            </div>
-
-            <!-- 3. Summary (Grid of All Categories) -->
-            <div class="w-full lg:w-[40%] lg:border-l border-[rgba(255,255,255,0.1)] lg:pl-6">
-                <div class="flex justify-between items-center mb-3">
-                    <span class="text-[11px] font-bold text-[var(--text-sub)] uppercase tracking-widest"><i class="fas fa-chart-pie mr-1 text-[#f43f5e]"></i> Summary</span>
-                    <span id="totalCount" class="font-num font-bold text-white bg-[#000000] px-2.5 py-0.5 rounded text-xs shadow-md border border-[rgba(255,255,255,0.1)]">0</span>
-                </div>
-                <div id="statsGrid" class="grid grid-cols-2 gap-2">
-                    <!-- Stats generated by JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- History Log (Collapsible by Date & 5-Column Data) -->
-        <div class="glass-panel overflow-hidden flex flex-col flex-grow mt-2 shadow-lg">
-            <div class="px-5 py-4 border-b border-[rgba(255,255,255,0.05)] flex justify-between items-center bg-[rgba(15,15,20,0.5)]">
-                <h3 class="font-head font-bold text-[14px] text-[var(--text-sub)] uppercase tracking-widest"><i class="fas fa-history text-[#f43f5e] mr-2"></i> Production History</h3>
-            </div>
-            
-            <div id="historyContainer" class="p-4 flex-grow overflow-y-auto custom-scroll h-[65vh]">
-                <!-- Date headers and grids generated by JS -->
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="py-4 bg-[rgba(20,20,25,0.4)] backdrop-blur-md border-t border-[rgba(255,255,255,0.05)] mt-auto text-center">
-        <div class="font-head font-bold text-sm text-gradient mb-1">Pranto's Workspace &copy; 2026</div>
-    </footer>
-
-    <!-- Scripts -->
-    <script>
-        const tags = [
-            { name: 'Appeal', color: 'from-blue-600 to-indigo-600' },
-            { name: 'Claim Review', color: 'from-purple-600 to-violet-600' },
-            { name: 'Negotiation', color: 'from-emerald-600 to-teal-600' },
-            { name: 'IDR', color: 'from-rose-600 to-pink-600' },
-            { name: 'TDI', color: 'from-orange-600 to-amber-600' },
-            { name: 'Offer letter', color: 'from-cyan-600 to-blue-600' },
-            { name: 'Complaint', color: 'from-red-600 to-orange-600' },
-            { name: 'PT Letter', color: 'from-indigo-600 to-purple-600' },
-            { name: 'Follow-up', color: 'from-teal-600 to-emerald-600' },
-            { name: 'Final Review', color: 'from-amber-600 to-red-600' }
-        ];
-
-        let shift = 'Day';
-        let production = JSON.parse(localStorage.getItem('pranto_report_pro_v2')) || [];
-        let expandedDates = new Set(); 
-
-        // Clock Function
-        function updateClock() {
-            const now = new Date();
-            const clockEl = document.getElementById('liveClock');
-            if(clockEl) {
-                clockEl.innerText = now.toLocaleTimeString('en-US', { hour12: false });
-            }
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        const todayStr = getShiftDate(shift);
-        if(!expandedDates.has(todayStr)) expandedDates.add(todayStr);
-
-        function getShiftDate(s) {
-            return new Intl.DateTimeFormat('en-GB', {
-                timeZone: s === 'Night' ? 'America/New_York' : 'Asia/Dhaka', 
-                day: '2-digit', month: 'short', year: 'numeric'
-            }).format(new Date());
-        }
-
-        function setShift(s) {
-            shift = s;
-            const dayBtn = document.getElementById('dayBtn');
-            const nightBtn = document.getElementById('nightBtn');
-            const activeClasses = ['bg-[#6366f1]', 'text-white', 'shadow-md'];
-            const inactiveClasses = ['text-[var(--text-sub)]', 'hover:text-white', 'bg-transparent'];
-
-            if(s === 'Day') {
-                dayBtn.classList.add(...activeClasses); dayBtn.classList.remove(...inactiveClasses);
-                nightBtn.classList.add(...inactiveClasses); nightBtn.classList.remove(...activeClasses);
-            } else {
-                nightBtn.classList.add(...activeClasses); nightBtn.classList.remove(...inactiveClasses);
-                dayBtn.classList.add(...inactiveClasses); dayBtn.classList.remove(...activeClasses);
-            }
-            
-            const newToday = getShiftDate(shift);
-            expandedDates.add(newToday);
-            renderAll();
-        }
-
-        function handleInput() {
-            const ticketInput = document.getElementById('ticketInput');
-            if(!ticketInput) return;
-            const val = ticketInput.value.trim();
-            document.querySelectorAll('.tag-btn').forEach(btn => {
-                if (val.length > 0) { btn.classList.add('enabled'); }
-                else { btn.classList.remove('enabled'); }
-            });
-        }
-
-        function addEntry(tagName) {
-            const ticketInput = document.getElementById('ticketInput');
-            const rawVal = ticketInput.value.trim();
-            if(!rawVal) return;
-
-            // Split by space, newline, or comma
-            const dataArray = rawVal.split(/[\s\n,]+/).filter(item => item.trim() !== '');
-            const currentDate = getShiftDate(shift);
-            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            dataArray.forEach(dataItem => {
-                production.unshift({
-                    id: Date.now() + Math.random(), 
-                    data: dataItem,
-                    tag: tagName,
-                    shift: shift,
-                    date: currentDate,
-                    time: currentTime
-                });
-            });
-
-            localStorage.setItem('pranto_report_pro_v2', JSON.stringify(production));
-            ticketInput.value = '';
-            expandedDates.add(currentDate); 
-            handleInput(); 
-            renderAll();
-        }
-
-        function deleteEntry(id) {
-            production = production.filter(p => p.id !== id);
-            localStorage.setItem('pranto_report_pro_v2', JSON.stringify(production));
-            renderAll();
-        }
-
-        function copyDate(d, e) {
-            e.stopPropagation(); 
-            const text = production.filter(p => p.date === d).map((p, i) => `${i + 1}. ${p.data} - ${p.tag}`).join('\n');
-            const el = document.createElement("textarea"); el.value = text;
-            document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            
-            const btn = document.querySelector(`[data-copy-btn="${d}"]`);
-            if(btn) {
-                const icon = btn.querySelector('i');
-                if(icon) {
-                    icon.className = 'fas fa-check text-green-400';
-                    setTimeout(() => { icon.className = 'fas fa-copy text-[#0ea5e9]'; }, 2000);
-                }
-            }
-        }
-
-        function toggleDate(d) {
-            if(expandedDates.has(d)) {
-                expandedDates.delete(d);
-            } else {
-                expandedDates.add(d);
-            }
-            renderHistory();
-        }
-
-        function renderAll() {
-            renderTags();
-            updateSummary();
-            renderHistory();
-        }
-
-        function renderTags() {
-            const container = document.getElementById('tagContainer');
-            if(!container) return;
-            container.innerHTML = '';
-            const ticketInput = document.getElementById('ticketInput');
-            const val = ticketInput ? ticketInput.value.trim() : '';
-            tags.forEach(t => {
-                const btn = document.createElement('button');
-                // Removed overflow restrictions, allowed full wrapping
-                btn.className = `tag-btn px-3.5 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider bg-gradient-to-r ${t.color} text-white border border-transparent shadow-sm ${val.length > 0 ? 'enabled' : ''}`;
-                btn.innerText = t.name;
-                btn.onclick = () => { if(btn.classList.contains('enabled')) addEntry(t.name); };
-                container.appendChild(btn);
-            });
-        }
-
-        function updateSummary() {
-            const statsGrid = document.getElementById('statsGrid');
-            if(!statsGrid) return;
-            const today = getShiftDate(shift);
-            const filtered = production.filter(p => p.date === today);
-            
-            const counts = {};
-            filtered.forEach(p => counts[p.tag] = (counts[p.tag] || 0) + 1);
-            
-            const tc = document.getElementById('totalCount');
-            if(tc) tc.innerText = filtered.length;
-            
-            // Show all tags in the summary grid
-            statsGrid.innerHTML = tags.map(t => {
-                const count = counts[t.name] || 0;
-                return `
-                    <div class="rounded-md px-2.5 py-1.0 flex justify-between items-center border transition-all ${count > 0 ? `bg-gradient-to-r ${t.color} border-transparent text-white shadow-sm` : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] text-[var(--text-sub)]'}">
-                        <span class="text-[12px] font-bold uppercase tracking-wider truncate mr-2">${t.name}</span>
-                        <span class="font-num font-bold text-[15px] ${count > 0 ? 'bg-white/20 text-white' : 'bg-black/30 text-[var(--text-sub)]'} px-1.5 rounded">${count}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderHistory() {
-            const container = document.getElementById('historyContainer');
-            if(!container) return;
-            container.innerHTML = '';
-            const grouped = {};
-            production.forEach(p => { if(!grouped[p.date]) grouped[p.date] = []; grouped[p.date].push(p); });
-            const sortedDates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a));
-            
-            if(sortedDates.length === 0) {
-                container.innerHTML = `<div class="py-12 text-center text-[var(--text-sub)] font-medium font-num opacity-50">No data recorded yet. Start tracking!</div>`;
-                return;
-            }
-
-            sortedDates.forEach(d => {
-                const isExpanded = expandedDates.has(d);
-                const section = document.createElement('div');
-                section.className = "mb-3 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)] bg-[rgba(15,15,20,0.3)] shadow-sm";
-                
-                // Accordion Header
-                const header = `
-                    <div class="date-header px-5 py-3 flex justify-between items-center ${!isExpanded ? 'date-collapsed' : ''}" onclick="toggleDate('${d}')">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-chevron-down date-icon text-[#6366f1] text-[12px]"></i>
-                            <h3 class="font-num font-bold text-[14px] tracking-wide text-white"><i class="fas fa-calendar-day mr-2 text-[var(--text-sub)]"></i>${d}</h3>
-                            <span class="text-[14px] font-bold text-white bg-[rgba(99,102,241,0.2)] px-2.5 py-0.5 rounded-md border border-[rgba(99,102,241,0.3)]">${grouped[d].length} Items</span>
-                        </div>
-                        <button data-copy-btn="${d}" onclick="copyDate('${d}', event)" class="btn-action text-[var(--text-sub)] hover:text-white p-1.5 bg-[rgba(255,255,255,0.05)] rounded-lg transition-colors shadow-sm" title="Copy All">
-                            <i class="fas fa-copy text-[#0ea5e9] text-sm"></i>
-                        </button>
-                    </div>
-                `;
-                
-                // Exactly 5-Column Grid Content (responsive)
-                let contentHTML = '';
-                if(isExpanded) {
-                    contentHTML = `
-                        <div class="p-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                            ${grouped[d].map((item, idx) => `
-                                <div class="data-item rounded-xl p-3 flex justify-between items-center group relative overflow-hidden">
-                                    <div class="flex items-center gap-2 overflow-hidden w-full pr-7">
-                                        <span class="text-[11px] font-black text-[#6366f1] w-5 text-right flex-shrink-0">#${grouped[d].length - idx}</span>
-                                        <span class="font-num text-[13px] text-white truncate font-semibold" style="max-width:calc(100% - 70px);">${item.data}</span>
-                                        <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-gradient-to-r ${tags.find(t=>t.name===item.tag)?.color} text-white flex-shrink-0 absolute right-[32px] shadow-sm">
-                                            ${item.tag.substring(0,6)}${item.tag.length>6?'..':''}
-                                        </span>
-                                    </div>
-                                    <button onclick="deleteEntry(${item.id})" class="btn-action text-[rgba(255,255,255,0.2)] group-hover:text-[#f43f5e] absolute right-2 p-1.5">
-                                        <i class="fas fa-times text-[11px]"></i>
-                                    </button>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                }
-
-                section.innerHTML = header + `<div class="date-content" style="max-height: ${isExpanded ? '5000px' : '0'};">${contentHTML}</div>`;
-                container.appendChild(section);
-            });
-        }
-
-        // Init
-        handleInput();
-        renderAll();
-    </script>
 </body>
 </html>
