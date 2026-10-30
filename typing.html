@@ -13,17 +13,18 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Auto Redirect (10 seconds) - Optional -->
-    <meta http-equiv="refresh" content="10;url=https://script.google.com/macros/s/AKfycbyHVVkeHWM52DYGITEU9QKjfC-6cJxHiISXdfBy1ZQMkHNxnm8THEge9DxqXFqt-26E/exec">
+    <!-- Auto Redirect (10 seconds) with NEW LINK -->
+    <meta http-equiv="refresh" content="10;url=https://script.google.com/macros/s/AKfycbw_h5AwpnpuzaAlNzIHQ96AwlPFSLNivtQgPJLUlLOuXjcLzfPnrJUTlBmKi3EsDb1N/exec">
 
     <style>
         :root {
             --primary: #4f46e5;
             --secondary: #0ea5e9;
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
+            /* Light Theme Variables */
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #0f172a;
+            --text-sub: #475569;
         }
 
         body {
@@ -36,8 +37,8 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.15) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.08) 0px, transparent 50%);
             color: var(--text-main);
             overflow: hidden;
         }
@@ -49,9 +50,9 @@
             background: var(--card-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
             text-align: center;
             animation: floatUp 0.6s ease-out;
         }
@@ -64,7 +65,7 @@
         .icon-box {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, rgba(79,70,229,0.2), rgba(14,165,233,0.2));
+            background: linear-gradient(135deg, rgba(79,70,229,0.1), rgba(14,165,233,0.1));
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -72,12 +73,12 @@
             margin: 0 auto 20px;
             color: var(--secondary);
             font-size: 2.5rem;
-            border: 1px solid rgba(14,165,233,0.3);
+            border: 1px solid rgba(14,165,233,0.2);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(14,165,233, 0.4); }
+            0% { box-shadow: 0 0 0 0 rgba(14,165,233, 0.2); }
             70% { box-shadow: 0 0 0 15px rgba(14,165,233, 0); }
             100% { box-shadow: 0 0 0 0 rgba(14,165,233, 0); }
         }
@@ -87,7 +88,7 @@
             font-size: 2rem;
             font-weight: 800;
             margin: 0 0 10px;
-            background: linear-gradient(135deg, #818cf8, #38bdf8);
+            background: linear-gradient(135deg, #4f46e5, #0ea5e9);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -97,12 +98,15 @@
             color: var(--text-sub);
             line-height: 1.6;
             margin-bottom: 30px;
-            font-weight: 400;
+            font-weight: 500;
         }
 
         .highlight {
-            color: #f8fafc;
-            font-weight: 600;
+            color: #0f172a;
+            font-weight: 700;
+            background: rgba(79, 70, 229, 0.1);
+            padding: 2px 6px;
+            border-radius: 6px;
         }
 
         .btn-premium {
@@ -118,7 +122,7 @@
             font-size: 1.1rem;
             font-weight: 700;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
             border-bottom: 3px solid #3730a3;
             width: 100%;
             box-sizing: border-box;
@@ -126,10 +130,11 @@
 
         .btn-premium:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.6);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
             filter: brightness(1.1);
             border-bottom-width: 1px;
             margin-bottom: 2px;
+            color: white;
         }
 
         .btn-premium:active {
@@ -141,7 +146,8 @@
         .footer-note {
             margin-top: 20px;
             font-size: 0.8rem;
-            color: rgba(148, 163, 184, 0.6);
+            color: rgba(71, 85, 105, 0.7);
+            font-weight: 500;
         }
     </style>
 </head>
@@ -156,8 +162,8 @@
         
         <p>This legacy workspace has been <span class="highlight">closed and relocated</span> to a new, faster, and more secure cloud server. Please save the new page link for future access.</p>
         
-        <!-- Redirect Button to Apps Script Web App -->
-        <a href="https://script.google.com/macros/s/AKfycbyHVVkeHWM52DYGITEU9QKjfC-6cJxHiISXdfBy1ZQMkHNxnm8THEge9DxqXFqt-26E/exec" class="btn-premium">
+        <!-- Redirect Button to NEW Apps Script Web App -->
+        <a href="https://script.google.com/macros/s/AKfycbw_h5AwpnpuzaAlNzIHQ96AwlPFSLNivtQgPJLUlLOuXjcLzfPnrJUTlBmKi3EsDb1N/exec" class="btn-premium">
             Access New Workspace <i class="bi bi-arrow-right-circle-fill"></i>
         </a>
         
